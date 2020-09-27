@@ -1,0 +1,43 @@
+# build output 
+# x64
+src/x64/
+src/botlib/x64/
+src/cgame/x64/
+src/extractfuncs/x64/
+src/game/x64/
+src/renderer/x64/
+src/splines/x64/
+src/ui/x64/
+
+# debug
+src/Debug/
+src/botlib/Debug/
+src/cgame/Debug/
+src/extractfuncs/Debug/
+src/extractfuncs/extractfuncs.exe
+src/extractfuncs/extractfuncs.ilk
+src/game/Debug/
+src/renderer/Debug/
+src/splines/Debug/
+src/ui/Debug/
+
+# release
+src/Release/
+src/botlib/Release/
+src/cgame/Release/
+src/extractfuncs/Release/
+src/game/Release/
+src/renderer/Release/
+src/splines/Release/
+src/ui/Release/
+
+
+# Visual Studio output
+src/.vs/
+src/Backup/
+src/UpgradeLog.htm
+src/*.vcxproj.user
+src/*/*.vcxproj.user
+
+# Visual Studio Code
+.vscode/
