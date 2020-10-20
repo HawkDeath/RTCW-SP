@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -42,7 +42,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../game/q_shared.h"
 #include "../game/botlib.h"
 #include "be_interface.h"            //for botimport.Print
-
+// clang-format on
 
 // FIXME: byte swap?
 

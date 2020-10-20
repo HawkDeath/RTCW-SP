@@ -27,10 +27,11 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // cl_cgame.c  -- client system interaction with client game
-
+// clang-format off
 #include "client.h"
 
 #include "../game/botlib.h"
+// clang-format on
 
 extern botlib_export_t *botlib_export;
 
@@ -55,6 +56,7 @@ void CL_GetGameState( gameState_t *gs ) {
 /*
 ====================
 CL_GetGlconfig
+
 ====================
 */
 void CL_GetGlconfig( glconfig_t *glconfig ) {

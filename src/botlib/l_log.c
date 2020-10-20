@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -43,6 +43,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../game/botlib.h"
 #include "be_interface.h"            //for botimport.Print
 #include "l_libvar.h"
+// clang-format on
 
 #define MAX_LOGFILENAMESIZE     1024
 

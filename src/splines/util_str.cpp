@@ -28,11 +28,13 @@ If you have questions concerning this license or the applicable additional terms
 
 //need to rewrite this
 
+// clang-format off
 #include "util_str.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+// clang-format on
 
 #ifdef _WIN32
 #pragma warning(disable : 4244) // 'conversion' conversion from 'type1' to 'type2', possible loss of data

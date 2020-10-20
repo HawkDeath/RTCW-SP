@@ -33,9 +33,10 @@ If you have questions concerning this license or the applicable additional terms
 // Programmer:		Ridah
 // Tab Size:		4 (real tabs)
 //===========================================================================
-
+// clang-format off
 #include "../game/g_local.h"
 #include "../game/q_shared.h"
+// clang-format on
 
 /*
 Contains the code to handle the various commands available with an event script.

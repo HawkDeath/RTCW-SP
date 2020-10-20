@@ -24,11 +24,11 @@
 #define AHANGLES_H
 
 
-
+// clang-format off
 #include "ahtypes.h"
 
 #include "ftobjs.h"
-
+// clang-format on
 
 /* PI expressed in ah_angles -- we don't really need an important */
 /* precision, so 256 should be enough                             */

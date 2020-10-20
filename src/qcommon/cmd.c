@@ -27,9 +27,10 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // cmd.c -- Quake script command processing module
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "qcommon.h"
+// clang-format on
 
 #define MAX_CMD_BUFFER  16384
 #define MAX_CMD_LINE    1024

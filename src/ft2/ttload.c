@@ -16,15 +16,14 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ftdebug.h"
 #include "tterrors.h"
 #include "tttags.h"
 
-
 #include "ttload.h"
 #include "ttcmap.h"
-
+// clang-format on
 
 /*************************************************************************/
 /*                                                                       */

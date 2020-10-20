@@ -41,6 +41,7 @@
 
 
 /* Include the header file containing all developer build options */
+// clang-format off
 #include "ftoption.h"
 
 
@@ -58,6 +59,7 @@
 
 /* We use <limits.h> values to know the sizes of the types.  */
 #include <limits.h>
+// clang-format on
 
 /* The number of bytes in an `int' type.  */
 #if   UINT_MAX == 0xFFFFFFFF

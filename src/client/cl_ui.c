@@ -26,10 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include "client.h"
 
 #include "../game/botlib.h"
+// clang-format on
 
 extern botlib_export_t *botlib_export;
 

@@ -27,9 +27,10 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // g_bot.c
-
+// clang-format off
 #include "g_local.h"
 #include "../botai/botai.h"
+// clang-format on
 
 
 static int g_numBots;

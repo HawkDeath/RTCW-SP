@@ -28,11 +28,12 @@ If you have questions concerning this license or the applicable additional terms
 
 #ifndef __MATH_ANGLES_H__
 #define __MATH_ANGLES_H__
-
+// clang-format off
 #include <stdlib.h>
 #include <assert.h>
 
 #include "math_vector.h"
+// clang-format on
 
 class mat3_t;
 class quat_t;

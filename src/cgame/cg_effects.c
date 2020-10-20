@@ -29,7 +29,9 @@ If you have questions concerning this license or the applicable additional terms
 // cg_effects.c -- these functions generate localentities, usually as a result
 // of event processing
 
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 
 /*

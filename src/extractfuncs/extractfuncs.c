@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -40,6 +40,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "l_script.h"
 #include "l_precomp.h"
 #include "l_log.h"
+// clang-format on
 
 typedef enum {false, true}  qboolean;
 

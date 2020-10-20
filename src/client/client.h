@@ -27,7 +27,7 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // client.h -- primary header for client
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "../renderer/tr_public.h"
@@ -36,6 +36,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "snd_public.h"
 #include "../cgame/cg_public.h"
 #include "../game/bg_public.h"
+// clang-format on
 
 #define RETRANSMIT_TIMEOUT  3000    // time between connection packet retransmits
 

@@ -15,16 +15,15 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ftdebug.h"
 #include "ftcalc.h"
 #include "ftsystem.h"
 
-
 #include "ttinterp.h"
 
 #include "tterrors.h"
-
+// clang-format on
 
 #ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
 

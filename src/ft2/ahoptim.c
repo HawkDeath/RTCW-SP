@@ -30,12 +30,12 @@
 /*                                                                       */
 /*************************************************************************/
 
-
+// clang-format off
 #include "ftobjs.h"  /* for ALLOC_ARRAY() and FREE() */
 
 
 #include "ahoptim.h"
-
+// clang-format on
 
 /* define this macro to use brute force optimisation -- this is slow,  */
 /* but a good way to perfect the distortion function `by hand' through */
@@ -59,11 +59,11 @@
 
 
 #ifdef AH_DEBUG_OPTIM
-
+// clang-format off
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-
+// clang-format on
 #define FLOAT( x )  ( (float)( ( x ) / 64.0 ) )
 
 static

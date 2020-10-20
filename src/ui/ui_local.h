@@ -29,6 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __UI_LOCAL_H__
 #define __UI_LOCAL_H__
 
+// clang-format off
 //#include <string.h>
 //#include <ctype.h>
 //#include <limits.h>
@@ -39,6 +40,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "keycodes.h"
 #include "../game/bg_public.h"
 #include "ui_shared.h"
+// clang-format on
 
 extern vmCvar_t ui_ffa_fraglimit;
 extern vmCvar_t ui_ffa_timelimit;

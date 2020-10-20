@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "win_local.h"
@@ -39,6 +39,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <direct.h>
 #include <io.h>
 #include <conio.h>
+// clang-format on
 
 /*
 ================

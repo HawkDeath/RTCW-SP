@@ -29,12 +29,13 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
 
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "../cgame/tr_types.h"
 #include "keycodes.h"
 
 #include "../../main/ui/menudef.h"
+// clang-format on
 
 #define MAX_MENUNAME 32
 #define MAX_ITEMTEXT 64

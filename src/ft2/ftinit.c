@@ -36,7 +36,7 @@
 /*                                                                       */
 /*************************************************************************/
 
-
+// clang-format off
 #include "ftconfig.h"
 #include "ftobjs.h"
 #include "ftdebug.h"
@@ -46,6 +46,7 @@
 #include "sfdriver.h"
 #include "ftsmooth.h"
 #include "ftrend1.h"
+// clang-format on
 
 /*************************************************************************/
 /*                                                                       */

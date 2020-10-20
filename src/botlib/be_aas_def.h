@@ -168,9 +168,11 @@ typedef struct aas_reversedreachability_s
 	aas_reversedlink_t *first;
 } aas_reversedreachability_t;
 
+// clang-format off
 // Ridah, route-tables
 #include "be_aas_routetable.h"
 // done.
+// clang-format on
 
 typedef struct aas_s
 {

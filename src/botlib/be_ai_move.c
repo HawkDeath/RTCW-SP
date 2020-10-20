@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "l_memory.h"
 #include "l_libvar.h"
@@ -51,6 +51,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../game/be_ea.h"
 #include "../game/be_ai_goal.h"
 #include "../game/be_ai_move.h"
+// clang-format on
 
 
 //#define DEBUG_AI_MOVE

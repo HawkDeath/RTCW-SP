@@ -19,10 +19,10 @@
 #ifndef FTMEMORY_H
 #define FTMEMORY_H
 
-
+// clang-format off
 #include "ftconfig.h"
 #include "fttypes.h"
-
+// clang-format on
 
 /*************************************************************************/
 /*                                                                       */

@@ -26,10 +26,12 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+// clang-format off
 #include <float.h>
 
 #include "../client/snd_local.h"
 #include "win_local.h"
+// clang-format on
 
 HRESULT ( WINAPI * pDirectSoundCreate )( GUID FAR *lpGUID, LPDIRECTSOUND FAR *lplpDS, IUnknown FAR *pUnkOuter );
 #define iDirectSoundCreate( a,b,c )   pDirectSoundCreate( a,b,c )

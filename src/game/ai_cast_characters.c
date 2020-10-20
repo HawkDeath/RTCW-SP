@@ -33,7 +33,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  * $Archive: /Wolf5/src/game/ai_cast_characters.c $
 */
-
+// clang-format off
 #include "g_local.h"
 #include "../game/botlib.h"      //bot lib interface
 #include "../game/be_aas.h"
@@ -44,6 +44,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../botai/botai.h"          //bot ai interface
 
 #include "ai_cast.h"
+// clang-format on
 
 //---------------------------------------------------------------------------
 // Character specific attributes (defaults, these can be altered in the editor (TODO!))

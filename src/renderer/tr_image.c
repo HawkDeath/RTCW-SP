@@ -32,7 +32,7 @@ If you have questions concerning this license or the applicable additional terms
  * desc:
  *
 */
-
+// clang-format off
 #include "tr_local.h"
 
 /*
@@ -45,7 +45,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #define JPEG_INTERNALS
 #include "../jpeg-6/jpeglib.h"
-
+// clang-format on
 
 static void LoadBMP( const char *name, byte **pic, int *width, int *height );
 static void LoadTGA( const char *name, byte **pic, int *width, int *height );

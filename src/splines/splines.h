@@ -28,7 +28,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #ifndef __SPLINES_H
 #define __SPLINES_H
-
+// clang-format off
 extern "C" {
 #ifdef Q3RADIANT
   #include "../qgl.h"
@@ -39,6 +39,7 @@ extern "C" {
 #include "util_list.h"
 #include "util_str.h"
 #include "math_vector.h"
+// clang-format on
 
 typedef int fileHandle_t;
 

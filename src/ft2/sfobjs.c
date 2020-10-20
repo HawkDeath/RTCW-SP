@@ -16,14 +16,14 @@
 /***************************************************************************/
 
 
-
+// clang-format off
 #include "sfobjs.h"
-
 
 #include "sfnt.h"
 #include "psnames.h"
 #include "ttnameid.h"
 #include "tterrors.h"
+// clang-format on
 
 
 /*************************************************************************/

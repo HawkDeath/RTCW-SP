@@ -17,9 +17,10 @@
 /*  Note that this license is compatible with the FreeType license.        */
 /*                                                                         */
 /***************************************************************************/
-
+// clang-format off
 #include "ahglobal.h"
 #include "ahglyph.h"
+// clang-format on
 
 #define MAX_TEST_CHARACTERS  12
 

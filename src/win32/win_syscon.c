@@ -26,6 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+// clang-format off
 // win_syscon.h
 #include "../client/client.h"
 #include "win_local.h"
@@ -37,6 +38,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <direct.h>
 #include <io.h>
 #include <conio.h>
+// clang-format on
 
 #define COPY_ID         1
 #define QUIT_ID         2

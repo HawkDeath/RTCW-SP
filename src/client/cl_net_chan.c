@@ -26,10 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "client.h"
+// clang-format on
 
 #if DO_NET_ENCODE
 /*

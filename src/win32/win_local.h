@@ -27,7 +27,7 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // win_local.h: Win32-specific Quake3 header file
-
+// clang-format off
 #if defined ( _MSC_VER ) && ( _MSC_VER >= 1200 )
 #pragma warning(disable : 4201)
 #pragma warning( push )
@@ -49,6 +49,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #include <winsock.h>
 #include <wsipx.h>
+// clang-format on
 
 #ifdef DOOMSOUND    ///// (SA)DOOMSOUND
 #ifdef __cplusplus

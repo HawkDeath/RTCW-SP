@@ -26,10 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include <limits.h>
 
 #include "g_local.h"
+// clang-format on
 
 typedef struct teamgame_s
 {

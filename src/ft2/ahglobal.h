@@ -22,10 +22,11 @@
 
 #ifndef AHGLOBAL_H
 #define AHGLOBAL_H
-
+// clang-format off
 #include "ahtypes.h"
 
 #include "ftobjs.h"
+// clang-format on
 
 #define AH_IS_TOP_BLUE( b )  ( ( b ) == ah_blue_capital_top || \
 							   ( b ) == ah_blue_small_top   )

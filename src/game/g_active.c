@@ -26,11 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include "g_local.h"
 
 #include "ai_cast_fight.h"   // need these for avoidance
-
+// clang-format on
 
 extern void G_CheckForCursorHints( gentity_t *ent );
 

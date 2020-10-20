@@ -15,7 +15,7 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ftdebug.h"
 #include "ftcalc.h"
 #include "ftstream.h"
@@ -23,9 +23,8 @@
 #include "tttags.h"
 #include "ftoutln.h"
 
-
 #include "ttgload.h"
-
+// clang-format on
 
 /*************************************************************************/
 /*                                                                       */

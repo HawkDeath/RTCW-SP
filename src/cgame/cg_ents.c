@@ -33,8 +33,9 @@ If you have questions concerning this license or the applicable additional terms
  *
 */
 
-
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 ///////////////////////
 extern int propellerModel;

@@ -26,9 +26,10 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include "../client/client.h"
 #include "win_local.h"
+// clang-format on
 
 WinVars_t g_wv;
 

@@ -34,13 +34,14 @@ If you have questions concerning this license or the applicable additional terms
 // Last update:  1997-12-31
 // Tab Size:     3
 //===========================================================================
-
+// clang-format off
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #define MAX_QPATH 64
 #include "../bspc/qbsp.h"
+// clang-format on
 
 #define MAX_LOGFILENAMESIZE     1024
 

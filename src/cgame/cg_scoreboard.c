@@ -27,7 +27,9 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // cg_scoreboard -- draw the scoreboard on top of the game screen
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 
 #define SCOREBOARD_WIDTH    ( 31 * BIGCHAR_WIDTH )

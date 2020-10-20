@@ -33,7 +33,7 @@ If you have questions concerning this license or the applicable additional terms
 // Programmer:		Ridah
 // Tab Size:		4 (real tabs)
 //===========================================================================
-
+// clang-format off
 #include "../game/g_local.h"
 #include "../game/q_shared.h"
 #include "../game/botlib.h"      //bot lib interface
@@ -46,6 +46,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../botai/botai.h"          //bot ai interface
 
 #include "ai_cast.h"
+// clang-format on
 
 /*
 Support routines for the Decision Making layer.

@@ -18,13 +18,13 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ahhint.h"
 #include "ahglyph.h"
 #include "ahangles.h"
 
 #include "ftoutln.h"
-
+// clang-format on
 
 #define FACE_GLOBALS( face )  ( (AH_Face_Globals*)( face )->autohint.data )
 

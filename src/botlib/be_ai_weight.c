@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "l_memory.h"
 #include "l_log.h"
@@ -49,6 +49,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "be_aas_funcs.h"
 #include "be_interface.h"
 #include "be_ai_weight.h"
+// clang-format on
 
 #define MAX_INVENTORYVALUE          999999
 #define EVALUATERECURSIVELY

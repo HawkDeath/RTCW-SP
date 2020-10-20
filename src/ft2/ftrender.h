@@ -19,9 +19,10 @@
 #ifndef FTRENDER_H
 #define FTRENDER_H
 
+// clang-format off
 #include "ftmodule.h"
 #include "ftglyph.h"
-
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

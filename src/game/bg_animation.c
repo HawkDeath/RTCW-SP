@@ -36,9 +36,10 @@ If you have questions concerning this license or the applicable additional terms
 //	reference system and other bits and pieces.
 //
 //===========================================================================
-
+// clang-format off
 #include "q_shared.h"
 #include "bg_public.h"
+// clang-format on
 
 // debug defines, to prevent doing costly string cvar lookups
 //#define	DBGANIMS

@@ -32,8 +32,9 @@ If you have questions concerning this license or the applicable additional terms
  * desc:		handle the media and animation for player entities
  *
 */
-
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 #define SWING_RIGHT 1
 #define SWING_LEFT  2

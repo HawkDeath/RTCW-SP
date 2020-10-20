@@ -32,7 +32,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #ifndef __QGL_H__
 #define __QGL_H__
-
+// clang-format off
 #if defined( __LINT__ )
 
 #include <GL/gl.h>
@@ -74,7 +74,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <gl.h>
 
 #endif
-
+// clang-format on
 
 #ifndef APIENTRY
 #define APIENTRY

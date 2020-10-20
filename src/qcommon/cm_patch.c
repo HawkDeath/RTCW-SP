@@ -26,9 +26,10 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include "cm_local.h"
 #include "cm_patch.h"
+// clang-format on
 
 /*
 

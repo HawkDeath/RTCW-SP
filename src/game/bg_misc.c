@@ -33,10 +33,10 @@ If you have questions concerning this license or the applicable additional terms
  *
 */
 
-
+// clang-format off
 #include "q_shared.h"
 #include "bg_public.h"
-
+// clang-format on
 
 #ifdef CGAMEDLL
 extern vmCvar_t cg_gameType;

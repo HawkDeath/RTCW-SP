@@ -44,7 +44,7 @@ If you have questions concerning this license or the applicable additional terms
 //#define QUAKE
 //#define QUAKEC
 //#define MEQCC
-
+// clang-format off
 #ifdef SCREWUP
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,7 +100,7 @@ typedef enum {qfalse, qtrue}    qboolean;
 #if defined( QUAKE ) && !defined( BSPC )
 #include "l_utils.h"
 #endif //QUAKE
-
+// clang-format on
 //#define DEBUG_EVAL
 
 #define MAX_DEFINEPARMS         128

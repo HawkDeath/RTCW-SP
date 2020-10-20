@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/g_local.h"
 #include "../game/botlib.h"
 #include "../game/be_aas.h"
@@ -57,6 +57,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "inv.h"         //indexes into the inventory
 #include "syn.h"         //synonyms
 #include "match.h"           //string matching types and vars
+// clang-format on
 
 //goal flag, see be_ai_goal.h for the other GFL_*
 #define GFL_AIR         16

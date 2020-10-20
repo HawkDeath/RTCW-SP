@@ -24,7 +24,7 @@
 /*                                                                       */
 /*************************************************************************/
 
-
+// clang-format off
 #include "ftconfig.h"
 #include "ftdebug.h"
 #include "ftsystem.h"
@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+// clang-format on
 
 /*************************************************************************/
 /*                                                                       */

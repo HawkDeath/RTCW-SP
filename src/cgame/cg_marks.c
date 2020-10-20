@@ -27,8 +27,9 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // cg_marks.c -- wall marks
-
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 /*
 ===================================================================

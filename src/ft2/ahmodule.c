@@ -18,12 +18,12 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ftmodule.h"
 
 
 #include "ahhint.h"
-
+// clang-format on
 
 typedef struct  FT_AutoHinterRec_
 {

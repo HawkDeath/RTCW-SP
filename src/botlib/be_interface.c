@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "l_memory.h"
 #include "l_log.h"
@@ -57,6 +57,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../game/be_ai_chat.h"
 #include "../game/be_ai_char.h"
 #include "../game/be_ai_gen.h"
+// clang-format on
 
 //library globals in a structure
 botlib_globals_t botlibglobals;

@@ -35,10 +35,11 @@ If you have questions concerning this license or the applicable additional terms
  *
  *****************************************************************************/
 
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "qcommon.h"
 #include "unzip.h"
+// clang-format on
 
 /*
 =============================================================================

@@ -43,7 +43,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma warning(disable : 4018) // signed/unsigned mismatch
 #pragma warning(disable : 4305) // truncate from double to float
 #endif
-
+// clang-format off
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -51,6 +51,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <ctype.h>
 #include <time.h>
 #include <stdarg.h>
+// clang-format on
 
 #ifndef __BYTEBOOL__
 #define __BYTEBOOL__

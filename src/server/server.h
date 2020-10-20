@@ -27,11 +27,12 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // server.h
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "../game/g_public.h"
 #include "../game/bg_public.h"
+// clang-format on
 
 //=============================================================================
 

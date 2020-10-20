@@ -31,9 +31,11 @@ If you have questions concerning this license or the applicable additional terms
 // bg_pmove.c -- both games player movement code
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
+// clang-format off
 #include "q_shared.h"
 #include "bg_public.h"
 #include "bg_local.h"
+// clang-format on
 
 // Rafael gameskill
 int bg_pmove_gameskill_integer;

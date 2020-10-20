@@ -36,7 +36,7 @@ If you have questions concerning this license or the applicable additional terms
  *****************************************************************************/
 
 #ifndef BSPCINCLUDE
-
+// clang-format off
 #include "be_aas_main.h"
 #include "be_aas_entity.h"
 #include "be_aas_sample.h"
@@ -52,5 +52,5 @@ If you have questions concerning this license or the applicable additional terms
 
 // Ridah, route-tables
 #include "be_aas_routetable.h"
-
+// clang-format on
 #endif //BSPCINCLUDE

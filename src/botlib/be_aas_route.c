@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "l_utils.h"
 #include "l_memory.h"
@@ -50,6 +50,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "be_aas_funcs.h"
 #include "be_interface.h"
 #include "be_aas_def.h"
+// clang-format on
 
 #define ROUTING_DEBUG
 

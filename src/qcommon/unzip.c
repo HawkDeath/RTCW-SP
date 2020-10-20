@@ -34,8 +34,10 @@ If you have questions concerning this license or the applicable additional terms
  *
  *****************************************************************************/
 
+// clang-format off
 #include "../client/client.h"
 #include "unzip.h"
+// clang-format on
 
 /* unzip.h -- IO for uncompress .zip files using zlib 
    Version 0.15 beta, Mar 19th, 1998,

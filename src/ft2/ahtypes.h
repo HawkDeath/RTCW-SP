@@ -23,10 +23,8 @@
 #ifndef AHTYPES_H
 #define AHTYPES_H
 
-
+// clang-format off
 #include "ftobjs.h"
-
-
 #include "ahloader.h"
 
 
@@ -36,7 +34,7 @@
 #ifdef AH_DEBUG
 
 #include <stdio.h>
-
+// clang-format on
 #define AH_LOG( x )  printf ## x
 
 #else

@@ -15,7 +15,7 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ftobjs.h"
 #include "ftoutln.h"
 
@@ -23,7 +23,7 @@
 
 #include "ftrend1.h"
 #include "ftraster.h"
-
+// clang-format on
 
 /* initialize renderer -- init its raster */
 static

@@ -27,9 +27,10 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // cvar.c -- dynamic variable tracking
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "qcommon.h"
+// clang-format on
 
 cvar_t      *cvar_vars;
 cvar_t      *cvar_cheats;

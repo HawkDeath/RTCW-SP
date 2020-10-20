@@ -34,10 +34,11 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "l_memory.h"
 #include "l_libvar.h"
+// clang-format on
 
 //list with library variables
 libvar_t *libvarlist;

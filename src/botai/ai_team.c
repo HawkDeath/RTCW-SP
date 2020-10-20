@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/g_local.h"
 #include "../game/botlib.h"
 #include "../game/be_aas.h"
@@ -52,7 +52,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "ai_chat.h"
 #include "ai_cmd.h"
 #include "ai_dmnet.h"
-
+// clang-format off
 
 /*
 ==================

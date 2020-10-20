@@ -63,7 +63,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma warning(disable : 4220) // varargs matches remaining parameters
 
 #endif
-
+// clang-format off
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -76,7 +76,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <malloc.h>          // for _alloca()
 #endif
 #ifdef _WIN32
-
+// clang-format on
 //#pragma intrinsic( memset, memcpy )
 
 #endif
@@ -335,10 +335,12 @@ MATHLIB
 #define M_PI        3.14159265358979323846  // matches value in gcc v2 math.h
 #endif
 
+// clang-format off
 #include "math_vector.h"
 #include "math_angles.h"
 #include "math_matrix.h"
 #include "math_quaternion.h"
+// clang-format on
 
 class idVec3;                       // for defining vectors
 typedef idVec3 &vec3_p;             // for passing vectors as function arguments

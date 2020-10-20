@@ -39,7 +39,7 @@ If you have questions concerning this license or the applicable additional terms
 //#define BOTLIB
 //#define MEQCC
 //#define BSPC
-
+// clang-format off
 #ifdef SCREWUP
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +85,7 @@ int COM_Compress( char *data_p );
 #define qtrue   true
 #define qfalse  false
 #endif //BSPC
-
+// clang-format on
 
 #define PUNCTABLE
 

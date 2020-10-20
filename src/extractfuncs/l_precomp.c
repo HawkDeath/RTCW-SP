@@ -36,7 +36,7 @@ If you have questions concerning this license or the applicable additional terms
  *****************************************************************************/
 
 //Notes:			fix: PC_StringizeTokens
-
+// clang-format off
 #ifdef SCREWUP
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,6 +49,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "l_script.h"
 #include "l_precomp.h"
 #include "l_log.h"
+// clang-format on
 
 typedef enum {qfalse, qtrue}    qboolean;
 
@@ -147,7 +148,7 @@ char *Q_strupr( char *s1 ) {
 }
 
 #endif //SCREWUP
-
+// clang-format off
 #ifdef BOTLIB
 #include "../game/q_shared.h"
 #include "botlib.h"
@@ -186,6 +187,7 @@ char *Q_strupr( char *s1 ) {
 #if defined( QUAKE ) && !defined( BSPC )
 #include "l_utils.h"
 #endif //QUAKE
+// clang-format on
 
 //#define DEBUG_EVAL
 

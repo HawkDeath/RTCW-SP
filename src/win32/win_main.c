@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-
+// clang-format off
 // win_main.h
 
 #include "../client/client.h"
@@ -39,6 +39,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <direct.h>
 #include <io.h>
 #include <conio.h>
+// clang-format on
 
 //#define	CD_BASEDIR	"wolf"
 #define CD_BASEDIR  ""

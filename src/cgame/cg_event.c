@@ -30,8 +30,10 @@ If you have questions concerning this license or the applicable additional terms
 
 // cg_event.c -- handle entity events at snapshot or playerstate transitions
 
+// clang-format off
 #include "cg_local.h"
 #include "../ui/ui_shared.h" // for Menus_CloseAll()
+// clang-format on
 
 extern int hWeaponSnd;
 

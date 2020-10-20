@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "l_memory.h"
 #include "l_script.h"
@@ -42,6 +42,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "l_struct.h"
 #include "../game/botlib.h"
 #include "be_interface.h"
+// clang-format on
 
 #define MAX_USERMOVE                400
 #define MAX_COMMANDARGUMENTS        10

@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/q_shared.h"
 //#include "../server/server.h"
 #include "l_memory.h"
@@ -51,7 +51,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "be_interface.h"
 #include "../game/be_ea.h"
 #include "../game/be_ai_chat.h"
-
+// clang-format on
 
 //escape character
 #define ESCAPE_CHAR             0x01    //'_'

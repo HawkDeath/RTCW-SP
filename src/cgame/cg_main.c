@@ -33,9 +33,10 @@ If you have questions concerning this license or the applicable additional terms
  *
 */
 
-
+// clang-format off
 #include "cg_local.h"
 #include "../ui/ui_shared.h"
+// clang-format on
 
 displayContextDef_t cgDC;
 

@@ -28,8 +28,9 @@ If you have questions concerning this license or the applicable additional terms
 
 // Rafael particles
 // cg_particles.c
-
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 #define MUSTARD     1
 #define BLOODRED    2

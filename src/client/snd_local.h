@@ -28,10 +28,11 @@ If you have questions concerning this license or the applicable additional terms
 
 // snd_local.h -- private sound definations
 
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "snd_public.h"
+// clang-format on
 
 #define PAINTBUFFER_SIZE        4096                    // this is in samples
 

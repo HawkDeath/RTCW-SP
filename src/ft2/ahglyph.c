@@ -19,13 +19,13 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ahglyph.h"
 #include "ahangles.h"
 #include "ahglobal.h"
 
 #include <stdio.h>
-
+// clang-format on
 
 #define xxxAH_DEBUG_GLYPH
 

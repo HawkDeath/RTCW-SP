@@ -27,9 +27,10 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // cl_main.c  -- client main loop
-
+// clang-format off
 #include "client.h"
 #include <limits.h>
+// clang-format on
 
 cvar_t  *cl_nodelta;
 cvar_t  *cl_debugMove;

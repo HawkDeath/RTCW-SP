@@ -33,7 +33,7 @@ If you have questions concerning this license or the applicable additional terms
 // Programmer:		Ridah
 // Tab Size:		3
 //===========================================================================
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "l_memory.h"
 #include "l_script.h"
@@ -46,6 +46,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../game/be_aas.h"
 #include "be_interface.h"
 #include "be_aas_def.h"
+// clang-format on
 
 // ugly hack to turn off route-tables, can't find a way to check cvar's
 int disable_routetable = 0;

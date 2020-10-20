@@ -41,12 +41,14 @@ If you have questions concerning this license or the applicable additional terms
 ** Note that the GLW_xxx functions are Windows specific GL-subsystem
 ** related functions that are relevant ONLY to win_glimp.c
 */
+// clang-format off
 #include <assert.h>
 #include "../renderer/tr_local.h"
 #include "../qcommon/qcommon.h"
 #include "resource.h"
 #include "glw_win.h"
 #include "win_local.h"
+// clang-format on
 
 extern void WG_CheckHardwareGamma( void );
 extern void WG_RestoreGamma( void );

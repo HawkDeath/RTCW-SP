@@ -36,12 +36,12 @@ If you have questions concerning this license or the applicable additional terms
 
  *
 */
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "tr_types.h"
 #include "../game/bg_public.h"
 #include "cg_public.h"
-
+// clang-format on
 
 #define POWERUP_BLINKS      5
 

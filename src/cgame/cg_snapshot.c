@@ -30,9 +30,9 @@ If you have questions concerning this license or the applicable additional terms
 // not necessarily every single rendered frame
 
 
-
+// clang-format off
 #include "cg_local.h"
-
+// clang-format on
 
 
 /*

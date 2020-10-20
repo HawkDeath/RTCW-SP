@@ -27,10 +27,11 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // common.c -- misc functions used in client and server
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "qcommon.h"
 #include <setjmp.h>
+// clang-format on
 
 #define MAXPRINTMSG 4096
 

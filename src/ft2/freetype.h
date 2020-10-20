@@ -37,11 +37,11 @@
 #define FREETYPE_MAJOR 2
 #define FREETYPE_MINOR 0
 
-
+// clang-format off
 #include "ftconfig.h"   /* read configuration information */
 #include "fterrors.h"
 #include "fttypes.h"
-
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

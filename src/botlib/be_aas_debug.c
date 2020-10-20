@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "l_memory.h"
 #include "l_script.h"
@@ -47,6 +47,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "be_interface.h"
 #include "be_aas_funcs.h"
 #include "be_aas_def.h"
+// clang-format on
 
 #define MAX_DEBUGLINES              1024
 #define MAX_DEBUGPOLYGONS           128

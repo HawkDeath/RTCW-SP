@@ -34,8 +34,9 @@ If you have questions concerning this license or the applicable additional terms
 // Last update:  1999-12-01
 // Tab Size:     3
 //===========================================================================
-
+// clang-format off
 #include "../qcommon/unzip.h"
+// clang-format on
 
 #define QFILETYPE_UNKNOWN           0x8000
 #define QFILETYPE_PAK               0x0001

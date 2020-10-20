@@ -27,7 +27,9 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // cg_drawtools.c -- helper functions called by cg_draw, cg_scoreboard, cg_info, etc
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 /*
 ================

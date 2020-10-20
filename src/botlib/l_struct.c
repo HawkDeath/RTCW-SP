@@ -34,7 +34,7 @@ If you have questions concerning this license or the applicable additional terms
  *
  *
  *****************************************************************************/
-
+// clang-format off
 #ifdef BOTLIB
 #include "../game/q_shared.h"
 #include "../game/botlib.h"              //for the include of be_interface.h
@@ -56,6 +56,7 @@ If you have questions concerning this license or the applicable additional terms
 #define qtrue   true
 #define qfalse  false
 #endif //BSPC
+// clang-format on
 
 //===========================================================================
 //

@@ -25,7 +25,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-
+// clang-format off
 //#include "../game/q_shared.h"
 #include "math_vector.h"
 #include <assert.h>
@@ -36,6 +36,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <stdlib.h>
 #include <time.h>
 #include <ctype.h>
+// clang-format on
 
 #define M_PI        3.14159265358979323846  // matches value in gcc v2 math.h
 

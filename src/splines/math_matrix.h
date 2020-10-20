@@ -29,8 +29,10 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __MATH_MATRIX_H__
 #define __MATH_MATRIX_H__
 
+// clang-format off
 #include <string.h>
 #include "math_vector.h"
+// clang-format on
 
 #ifndef ID_INLINE
 #ifdef _WIN32

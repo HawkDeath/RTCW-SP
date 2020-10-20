@@ -26,10 +26,12 @@
 #ifndef FTOBJS_H
 #define FTOBJS_H
 
+// clang-format off
 #include "ftmemory.h"
 #include "ftrender.h"
 #include "ftdriver.h"
 #include "autohint.h"
+// clang-format on
 
 
 #ifdef __cplusplus

@@ -100,8 +100,10 @@
 #define ErrRaster_Invalid_Mode     -2
 #define ErrRaster_Invalid_Outline  -1
 
+// clang-format off
 #include "ftimage.h"
 #include "ftgrays.h"
+// clang-format on
 
 /* This macro is used to indicate that a function parameter is unused. */
 /* Its purpose is simply to reduce compiler warnings.  Note also that  */
@@ -123,14 +125,14 @@
 #else /* _STANDALONE_ */
 
 
-
+// clang-format off
 #include "ftgrays.h"
 
 
 #include "ftobjs.h"  /* for FT_UNUSED()               */
 #include "ftdebug.h" /* for FT_TRACE() and FT_ERROR() */
 #include "ftoutln.h"          /* for FT_Outline_Decompose()    */
-
+// clang-format on
 #define ErrRaster_Invalid_Mode     FT_Err_Cannot_Render_Glyph
 #define ErrRaster_Invalid_Outline  FT_Err_Invalid_Outline
 

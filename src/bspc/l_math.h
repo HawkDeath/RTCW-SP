@@ -30,8 +30,9 @@ If you have questions concerning this license or the applicable additional terms
 #define __MATHLIB__
 
 // mathlib.h
-
+// clang-format off
 #include <math.h>
+// clang-format on
 
 #ifdef DOUBLEVEC_T
 typedef double vec_t;

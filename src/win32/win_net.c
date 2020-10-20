@@ -26,11 +26,13 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+// clang-format off
 // net_wins.c
 
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "win_local.h"
+// clang-format on
 
 static WSADATA winsockdata;
 static qboolean winsockInitialized = qfalse;

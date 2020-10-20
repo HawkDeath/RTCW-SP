@@ -43,9 +43,10 @@ If you have questions concerning this license or the applicable additional terms
 //  I need to ask Ryan if it's as simple as a constant index or
 // if some more coding needs to be done.
 
-
+// clang-format off
 #include "client.h"
 //#include "snd_local.h"
+// clang-format on
 
 #define MAXSIZE             8
 #define MINSIZE             4

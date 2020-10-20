@@ -31,10 +31,10 @@ If you have questions concerning this license or the applicable additional terms
 // cg_servercmds.c -- reliably sequenced text commands sent by the server
 // these are processed at snapshot transition time, so there will definately
 // be a valid snapshot this frame
-
+// clang-format off
 #include "cg_local.h"
 #include "../ui/ui_shared.h" // bk001205 - for Q3_ui as well
-
+// clang-format on
 
 /*
 =================

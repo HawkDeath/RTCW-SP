@@ -26,10 +26,10 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include "qfiles.h"
-
 #include "../cgame/tr_types.h"
+// clang-format on
 
 void        CM_LoadMap( const char *name, qboolean clientload, int *checksum );
 clipHandle_t CM_InlineModel( int index );       // 0 = world, 1 + are bmodels

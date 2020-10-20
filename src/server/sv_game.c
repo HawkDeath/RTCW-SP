@@ -27,10 +27,11 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // sv_game.c -- interface to the game dll
-
+// clang-format off
 #include "server.h"
 
 #include "../game/botlib.h"
+// clang-format on
 
 botlib_export_t *botlib_export;
 

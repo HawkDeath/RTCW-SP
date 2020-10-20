@@ -26,8 +26,10 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+// clang-format off
 #include "math_quaternion.h"
 #include "math_matrix.h"
+// clang-format on
 
 void toQuat( idVec3 &src, quat_t &dst ) {
 	dst.x = src.x;

@@ -26,8 +26,10 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+// clang-format off
 #include "../game/q_shared.h"
 #include "qcommon.h"
+// clang-format on
 
 static huffman_t msgHuff;
 static qboolean msgInit = qfalse;

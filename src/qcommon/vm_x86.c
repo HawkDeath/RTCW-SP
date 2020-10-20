@@ -27,12 +27,13 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // vm_x86.c -- load time compiler and execution environment for x86
-
+// clang-format off
 #include "vm_local.h"
 
 #ifndef _WIN32
 #include <sys/mman.h> // for PROT_ stuff
 #endif
+// clang-format on
 
 /*
 

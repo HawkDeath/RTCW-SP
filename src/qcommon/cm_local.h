@@ -26,11 +26,11 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
+// clang-format off
 #include "../game/q_shared.h"
 #include "qcommon.h"
 #include "cm_polylib.h"
-
+// clang-format on
 
 //	(SA) DM needs more than 256 since this includes func_static and func_explosives
 //#define	MAX_SUBMODELS		256

@@ -32,8 +32,9 @@ If you have questions concerning this license or the applicable additional terms
 // With normal play, this will be done after local prediction, but when
 // following another player or playing back a demo, it will be checked
 // when the snapshot transitions like all the other entities
-
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 /*
 ==============

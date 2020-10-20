@@ -29,10 +29,11 @@ If you have questions concerning this license or the applicable additional terms
 
 
 // g_local.h -- local definitions for game module
-
+// clang-format off
 #include "q_shared.h"
 #include "bg_public.h"
 #include "g_public.h"
+// clang-format on
 
 //==================================================================
 

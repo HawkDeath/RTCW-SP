@@ -18,9 +18,10 @@
 
 #ifndef FTCALC_H
 #define FTCALC_H
-
+// clang-format off
 #include "freetype.h"
 #include "ftconfig.h"
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

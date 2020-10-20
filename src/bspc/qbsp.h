@@ -27,7 +27,7 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 
-
+// clang-format off
 #if defined( WIN32 ) || defined( _WIN32 )
 #include <io.h>
 #endif
@@ -43,6 +43,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "l_utils.h"
 #include "l_log.h"
 #include "l_qfiles.h"
+// clang-format on
 
 //Mr Elusive shit
 #define ME

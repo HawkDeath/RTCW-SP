@@ -50,11 +50,11 @@ char ft_trace_levels[trace_max];
 
 #if defined( FT_DEBUG_LEVEL_ERROR ) || defined( FT_DEBUG_LEVEL_TRACE )
 
-
+// clang-format off
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-
+// clang-format on
 
 FT_EXPORT_FUNC( void )  FT_Message( const char*  fmt, ... )
 {

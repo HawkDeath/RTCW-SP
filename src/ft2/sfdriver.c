@@ -15,11 +15,9 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "sfnt.h"
 #include "ftobjs.h"
-
-
 
 #include "sfdriver.h"
 #include "ttload.h"
@@ -29,7 +27,7 @@
 #include "sfobjs.h"
 
 #include <string.h>     /* for strcmp() */
-
+// clang-format on
 
 static
 void*  get_sfnt_table( TT_Face face,

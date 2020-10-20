@@ -26,8 +26,10 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+// clang-format off
 #include "q_splineshared.h"
 #include "splines.h"
+// clang-format on
 
 extern "C" {
 int FS_Write( const void *buffer, int len, fileHandle_t h );

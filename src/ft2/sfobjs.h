@@ -19,8 +19,10 @@
 #ifndef SFOBJS_H
 #define SFOBJS_H
 
+// clang-format off
 #include "sfnt.h"
 #include "ftobjs.h"
+// clang-format on
 
 
 #ifdef __cplusplus

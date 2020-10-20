@@ -87,13 +87,10 @@ If you have questions concerning this license or the applicable additional terms
   you will have to add your own version for support in the VM.
 
  **********************************************************************/
-
+// clang-format off
 #ifdef Q3_VM
-
 #include "bg_lib.h"
-
 #else
-
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -103,8 +100,8 @@ If you have questions concerning this license or the applicable additional terms
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
-
 #endif
+// clang-format on
 
 #ifdef _WIN32
 

@@ -25,9 +25,10 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-
+// clang-format off
 #include "q_splineshared.h"
 #include <float.h>
+// clang-format on
 
 angles_t ang_zero( 0.0f, 0.0f, 0.0f );
 

@@ -77,17 +77,20 @@ If you have questions concerning this license or the applicable additional terms
 // uncheck the exclude from build check box in the FreeType2 area of the Renderer project.
 
 
-
+// clang-format off
 #include "tr_local.h"
 #include "../qcommon/qcommon.h"
+// clang-format on
 
 //#define BUILD_FREETYPE
 #ifdef BUILD_FREETYPE
+// clang-format off
 #include "../ft2/fterrors.h"
 #include "../ft2/ftsystem.h"
 #include "../ft2/ftimage.h"
 #include "../ft2/freetype.h"
 #include "../ft2/ftoutln.h"
+// clang-format on
 
 #define _FLOOR( x )  ( ( x ) & - 64 )
 #define _CEIL( x )   ( ( ( x ) + 63 ) & - 64 )

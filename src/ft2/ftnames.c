@@ -18,10 +18,10 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ftnames.h"
 #include "tttypes.h"
-
+// clang-format on
 
 #ifdef FT_CONFIG_OPTION_SFNT_NAMES
 

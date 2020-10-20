@@ -19,10 +19,11 @@
 #ifndef SFNT_H
 #define SFNT_H
 
-
+// clang-format off
 #include "freetype.h"
 #include "ftdriver.h"
 #include "tttypes.h"
+// clang-format on
 
 
 /*************************************************************************/

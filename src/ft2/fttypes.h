@@ -19,10 +19,10 @@
 #ifndef FTTYPES_H
 #define FTTYPES_H
 
-
+// clang-format off
 #include "ftsystem.h"
 #include "ftimage.h"
-
+// clang-format on
 
 /*************************************************************************/
 /*                                                                       */

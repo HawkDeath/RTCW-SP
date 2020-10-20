@@ -19,10 +19,10 @@
 #ifndef FTDRIVER_H
 #define FTDRIVER_H
 
-
+// clang-format off
 #include "ftmodule.h"
 #include "ftconfig.h"   /* for FT_DEBUG_LEVEL_TRACE, */
-
+// clang-format on
 
 typedef FT_Error ( *FTDriver_initFace )( FT_Stream stream,
 										 FT_Face face,

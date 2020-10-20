@@ -32,8 +32,9 @@ If you have questions concerning this license or the applicable additional terms
 // interpolating between snapshots from the server or locally predicting
 // ahead the client's movement.
 // It also handles local physics interaction, like fragments bouncing off walls
-
+// clang-format off
 #include "cg_local.h"
+// clang-format on
 
 static pmove_t cg_pmove;
 

@@ -36,9 +36,11 @@ If you have questions concerning this license or the applicable additional terms
 ** QGL_Init() - loads libraries, assigns function pointers, etc.
 ** QGL_Shutdown() - unloads libraries, NULLs function pointers
 */
+// clang-format off
 #include <float.h>
 #include "../renderer/tr_local.h"
 #include "glw_win.h"
+// clang-format on
 
 void QGL_EnableLogging( qboolean enable );
 

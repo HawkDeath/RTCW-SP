@@ -15,16 +15,15 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ftdebug.h"
 #include "ftstream.h"
 #include "sfnt.h"
 #include "ttnameid.h"
 
-
 #include "ttdriver.h"
 #include "ttgload.h"
-
+// clang-format on
 
 /*************************************************************************/
 /*                                                                       */

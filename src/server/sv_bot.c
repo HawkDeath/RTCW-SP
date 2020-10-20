@@ -27,10 +27,11 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 // sv_bot.c
-
+// clang-format off
 #include "server.h"
 #include "../game/botlib.h"
 #include "../botai/botai.h"
+// clang-format on
 
 #define MAX_DEBUGPOLYS      128
 

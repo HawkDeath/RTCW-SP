@@ -15,23 +15,18 @@
 /*                                                                         */
 /***************************************************************************/
 
-
+// clang-format off
 #include "ftobjs.h"
 #include "ftoutln.h"
 
-
 #ifdef FT_FLAT_COMPILE
-
 #include "ftsmooth.h"
 #include "ftgrays.h"
-
 #else
-
 #include "ftsmooth.h"
 #include "ftgrays.h"
-
 #endif
-
+// clang-format on
 
 /* initialize renderer -- init its raster */
 static
