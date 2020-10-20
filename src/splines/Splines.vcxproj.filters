@@ -1,68 +1,48 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{170fb0d4-1045-49cb-9f39-108128c7f65e}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{15bfeb38-4d65-4f39-8f59-0604272ab7d6}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl</Extensions>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="math_angles.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="math_matrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="math_quaternion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="math_vector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="q_parse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="q_shared.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="splines.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="util_str.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="math_angles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="math_matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="math_quaternion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="math_vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="q_shared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="q_splineshared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="splines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util_list.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util_str.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-</Project>
+﻿< ? xml version = "1.0" encoding =
+        "utf-8" ? > <Project ToolsVersion = "4.0" xmlns =
+                         "http://schemas.microsoft.com/developer/msbuild/2003">
+                      <ItemGroup><Filter Include = "Source Files">
+                      <UniqueIdentifier>{170fb0d4 - 1045 - 49cb - 9f39 -
+                                         108128c7f65e}</ UniqueIdentifier>
+                      <Extensions> cpp;
+c;
+cxx;
+rc;
+def;
+r;
+odl;
+idl;
+hpj;
+bat</ Extensions></ Filter><Filter Include = "Header Files"><UniqueIdentifier>{
+    15bfeb38 - 4d65 - 4f39 - 8f59 - 0604272ab7d6}</ UniqueIdentifier>
+    <Extensions> h;
+hpp;
+hxx;
+hm;
+inl</ Extensions></ Filter></ ItemGroup><ItemGroup>
+    <ClCompile Include = "math_angles.cpp"><Filter> Source Files</ Filter>
+    </ ClCompile><ClCompile Include = "math_matrix.cpp">
+    <Filter> Source Files</ Filter></ ClCompile>
+    <ClCompile Include = "math_quaternion.cpp"><Filter> Source Files</ Filter>
+    </ ClCompile><ClCompile Include = "math_vector.cpp">
+    <Filter> Source Files</ Filter></ ClCompile>
+    <ClCompile Include = "q_parse.cpp"><Filter> Source Files</ Filter>
+    </ ClCompile><ClCompile Include = "q_shared.cpp">
+    <Filter> Source Files</ Filter></ ClCompile>
+    <ClCompile Include = "splines.cpp"><Filter> Source Files</ Filter>
+    </ ClCompile><ClCompile Include = "util_str.cpp">
+    <Filter> Source Files</ Filter></ ClCompile></ ItemGroup><ItemGroup>
+    <ClInclude Include = "math_angles.h"><Filter> Header Files</ Filter>
+    </ ClInclude><ClInclude Include = "math_matrix.h">
+    <Filter> Header Files</ Filter></ ClInclude>
+    <ClInclude Include = "math_quaternion.h"><Filter> Header Files</ Filter>
+    </ ClInclude><ClInclude Include = "math_vector.h">
+    <Filter> Header Files</ Filter></ ClInclude>
+    <ClInclude Include = "q_shared.h"><Filter> Header Files</ Filter>
+    </ ClInclude><ClInclude Include = "q_splineshared.h">
+    <Filter> Header Files</ Filter></ ClInclude>
+    <ClInclude Include = "splines.h"><Filter> Header Files</ Filter>
+    </ ClInclude><ClInclude Include = "util_list.h">
+    <Filter> Header Files</ Filter></ ClInclude>
+    <ClInclude Include = "util_str.h"><Filter> Header Files</ Filter>
+    </ ClInclude></ ItemGroup></ Project>
