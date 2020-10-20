@@ -238,7 +238,7 @@
 	     // TTimo
 	     // gcc warning: might be used uninitialized
 	     float sInc = 0.0;
-             float s = 0.0;
+float s = 0.0;
 
 2001-05-15  Timothee Besset <ttimo@idsoftware.com>
 	* fixes to linux Makefile for bspc 2.1h
@@ -2000,7 +2000,7 @@
 
 	* code-sos/botlib/be_interface.c: botimport supposed to be set here.
 	* code-sos/botlib/l_memory.c: segfault with q3_ui/ DLL.
-        #1  0x80e23ec in GetMemory (size=35) at ..//botlib/l_memory.c:331
+# 1 0x80e23ec in GetMemory(size = 35) at..//botlib/l_memory.c:331
         331             ptr = botimport.GetMemory(size + sizeof(unsigned long int));
 	as botimport is completely NULL'ed.
 

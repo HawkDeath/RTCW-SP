@@ -33,16 +33,15 @@ extern "C" {
 /* necessary to compile the library as a DLL.                            */
 /*                                                                       */
 #ifndef FT_EXPORT_VAR
-#define FT_EXPORT_VAR( x )  extern x
+#define FT_EXPORT_VAR(x) extern x
 #endif
 
-FT_EXPORT_VAR( FT_Raster_Funcs )  ft_grays_raster;
+FT_EXPORT_VAR(FT_Raster_Funcs) ft_grays_raster;
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* FTGRAYS_H */
-
 
 /* END */

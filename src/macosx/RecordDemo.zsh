@@ -1,18 +1,11 @@
-#!/bin/zsh -x
+#!/ bin / zsh - x
 
+/ Local / Public / bungi / BuildOutput / Quake3.app / Contents / MacOS / Quake3
 
+    + set sv_pure 0
 
-/Local/Public/bungi/BuildOutput/Quake3.app/Contents/MacOS/Quake3 \
+    + set g_syncronousClients 1
 
-  +set sv_pure 0 \
+    + map q3dm6
 
-  +set g_syncronousClients 1 \
-
-  +map q3dm6 \
-
-  +record foo
-
-
-
-
-
+    + record foo

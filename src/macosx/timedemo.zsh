@@ -1,52 +1,42 @@
-#!/bin/zsh
+#!/ bin / zsh
 
+buildRoot =./ build
 
+                  executable = $buildRoot / Quake3.app / Contents / MacOS /
+                                   Quake3
 
-buildRoot=./build
+                                       ls -
+                               l $executable
 
-executable=$buildRoot/Quake3.app/Contents/MacOS/Quake3
+                                   flags = "$flags +set timedemo 1"
 
-ls -l $executable
+    flags = "$flags +set s_initsound 0"
 
+    flags = "$flags +set vm_cgame 1"
 
+    flags = "$flags +set vm_game 1"
 
-flags="$flags +set timedemo 1"
+    flags = "$flags +set r_texturebits 16"
 
-flags="$flags +set s_initsound 0"
+    flags = "$flags +set r_depthbits 16"
 
-flags="$flags +set vm_cgame 1"
+    flags = "$flags +set r_colorbits 16"
 
-flags="$flags +set vm_game 1"
+    flags = "$flags +set stencilbits 8"
 
-flags="$flags +set r_texturebits 16"
+    flags = "$flags +set r_appleTransformHint 1"
 
-flags="$flags +set r_depthbits 16"
+    echo flags =
+        $flags
 
-flags="$flags +set r_colorbits 16"
+            function demo{
 
-flags="$flags +set stencilbits 8"
+                echo Demo $ *
 
+                        $executable $flags +
+                    demo $ *
+                | &egrep "(seconds|VM)"
 
-
-flags="$flags +set r_appleTransformHint 1"
-
-
-
-echo flags=$flags
-
-
-
-function demo {
-
-    echo Demo $*
-
-    $executable $flags +demo $* |& egrep "(seconds|VM)"
-
-}
-
-
+            }
 
 demo foo
-
-
-

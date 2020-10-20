@@ -15,7 +15,6 @@
 /*                                                                         */
 /***************************************************************************/
 
-
 #ifndef FTMM_H
 #define FTMM_H
 
@@ -24,7 +23,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -42,14 +40,12 @@ extern "C" {
 /*                                                                       */
 /*    maximum :: The axis's maximum design coordinate.                   */
 /*                                                                       */
-typedef struct  FT_MM_Axis_
-{
-	FT_String*  name;
-	FT_Long minimum;
-	FT_Long maximum;
+typedef struct FT_MM_Axis_ {
+  FT_String *name;
+  FT_Long minimum;
+  FT_Long maximum;
 
 } FT_MM_Axis;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -70,26 +66,20 @@ typedef struct  FT_MM_Axis_
 /*                                                                       */
 /*    axis        :: A table of axis descriptors.                        */
 /*                                                                       */
-typedef struct  FT_Multi_Master_
-{
-	FT_UInt num_axis;
-	FT_UInt num_designs;
-	FT_MM_Axis axis[T1_MAX_MM_AXIS];
+typedef struct FT_Multi_Master_ {
+  FT_UInt num_axis;
+  FT_UInt num_designs;
+  FT_MM_Axis axis[T1_MAX_MM_AXIS];
 
 } FT_Multi_Master;
 
+typedef FT_Error (*FT_Get_MM_Func)(FT_Face face, FT_Multi_Master *master);
 
-typedef FT_Error ( *FT_Get_MM_Func )( FT_Face face,
-									  FT_Multi_Master*  master );
+typedef FT_Error (*FT_Set_MM_Design_Func)(FT_Face face, FT_UInt num_coords,
+                                          FT_Long *coords);
 
-typedef FT_Error ( *FT_Set_MM_Design_Func )( FT_Face face,
-											 FT_UInt num_coords,
-											 FT_Long*  coords );
-
-typedef FT_Error ( *FT_Set_MM_Blend_Func )( FT_Face face,
-											FT_UInt num_coords,
-											FT_Long*  coords );
-
+typedef FT_Error (*FT_Set_MM_Blend_Func)(FT_Face face, FT_UInt num_coords,
+                                         FT_Long *coords);
 
 /*************************************************************************/
 /*                                                                       */
@@ -108,9 +98,8 @@ typedef FT_Error ( *FT_Set_MM_Blend_Func )( FT_Face face,
 /* <Return>                                                              */
 /*    FreeType error code.  0 means success.                             */
 /*                                                                       */
-FT_EXPORT_DEF( FT_Error )  FT_Get_Multi_Master( FT_Face face,
-												FT_Multi_Master *  master );
-
+FT_EXPORT_DEF(FT_Error)
+FT_Get_Multi_Master(FT_Face face, FT_Multi_Master *master);
 
 /*************************************************************************/
 /*                                                                       */
@@ -132,11 +121,8 @@ FT_EXPORT_DEF( FT_Error )  FT_Get_Multi_Master( FT_Face face,
 /* <Return>                                                              */
 /*    FreeType error code.  0 means success.                             */
 /*                                                                       */
-FT_EXPORT_DEF( FT_Error )  FT_Set_MM_Design_Coordinates(
-	FT_Face face,
-	FT_UInt num_coords,
-	FT_Long *  coords );
-
+FT_EXPORT_DEF(FT_Error)
+FT_Set_MM_Design_Coordinates(FT_Face face, FT_UInt num_coords, FT_Long *coords);
 
 /*************************************************************************/
 /*                                                                       */
@@ -159,17 +145,13 @@ FT_EXPORT_DEF( FT_Error )  FT_Set_MM_Design_Coordinates(
 /* <Return>                                                              */
 /*    FreeType error code.  0 means success.                             */
 /*                                                                       */
-FT_EXPORT_DEF( FT_Error )  FT_Set_MM_Blend_Coordinates(
-	FT_Face face,
-	FT_UInt num_coords,
-	FT_Fixed *  coords );
-
+FT_EXPORT_DEF(FT_Error)
+FT_Set_MM_Blend_Coordinates(FT_Face face, FT_UInt num_coords, FT_Fixed *coords);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* FTMM_H */
-
 
 /* END */

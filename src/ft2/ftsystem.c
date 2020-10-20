@@ -24,17 +24,15 @@
 /*                                                                       */
 /*************************************************************************/
 
-
+#include "ftsystem.h"
 #include "ftconfig.h"
 #include "ftdebug.h"
-#include "ftsystem.h"
 #include "fterrors.h"
 #include "fttypes.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -49,7 +47,6 @@
 /* routines like FT_Alloc() or FT_Realloc().                             */
 /*                                                                       */
 /*************************************************************************/
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -67,14 +64,11 @@
 /* <Return>                                                              */
 /*    block  :: The address of newly allocated block.                    */
 /*                                                                       */
-static
-void*  ft_alloc( FT_Memory memory,
-				 long size ) {
-	FT_UNUSED( memory );
+static void *ft_alloc(FT_Memory memory, long size) {
+  FT_UNUSED(memory);
 
-	return malloc( size );
+  return malloc(size);
 }
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -96,17 +90,13 @@ void*  ft_alloc( FT_Memory memory,
 /* <Return>                                                              */
 /*    The address of the reallocated memory block.                       */
 /*                                                                       */
-static
-void*  ft_realloc( FT_Memory memory,
-				   long cur_size,
-				   long new_size,
-				   void*      block ) {
-	FT_UNUSED( memory );
-	FT_UNUSED( cur_size );
+static void *ft_realloc(FT_Memory memory, long cur_size, long new_size,
+                        void *block) {
+  FT_UNUSED(memory);
+  FT_UNUSED(cur_size);
 
-	return realloc( block, new_size );
+  return realloc(block, new_size);
 }
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -121,14 +111,11 @@ void*  ft_realloc( FT_Memory memory,
 /*                                                                       */
 /*    block   :: The address of block in memory to be freed.             */
 /*                                                                       */
-static
-void  ft_free( FT_Memory memory,
-			   void*      block ) {
-	FT_UNUSED( memory );
+static void ft_free(FT_Memory memory, void *block) {
+  FT_UNUSED(memory);
 
-	free( block );
+  free(block);
 }
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -136,20 +123,18 @@ void  ft_free( FT_Memory memory,
 /*                                                                       */
 /*************************************************************************/
 
-
 /*************************************************************************/
 /*                                                                       */
 /* The macro FT_COMPONENT is used in trace mode.  It is an implicit      */
 /* parameter of the FT_TRACE() and FT_ERROR() macros, used to print/log  */
 /* messages during execution.                                            */
 /*                                                                       */
-#undef  FT_COMPONENT
-#define FT_COMPONENT  trace_io
+#undef FT_COMPONENT
+#define FT_COMPONENT trace_io
 
 /* We use the macro STREAM_FILE for convenience to extract the       */
 /* system-specific stream handle from a given FreeType stream object */
-#define STREAM_FILE( stream )  ( (FILE*)stream->descriptor.pointer )
-
+#define STREAM_FILE(stream) ((FILE *)stream->descriptor.pointer)
 
 /*************************************************************************/
 /*                                                                       */
@@ -162,15 +147,13 @@ void  ft_free( FT_Memory memory,
 /* <Input>                                                               */
 /*    stream :: A pointer to the stream object.                          */
 /*                                                                       */
-static
-void  ft_close_stream( FT_Stream stream ) {
-	fclose( STREAM_FILE( stream ) );
+static void ft_close_stream(FT_Stream stream) {
+  fclose(STREAM_FILE(stream));
 
-	stream->descriptor.pointer = NULL;
-	stream->size               = 0;
-	stream->base               = 0;
+  stream->descriptor.pointer = NULL;
+  stream->size = 0;
+  stream->base = 0;
 }
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -192,21 +175,16 @@ void  ft_close_stream( FT_Stream stream ) {
 /* <Return>                                                              */
 /*    The number of bytes actually read.                                 */
 /*                                                                       */
-static
-unsigned long  ft_io_stream( FT_Stream stream,
-							 unsigned long offset,
-							 unsigned char*  buffer,
-							 unsigned long count ) {
-	FILE*  file;
+static unsigned long ft_io_stream(FT_Stream stream, unsigned long offset,
+                                  unsigned char *buffer, unsigned long count) {
+  FILE *file;
 
+  file = STREAM_FILE(stream);
 
-	file = STREAM_FILE( stream );
+  fseek(file, offset, SEEK_SET);
 
-	fseek( file, offset, SEEK_SET );
-
-	return (unsigned long)fread( buffer, 1, count, file );
+  return (unsigned long)fread(buffer, 1, count, file);
 }
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -225,42 +203,39 @@ unsigned long  ft_io_stream( FT_Stream stream,
 /* <Return>                                                              */
 /*    FreeType error code.  0 means success.                             */
 /*                                                                       */
-FT_EXPORT_FUNC( FT_Error )  FT_New_Stream( const char*  filepathname,
-										   FT_Stream stream )
-{
-	FILE*  file;
+FT_EXPORT_FUNC(FT_Error)
+FT_New_Stream(const char *filepathname, FT_Stream stream) {
+  FILE *file;
 
+  if (!stream) {
+    return FT_Err_Invalid_Stream_Handle;
+  }
 
-	if ( !stream ) {
-		return FT_Err_Invalid_Stream_Handle;
-	}
+  file = fopen(filepathname, "rb");
+  if (!file) {
+    FT_ERROR(("FT_New_Stream:"));
+    FT_ERROR((" could not open `%s'\n", filepathname));
 
-	file = fopen( filepathname, "rb" );
-	if ( !file ) {
-		FT_ERROR( ( "FT_New_Stream:" ) );
-		FT_ERROR( ( " could not open `%s'\n", filepathname ) );
+    return FT_Err_Cannot_Open_Resource;
+  }
 
-		return FT_Err_Cannot_Open_Resource;
-	}
+  fseek(file, 0, SEEK_END);
+  stream->size = ftell(file);
+  fseek(file, 0, SEEK_SET);
 
-	fseek( file, 0, SEEK_END );
-	stream->size = ftell( file );
-	fseek( file, 0, SEEK_SET );
+  stream->descriptor.pointer = file;
+  stream->pathname.pointer = (char *)filepathname;
+  stream->pos = 0;
 
-	stream->descriptor.pointer = file;
-	stream->pathname.pointer   = (char*)filepathname;
-	stream->pos                = 0;
+  stream->read = ft_io_stream;
+  stream->close = ft_close_stream;
 
-	stream->read  = ft_io_stream;
-	stream->close = ft_close_stream;
+  FT_TRACE1(("FT_New_Stream:"));
+  FT_TRACE1(
+      (" opened `%s' (%d bytes) successfully\n", filepathname, stream->size));
 
-	FT_TRACE1( ( "FT_New_Stream:" ) );
-	FT_TRACE1( ( " opened `%s' (%d bytes) successfully\n",
-				 filepathname, stream->size ) );
-
-	return FT_Err_Ok;
+  return FT_Err_Ok;
 }
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -273,21 +248,18 @@ FT_EXPORT_FUNC( FT_Error )  FT_New_Stream( const char*  filepathname,
 /* <Return>                                                              */
 /*    A pointer to the new memory object.  0 in case of error.           */
 /*                                                                       */
-FT_EXPORT_FUNC( FT_Memory )  FT_New_Memory( void )
-{
-	FT_Memory memory;
+FT_EXPORT_FUNC(FT_Memory) FT_New_Memory(void) {
+  FT_Memory memory;
 
+  memory = (FT_Memory)malloc(sizeof(*memory));
+  if (memory) {
+    memory->user = 0;
+    memory->alloc = ft_alloc;
+    memory->realloc = ft_realloc;
+    memory->free = ft_free;
+  }
 
-	memory = (FT_Memory)malloc( sizeof( *memory ) );
-	if ( memory ) {
-		memory->user    = 0;
-		memory->alloc   = ft_alloc;
-		memory->realloc = ft_realloc;
-		memory->free    = ft_free;
-	}
-
-	return memory;
+  return memory;
 }
-
 
 /* END */

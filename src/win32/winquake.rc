@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -22,58 +22,46 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // TEXTINCLUDE
+    //
 
-1 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "resource.h\0"
-END
+    1 TEXTINCLUDE DISCARDABLE BEGIN "resource.h\0" END
 
-2 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "#include ""winres.h""\r\n"
-    "\0"
-END
+    2 TEXTINCLUDE DISCARDABLE BEGIN "#include "
+                                    "winres.h"
+                                    "\r\n"
+                                    "\0" END
 
-3 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "\0"
-END
+    3 TEXTINCLUDE DISCARDABLE BEGIN
+    "\0" END
 
-#endif    // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
+        /////////////////////////////////////////////////////////////////////////////
+        //
+        // Icon
+        //
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
+        // Icon with lowest ID value placed first to ensure application icon
+        // remains consistent on all systems.
+        IDI_ICON1 ICON DISCARDABLE "qe3.ico"
 
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON1               ICON    DISCARDABLE     "qe3.ico"
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // Bitmap
+    //
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
+    IDB_BITMAP1 BITMAP DISCARDABLE
+    "background.bmp" IDB_BITMAP2 BITMAP DISCARDABLE "clear.bmp"
 
-IDB_BITMAP1             BITMAP  DISCARDABLE     "background.bmp"
-IDB_BITMAP2             BITMAP  DISCARDABLE     "clear.bmp"
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // String Table
+    //
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
+    STRINGTABLE DISCARDABLE BEGIN IDS_STRING1 "Wolfenstein" END
 
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_STRING1             "Wolfenstein"
-END
-
-#endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
+#endif // English (U.S.) resources
+    /////////////////////////////////////////////////////////////////////////////

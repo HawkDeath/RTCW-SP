@@ -21,377 +21,335 @@
 #include "ahglobal.h"
 #include "ahglyph.h"
 
-#define MAX_TEST_CHARACTERS  12
+#define MAX_TEST_CHARACTERS 12
 
-static
-const char*  blue_chars[ah_blue_max] =
-{
-	"THEZOCQS",
-	"HEZLOCUS",
-	"xzroesc",
-	"xzroesc",
-	"pqgjy"
-};
-
+static const char *blue_chars[ah_blue_max] = {"THEZOCQS", "HEZLOCUS", "xzroesc",
+                                              "xzroesc", "pqgjy"};
 
 /* simple insertion sort */
-static
-void  sort_values( FT_Int count,
-				   FT_Pos*  table ) {
-	FT_Int i, j, swap;
+static void sort_values(FT_Int count, FT_Pos *table) {
+  FT_Int i, j, swap;
 
+  for (i = 1; i < count; i++) {
+    for (j = i; j > 1; j--) {
+      if (table[j] > table[j - 1]) {
+        break;
+      }
 
-	for ( i = 1; i < count; i++ )
-	{
-		for ( j = i; j > 1; j-- )
-		{
-			if ( table[j] > table[j - 1] ) {
-				break;
-			}
-
-			swap         = table[j];
-			table[j]     = table[j - 1];
-			table[j - 1] = swap;
-		}
-	}
+      swap = table[j];
+      table[j] = table[j - 1];
+      table[j - 1] = swap;
+    }
+  }
 }
 
+static FT_Error ah_hinter_compute_blues(AH_Hinter *hinter) {
+  AH_Blue blue;
+  AH_Globals *globals = &hinter->globals->design;
+  FT_Pos flats[MAX_TEST_CHARACTERS];
+  FT_Pos rounds[MAX_TEST_CHARACTERS];
+  FT_Int num_flats;
+  FT_Int num_rounds;
 
-static
-FT_Error  ah_hinter_compute_blues( AH_Hinter*  hinter ) {
-	AH_Blue blue;
-	AH_Globals*   globals = &hinter->globals->design;
-	FT_Pos flats [MAX_TEST_CHARACTERS];
-	FT_Pos rounds[MAX_TEST_CHARACTERS];
-	FT_Int num_flats;
-	FT_Int num_rounds;
+  FT_Face face;
+  FT_GlyphSlot glyph;
+  FT_Error error;
+  FT_CharMap charmap;
 
-	FT_Face face;
-	FT_GlyphSlot glyph;
-	FT_Error error;
-	FT_CharMap charmap;
+  face = hinter->face;
+  glyph = face->glyph;
 
+  /* save current charmap */
+  charmap = face->charmap;
 
-	face  = hinter->face;
-	glyph = face->glyph;
+  /* do we have a Unicode charmap in there? */
+  error = FT_Select_Charmap(face, ft_encoding_unicode);
+  if (error) {
+    goto Exit;
+  }
 
-	/* save current charmap */
-	charmap = face->charmap;
+  /* we compute the blues simply by loading each character from the */
+  /* 'blue_chars[blues]' string, then compute its top-most and      */
+  /* bottom-most points                                             */
 
-	/* do we have a Unicode charmap in there? */
-	error = FT_Select_Charmap( face, ft_encoding_unicode );
-	if ( error ) {
-		goto Exit;
-	}
+  AH_LOG(("blue zones computation\n"));
+  AH_LOG(("------------------------------------------------\n"));
 
-	/* we compute the blues simply by loading each character from the */
-	/* 'blue_chars[blues]' string, then compute its top-most and      */
-	/* bottom-most points                                             */
+  for (blue = ah_blue_capital_top; blue < ah_blue_max; blue++) {
+    const char *p = blue_chars[blue];
+    const char *limit = p + MAX_TEST_CHARACTERS;
+    FT_Pos *blue_ref, *blue_shoot;
 
-	AH_LOG( ( "blue zones computation\n" ) );
-	AH_LOG( ( "------------------------------------------------\n" ) );
+    AH_LOG(("blue %3d: ", blue));
 
-	for ( blue = ah_blue_capital_top; blue < ah_blue_max; blue++ )
-	{
-		const char*  p     = blue_chars[blue];
-		const char*  limit = p + MAX_TEST_CHARACTERS;
-		FT_Pos       *blue_ref, *blue_shoot;
+    num_flats = 0;
+    num_rounds = 0;
 
+    for (; p < limit; p++) {
+      FT_UInt glyph_index;
+      FT_Vector *extremum;
+      FT_Vector *points;
+      FT_Vector *point_limit;
+      FT_Vector *point;
+      FT_Bool round;
 
-		AH_LOG( ( "blue %3d: ", blue ) );
+      /* exit if we reach the end of the string */
+      if (!*p) {
+        break;
+      }
 
-		num_flats  = 0;
-		num_rounds = 0;
+      AH_LOG(("`%c'", *p));
 
-		for ( ; p < limit; p++ )
-		{
-			FT_UInt glyph_index;
-			FT_Vector*  extremum;
-			FT_Vector*  points;
-			FT_Vector*  point_limit;
-			FT_Vector*  point;
-			FT_Bool round;
+      /* load the character in the face -- skip unknown or empty ones */
+      glyph_index = FT_Get_Char_Index(face, (FT_UInt)*p);
+      if (glyph_index == 0) {
+        continue;
+      }
 
+      error = FT_Load_Glyph(face, glyph_index, FT_LOAD_NO_SCALE);
+      if (error || glyph->outline.n_points <= 0) {
+        continue;
+      }
 
-			/* exit if we reach the end of the string */
-			if ( !*p ) {
-				break;
-			}
+      /* now compute min or max point indices and coordinates */
+      points = glyph->outline.points;
+      point_limit = points + glyph->outline.n_points;
+      point = points;
+      extremum = point;
+      point++;
 
-			AH_LOG( ( "`%c'", *p ) );
+      if (AH_IS_TOP_BLUE(blue)) {
+        for (; point < point_limit; point++)
+          if (point->y > extremum->y) {
+            extremum = point;
+          }
+      } else {
+        for (; point < point_limit; point++)
+          if (point->y < extremum->y) {
+            extremum = point;
+          }
+      }
 
-			/* load the character in the face -- skip unknown or empty ones */
-			glyph_index = FT_Get_Char_Index( face, ( FT_UInt ) * p );
-			if ( glyph_index == 0 ) {
-				continue;
-			}
+      AH_LOG(("%5d", (int)extremum->y));
 
-			error = FT_Load_Glyph( face, glyph_index, FT_LOAD_NO_SCALE );
-			if ( error || glyph->outline.n_points <= 0 ) {
-				continue;
-			}
+      /* now, check whether the point belongs to a straight or round  */
+      /* segment; we first need to find in which contour the extremum */
+      /* lies, then see its previous and next points                  */
+      {
+        FT_Int index = extremum - points;
+        FT_Int n;
+        FT_Int first, last, prev, next, end;
+        FT_Pos dist;
 
-			/* now compute min or max point indices and coordinates */
-			points      = glyph->outline.points;
-			point_limit = points + glyph->outline.n_points;
-			point       = points;
-			extremum    = point;
-			point++;
+        last = -1;
+        first = 0;
 
-			if ( AH_IS_TOP_BLUE( blue ) ) {
-				for ( ; point < point_limit; point++ )
-					if ( point->y > extremum->y ) {
-						extremum = point;
-					}
-			} else
-			{
-				for ( ; point < point_limit; point++ )
-					if ( point->y < extremum->y ) {
-						extremum = point;
-					}
-			}
+        for (n = 0; n < glyph->outline.n_contours; n++) {
+          end = glyph->outline.contours[n];
+          if (end >= index) {
+            last = end;
+            break;
+          }
+          first = end + 1;
+        }
 
-			AH_LOG( ( "%5d", (int)extremum->y ) );
+        /* XXX: should never happen! */
+        if (last < 0) {
+          continue;
+        }
 
-			/* now, check whether the point belongs to a straight or round  */
-			/* segment; we first need to find in which contour the extremum */
-			/* lies, then see its previous and next points                  */
-			{
-				FT_Int index = extremum - points;
-				FT_Int n;
-				FT_Int first, last, prev, next, end;
-				FT_Pos dist;
+        /* now look for the previous and next points that are not on the */
+        /* same Y coordinate.  Threshold the `closeness'...              */
 
+        prev = index;
+        next = prev;
 
-				last  = -1;
-				first = 0;
+        do {
+          if (prev > first) {
+            prev--;
+          } else {
+            prev = last;
+          }
 
-				for ( n = 0; n < glyph->outline.n_contours; n++ )
-				{
-					end = glyph->outline.contours[n];
-					if ( end >= index ) {
-						last = end;
-						break;
-					}
-					first = end + 1;
-				}
+          dist = points[prev].y - extremum->y;
+          if (dist < -5 || dist > 5) {
+            break;
+          }
 
-				/* XXX: should never happen! */
-				if ( last < 0 ) {
-					continue;
-				}
+        } while (prev != index);
 
-				/* now look for the previous and next points that are not on the */
-				/* same Y coordinate.  Threshold the `closeness'...              */
+        do {
+          if (next < last) {
+            next++;
+          } else {
+            next = first;
+          }
 
-				prev = index;
-				next = prev;
+          dist = points[next].y - extremum->y;
+          if (dist < -5 || dist > 5) {
+            break;
+          }
 
-				do
-				{
-					if ( prev > first ) {
-						prev--;
-					} else {
-						prev = last;
-					}
+        } while (next != index);
 
-					dist = points[prev].y - extremum->y;
-					if ( dist < -5 || dist > 5 ) {
-						break;
-					}
+        /* now, set the `round' flag depending on the segment's kind */
+        round = FT_CURVE_TAG(glyph->outline.tags[prev]) != FT_Curve_Tag_On ||
+                FT_CURVE_TAG(glyph->outline.tags[next]) != FT_Curve_Tag_On;
 
-				} while ( prev != index );
+        AH_LOG(("%c ", round ? 'r' : 'f'));
+      }
 
-				do
-				{
-					if ( next < last ) {
-						next++;
-					} else {
-						next = first;
-					}
+      if (round) {
+        rounds[num_rounds++] = extremum->y;
+      } else {
+        flats[num_flats++] = extremum->y;
+      }
+    }
 
-					dist = points[next].y - extremum->y;
-					if ( dist < -5 || dist > 5 ) {
-						break;
-					}
+    AH_LOG(("\n"));
 
-				} while ( next != index );
+    /* we have computed the contents of the `rounds' and `flats' tables, */
+    /* now determine the reference and overshoot position of the blue;   */
+    /* we simply take the median value after a simple short              */
+    sort_values(num_rounds, rounds);
+    sort_values(num_flats, flats);
 
-				/* now, set the `round' flag depending on the segment's kind */
-				round =
-					FT_CURVE_TAG( glyph->outline.tags[prev] ) != FT_Curve_Tag_On ||
-					FT_CURVE_TAG( glyph->outline.tags[next] ) != FT_Curve_Tag_On ;
+    blue_ref = globals->blue_refs + blue;
+    blue_shoot = globals->blue_shoots + blue;
+    if (num_flats == 0 && num_rounds == 0) {
+      *blue_ref = -10000;
+      *blue_shoot = -10000;
+    } else if (num_flats == 0) {
+      *blue_ref = *blue_shoot = rounds[num_rounds / 2];
+    } else if (num_rounds == 0) {
+      *blue_ref = *blue_shoot = flats[num_flats / 2];
+    } else {
+      *blue_ref = flats[num_flats / 2];
+      *blue_shoot = rounds[num_rounds / 2];
+    }
 
-				AH_LOG( ( "%c ", round ? 'r' : 'f' ) );
-			}
+    /* there are sometimes problems: if the overshoot position of top     */
+    /* zones is under its reference position, or the opposite for bottom  */
+    /* zones.  We must thus check everything there and correct the errors */
+    if (*blue_shoot != *blue_ref) {
+      FT_Pos ref = *blue_ref;
+      FT_Pos shoot = *blue_shoot;
+      FT_Bool over_ref = (shoot > ref);
 
-			if ( round ) {
-				rounds[num_rounds++] = extremum->y;
-			} else {
-				flats[num_flats++] = extremum->y;
-			}
-		}
+      if (AH_IS_TOP_BLUE(blue) ^ over_ref) {
+        *blue_shoot = *blue_ref = (shoot + ref) / 2;
+      }
+    }
 
-		AH_LOG( ( "\n" ) );
+    AH_LOG(("-- ref = %ld, shoot = %ld\n", *blue_ref, *blue_shoot));
+  }
 
-		/* we have computed the contents of the `rounds' and `flats' tables, */
-		/* now determine the reference and overshoot position of the blue;   */
-		/* we simply take the median value after a simple short              */
-		sort_values( num_rounds, rounds );
-		sort_values( num_flats,  flats  );
-
-		blue_ref   = globals->blue_refs + blue;
-		blue_shoot = globals->blue_shoots + blue;
-		if ( num_flats == 0 && num_rounds == 0 ) {
-			*blue_ref   = -10000;
-			*blue_shoot = -10000;
-		} else if ( num_flats == 0 )   {
-			*blue_ref   =
-				*blue_shoot = rounds[num_rounds / 2];
-		} else if ( num_rounds == 0 )   {
-			*blue_ref   =
-				*blue_shoot = flats[num_flats / 2];
-		} else
-		{
-			*blue_ref   = flats[num_flats / 2];
-			*blue_shoot = rounds[num_rounds / 2];
-		}
-
-		/* there are sometimes problems: if the overshoot position of top     */
-		/* zones is under its reference position, or the opposite for bottom  */
-		/* zones.  We must thus check everything there and correct the errors */
-		if ( *blue_shoot != *blue_ref ) {
-			FT_Pos ref      = *blue_ref;
-			FT_Pos shoot    = *blue_shoot;
-			FT_Bool over_ref = ( shoot > ref );
-
-
-			if ( AH_IS_TOP_BLUE( blue ) ^ over_ref ) {
-				*blue_shoot = *blue_ref = ( shoot + ref ) / 2;
-			}
-		}
-
-		AH_LOG( ( "-- ref = %ld, shoot = %ld\n", *blue_ref, *blue_shoot ) );
-	}
-
-	/* reset original face charmap */
-	FT_Set_Charmap( face, charmap );
-	error = 0;
+  /* reset original face charmap */
+  FT_Set_Charmap(face, charmap);
+  error = 0;
 
 Exit:
-	return error;
+  return error;
 }
 
+static FT_Error ah_hinter_compute_widths(AH_Hinter *hinter) {
+  /* scan the array of segments in each direction */
+  AH_Outline *outline = hinter->glyph;
+  AH_Segment *segments;
+  AH_Segment *limit;
+  AH_Globals *globals = &hinter->globals->design;
+  FT_Pos *widths;
+  FT_Int dimension;
+  FT_Int *p_num_widths;
+  FT_Error error = 0;
+  FT_Pos edge_distance_threshold = 32000;
 
-static
-FT_Error  ah_hinter_compute_widths( AH_Hinter*  hinter ) {
-	/* scan the array of segments in each direction */
-	AH_Outline*  outline = hinter->glyph;
-	AH_Segment*  segments;
-	AH_Segment*  limit;
-	AH_Globals*  globals = &hinter->globals->design;
-	FT_Pos*      widths;
-	FT_Int dimension;
-	FT_Int*      p_num_widths;
-	FT_Error error = 0;
-	FT_Pos edge_distance_threshold = 32000;
+  globals->num_widths = 0;
+  globals->num_heights = 0;
 
+  /* For now, compute the standard width and height from the `o'       */
+  /* character.  I started computing the stem width of the `i' and the */
+  /* stem height of the "-", but it wasn't too good.  Moreover, we now */
+  /* have a single character that gives us standard width and height.  */
+  {
+    FT_UInt glyph_index;
 
-	globals->num_widths  = 0;
-	globals->num_heights = 0;
+    glyph_index = FT_Get_Char_Index(hinter->face, 'o');
+    if (glyph_index == 0) {
+      return 0;
+    }
 
-	/* For now, compute the standard width and height from the `o'       */
-	/* character.  I started computing the stem width of the `i' and the */
-	/* stem height of the "-", but it wasn't too good.  Moreover, we now */
-	/* have a single character that gives us standard width and height.  */
-	{
-		FT_UInt glyph_index;
+    error = FT_Load_Glyph(hinter->face, glyph_index, FT_LOAD_NO_SCALE);
+    if (error) {
+      goto Exit;
+    }
 
+    error = ah_outline_load(hinter->glyph, hinter->face);
+    if (error) {
+      goto Exit;
+    }
 
-		glyph_index = FT_Get_Char_Index( hinter->face, 'o' );
-		if ( glyph_index == 0 ) {
-			return 0;
-		}
+    ah_outline_compute_segments(hinter->glyph);
+    ah_outline_link_segments(hinter->glyph);
+  }
 
-		error = FT_Load_Glyph( hinter->face, glyph_index, FT_LOAD_NO_SCALE );
-		if ( error ) {
-			goto Exit;
-		}
+  segments = outline->horz_segments;
+  limit = segments + outline->num_hsegments;
+  widths = globals->heights;
+  p_num_widths = &globals->num_heights;
 
-		error = ah_outline_load( hinter->glyph, hinter->face );
-		if ( error ) {
-			goto Exit;
-		}
+  for (dimension = 1; dimension >= 0; dimension--) {
+    AH_Segment *seg = segments;
+    AH_Segment *link;
+    FT_Int num_widths = 0;
 
-		ah_outline_compute_segments( hinter->glyph );
-		ah_outline_link_segments( hinter->glyph );
-	}
+    for (; seg < limit; seg++) {
+      link = seg->link;
+      /* we only consider stem segments there! */
+      if (link && link->link == seg && link > seg) {
+        FT_Int dist;
 
-	segments     = outline->horz_segments;
-	limit        = segments + outline->num_hsegments;
-	widths       = globals->heights;
-	p_num_widths = &globals->num_heights;
+        dist = seg->pos - link->pos;
+        if (dist < 0) {
+          dist = -dist;
+        }
 
-	for ( dimension = 1; dimension >= 0; dimension-- )
-	{
-		AH_Segment*  seg = segments;
-		AH_Segment*  link;
-		FT_Int num_widths = 0;
+        if (num_widths < 12) {
+          widths[num_widths++] = dist;
+        }
+      }
+    }
 
+    sort_values(num_widths, widths);
+    *p_num_widths = num_widths;
 
-		for ( ; seg < limit; seg++ )
-		{
-			link = seg->link;
-			/* we only consider stem segments there! */
-			if ( link && link->link == seg && link > seg ) {
-				FT_Int dist;
+    /* we will now try to find the smallest width */
+    if (num_widths > 0 && widths[0] < edge_distance_threshold) {
+      edge_distance_threshold = widths[0];
+    }
 
+    segments = outline->vert_segments;
+    limit = segments + outline->num_vsegments;
+    widths = globals->widths;
+    p_num_widths = &globals->num_widths;
+  }
 
-				dist = seg->pos - link->pos;
-				if ( dist < 0 ) {
-					dist = -dist;
-				}
+  /* Now, compute the edge distance threshold as a fraction of the */
+  /* smallest width in the font. Set it in `hinter.glyph' too!     */
+  if (edge_distance_threshold == 32000) {
+    edge_distance_threshold = 50;
+  }
 
-				if ( num_widths < 12 ) {
-					widths[num_widths++] = dist;
-				}
-			}
-		}
-
-		sort_values( num_widths, widths );
-		*p_num_widths = num_widths;
-
-		/* we will now try to find the smallest width */
-		if ( num_widths > 0 && widths[0] < edge_distance_threshold ) {
-			edge_distance_threshold = widths[0];
-		}
-
-		segments     = outline->vert_segments;
-		limit        = segments + outline->num_vsegments;
-		widths       = globals->widths;
-		p_num_widths = &globals->num_widths;
-
-	}
-
-	/* Now, compute the edge distance threshold as a fraction of the */
-	/* smallest width in the font. Set it in `hinter.glyph' too!     */
-	if ( edge_distance_threshold == 32000 ) {
-		edge_distance_threshold = 50;
-	}
-
-	/* let's try 20% */
-	hinter->glyph->edge_distance_threshold = edge_distance_threshold / 5;
+  /* let's try 20% */
+  hinter->glyph->edge_distance_threshold = edge_distance_threshold / 5;
 
 Exit:
-	return error;
+  return error;
 }
-
 
 LOCAL_FUNC
-FT_Error  ah_hinter_compute_globals( AH_Hinter*  hinter ) {
-	return ah_hinter_compute_widths( hinter ) ||
-		   ah_hinter_compute_blues( hinter );
+FT_Error ah_hinter_compute_globals(AH_Hinter *hinter) {
+  return ah_hinter_compute_widths(hinter) || ah_hinter_compute_blues(hinter);
 }
-
 
 /* END */

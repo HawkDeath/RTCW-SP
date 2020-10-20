@@ -4,82 +4,87 @@
 
 #include "qasm.h"
 
-.extern	C(instructionPointers)
+.extern C(instructionPointers)
 
-	.data
+    .data
 
-	.align	4
+    .align 4
 
-programStack	.long	0
-opStack			.long	0
-syscallNum		.long	0
+    programStack.long 0 opStack.long 0 syscallNum
+    .long 0
 
-	.text
+    .text
 
-.globl C(AsmCAll)
-C(AsmCall):
-	movl	(%edi),%eax
-	subl	4,%edi
-	orl		%eax,%eax
-	jl		systemCall
-	// calling another vm function
-	shll	2,%eax
-	addl	C(instructionPointers),%eax
-	call	(%eax)
-	ret
-systemCall:
+    .globl C(AsmCAll) C(AsmCall)
+    : movl(% edi),
+% eax subl 4, % edi orl % eax, % eax jl systemCall
+                                   // calling another vm function
+                                   shll 2,
+% eax addl C(instructionPointers), %
+                                       eax call(% eax) ret systemCall :
 
-	// convert negative num to system call number
-	// and store right before the first arg
-	negl	%eax
-	decl	%eax
+    // convert negative num to system call number
+    // and store right before the first arg
+    negl
+    %
+    eax decl %
+    eax
 
-	movl	%eax,syscallNum
-///---- UNFINISHED FROM HERE
-	mov		dword ptr syscallNum, eax	// so C code can get at it
-	mov		dword ptr programStack, esi	// so C code can get at it
-	mov		dword ptr opStack, edi
+    movl
+    %
+    eax,
+syscallNum
+    ///---- UNFINISHED FROM HERE
+    mov dword ptr syscallNum,
+eax // so C code can get at it
+    mov dword ptr programStack,
+esi // so C code can get at it
+    mov dword ptr opStack,
+edi
 
-	push	ecx
-	push	esi							// we may call recursively, so the
-	push	edi							// statics aren't guaranteed to be around
+    push ecx push esi // we may call recursively, so the
+    push edi          // statics aren't guaranteed to be around
 }
-	// save the stack to allow recursive VM entry
-	currentVM->programStack = programStack - 4;
-	*(int *)((byte *)currentVM->dataBase + programStack + 4) = syscallNum;
-//VM_LogSyscalls(  (int *)((byte *)currentVM->dataBase + programStack + 4) );
-	*(opStack+1) = currentVM->systemCall( (int *)((byte *)currentVM->dataBase + programStack + 4) );
+// save the stack to allow recursive VM entry
+currentVM->programStack = programStack - 4;
+*(int *)((byte *)currentVM->dataBase + programStack + 4) = syscallNum;
+// VM_LogSyscalls(  (int *)((byte *)currentVM->dataBase + programStack + 4) );
+*(opStack + 1) = currentVM->systemCall((int *)((byte *)currentVM->dataBase +
+                                               programStack + 4));
 
 _asm {
 	pop		edi
 	pop		esi
 	pop		ecx
-	add		edi, 4		// we added the return value
+	add		edi, 4 // we added the return value
 
 	ret
 }
-
 }
 
 //--------------------------------------------
-	movl	val(%esp),%ecx
-	movl	$0x100,%edx		// 0x10000000000 as dividend
-	cmpl	%edx,%ecx
-	jle		LOutOfRange
+movl val(% esp), % ecx movl $0x100, %
+                                        edx // 0x10000000000 as dividend
+                                        cmpl
+                                        % edx,
+    %
+        ecx jle LOutOfRange
 
-	subl	%eax,%eax
-	divl	%ecx
+        subl
+        % eax,
+    % eax divl %
+        ecx
 
-	ret
+        ret
 
-LOutOfRange:
-	movl	$0xFFFFFFFF,%eax
-	ret
+        LOutOfRange : movl $0xFFFFFFFF,
+    %
+        eax ret
 
 #if 0
 
-#define	in	4
-#define out	8
+#define in 4
+#define out 8
 
 	.align 2
 .globl C(TransformVector)
@@ -126,316 +131,366 @@ C(TransformVector):
 
 #endif
 
-#define EMINS	4+4
-#define EMAXS	4+8
-#define P		4+12
+#define EMINS 4 + 4
+#define EMAXS 4 + 8
+#define P 4 + 12
 
-	.align 2
-.globl C(BoxOnPlaneSide)
-C(BoxOnPlaneSide):
-	pushl	%ebx
+            .align 2.globl C(BoxOnPlaneSide) C(BoxOnPlaneSide)
+    : pushl
+        %
+        ebx
 
-	movl	P(%esp),%edx
-	movl	EMINS(%esp),%ecx
-	xorl	%eax,%eax
-	movl	EMAXS(%esp),%ebx
-	movb	pl_signbits(%edx),%al
-	cmpb	$8,%al
-	jge		Lerror
-	flds	pl_normal(%edx)		// p->normal[0]
-	fld		%st(0)				// p->normal[0] | p->normal[0]
-	jmp		Ljmptab(,%eax,4)
+        movl P(% esp),
+% edx movl EMINS(% esp), % ecx xorl % eax, % eax movl EMAXS(% esp),
+% ebx movb pl_signbits(% edx), % al cmpb $8,
+%
+        al jge Lerror flds pl_normal(% edx) // p->normal[0]
+        fld
+        %
+        st(0) // p->normal[0] | p->normal[0]
+        jmp Ljmptab(, % eax, 4)
 
+        // dist1= p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] +
+        // p->normal[2]*emaxs[2]; dist2= p->normal[0]*emins[0] +
+        // p->normal[1]*emins[1] + p->normal[2]*emins[2];
+        Lcase0 : fmuls(% ebx) // p->normal[0]*emaxs[0] | p->normal[0]
+                 flds pl_normal
+    +
+    4(% edx) // p->normal[1] | p->normal[0]*emaxs[0] |
+             //  p->normal[0]
+        fxch
+        %
+        st(2)        // p->normal[0] | p->normal[0]*emaxs[0] |
+                     //  p->normal[1]
+        fmuls(% ecx) // p->normal[0]*emins[0] |
+                     //  p->normal[0]*emaxs[0] | p->normal[1]
+        fxch
+        %
+        st(2) // p->normal[1] | p->normal[0]*emaxs[0] |
+              //  p->normal[0]*emins[0]
+        fld
+        %
+        st(0)          // p->normal[1] | p->normal[1] |
+                       //  p->normal[0]*emaxs[0] |
+                       //  p->normal[0]*emins[0]
+        fmuls 4(% ebx) // p->normal[1]*emaxs[1] | p->normal[1] |
+                       //  p->normal[0]*emaxs[0] |
+                       //  p->normal[0]*emins[0]
+        flds pl_normal
+    +
+    8(% edx) // p->normal[2] | p->normal[1]*emaxs[1] |
+             //  p->normal[1] | p->normal[0]*emaxs[0] |
+             //  p->normal[0]*emins[0]
+        fxch
+        %
+        st(2)          // p->normal[1] | p->normal[1]*emaxs[1] |
+                       //  p->normal[2] | p->normal[0]*emaxs[0] |
+                       //  p->normal[0]*emins[0]
+        fmuls 4(% ecx) // p->normal[1]*emins[1] |
+                       //  p->normal[1]*emaxs[1] |
+                       //  p->normal[2] | p->normal[0]*emaxs[0] |
+                       //  p->normal[0]*emins[0]
+        fxch
+        %
+        st(2) // p->normal[2] | p->normal[1]*emaxs[1] |
+              //  p->normal[1]*emins[1] |
+              //  p->normal[0]*emaxs[0] |
+              //  p->normal[0]*emins[0]
+        fld
+        %
+        st(0)          // p->normal[2] | p->normal[2] |
+                       //  p->normal[1]*emaxs[1] |
+                       //  p->normal[1]*emins[1] |
+                       //  p->normal[0]*emaxs[0] |
+                       //  p->normal[0]*emins[0]
+        fmuls 8(% ebx) // p->normal[2]*emaxs[2] |
+                       //  p->normal[2] |
+                       //  p->normal[1]*emaxs[1] |
+                       //  p->normal[1]*emins[1] |
+                       //  p->normal[0]*emaxs[0] |
+                       //  p->normal[0]*emins[0]
+        fxch
+        %
+        st(5) // p->normal[0]*emins[0] |
+              //  p->normal[2] |
+              //  p->normal[1]*emaxs[1] |
+              //  p->normal[1]*emins[1] |
+              //  p->normal[0]*emaxs[0] |
+              //  p->normal[2]*emaxs[2]
+        faddp
+        % st(0),
+%
+    st(3) // p->normal[2] |
+          // p->normal[1]*emaxs[1] |
+          // p->normal[1]*emins[1]+p->normal[0]*emins[0]|
+          // p->normal[0]*emaxs[0] |
+          // p->normal[2]*emaxs[2]
+    fmuls 8(% ecx) // p->normal[2]*emins[2] |
+                   // p->normal[1]*emaxs[1] |
+                   // p->normal[1]*emins[1]+p->normal[0]*emins[0]|
+                   // p->normal[0]*emaxs[0] |
+                   // p->normal[2]*emaxs[2]
+    fxch
+    %
+    st(1) // p->normal[1]*emaxs[1] |
+          // p->normal[2]*emins[2] |
+          // p->normal[1]*emins[1]+p->normal[0]*emins[0]|
+          // p->normal[0]*emaxs[0] |
+          // p->normal[2]*emaxs[2]
+    faddp
+    % st(0),
+%
+    st(3) // p->normal[2]*emins[2] |
+          // p->normal[1]*emins[1]+p->normal[0]*emins[0]|
+          // p->normal[0]*emaxs[0]+p->normal[1]*emaxs[1]|
+          // p->normal[2]*emaxs[2]
+    fxch
+    %
+    st(3) // p->normal[2]*emaxs[2] +
+          // p->normal[1]*emins[1]+p->normal[0]*emins[0]|
+          // p->normal[0]*emaxs[0]+p->normal[1]*emaxs[1]|
+          // p->normal[2]*emins[2]
+    faddp
+    % st(0),
+% st(2) // p->normal[1]*emins[1]+p->normal[0]*emins[0]|
+        // dist1 | p->normal[2]*emins[2]
 
-//dist1= p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-//dist2= p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-Lcase0:
-	fmuls	(%ebx)				// p->normal[0]*emaxs[0] | p->normal[0]
-	flds	pl_normal+4(%edx)	// p->normal[1] | p->normal[0]*emaxs[0] |
-								//  p->normal[0]
-	fxch	%st(2)				// p->normal[0] | p->normal[0]*emaxs[0] |
-								//  p->normal[1]
-	fmuls	(%ecx)				// p->normal[0]*emins[0] |
-								//  p->normal[0]*emaxs[0] | p->normal[1]
-	fxch	%st(2)				// p->normal[1] | p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	fld		%st(0)				// p->normal[1] | p->normal[1] |
-								//  p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	fmuls	4(%ebx)				// p->normal[1]*emaxs[1] | p->normal[1] |
-								//  p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	flds	pl_normal+8(%edx)	// p->normal[2] | p->normal[1]*emaxs[1] |
-								//  p->normal[1] | p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	fxch	%st(2)				// p->normal[1] | p->normal[1]*emaxs[1] |
-								//  p->normal[2] | p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	fmuls	4(%ecx)				// p->normal[1]*emins[1] |
-								//  p->normal[1]*emaxs[1] |
-								//  p->normal[2] | p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	fxch	%st(2)				// p->normal[2] | p->normal[1]*emaxs[1] |
-								//  p->normal[1]*emins[1] |
-								//  p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	fld		%st(0)				// p->normal[2] | p->normal[2] |
-								//  p->normal[1]*emaxs[1] |
-								//  p->normal[1]*emins[1] |
-								//  p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	fmuls	8(%ebx)				// p->normal[2]*emaxs[2] |
-								//  p->normal[2] |
-								//  p->normal[1]*emaxs[1] |
-								//  p->normal[1]*emins[1] |
-								//  p->normal[0]*emaxs[0] |
-								//  p->normal[0]*emins[0]
-	fxch	%st(5)				// p->normal[0]*emins[0] |
-								//  p->normal[2] |
-								//  p->normal[1]*emaxs[1] |
-								//  p->normal[1]*emins[1] |
-								//  p->normal[0]*emaxs[0] |
-								//  p->normal[2]*emaxs[2]
-	faddp	%st(0),%st(3)		//p->normal[2] |
-								// p->normal[1]*emaxs[1] |
-								// p->normal[1]*emins[1]+p->normal[0]*emins[0]|
-								// p->normal[0]*emaxs[0] |
-								// p->normal[2]*emaxs[2]
-	fmuls	8(%ecx)				//p->normal[2]*emins[2] |
-								// p->normal[1]*emaxs[1] |
-								// p->normal[1]*emins[1]+p->normal[0]*emins[0]|
-								// p->normal[0]*emaxs[0] |
-								// p->normal[2]*emaxs[2]
-	fxch	%st(1)				//p->normal[1]*emaxs[1] |
-								// p->normal[2]*emins[2] |
-								// p->normal[1]*emins[1]+p->normal[0]*emins[0]|
-								// p->normal[0]*emaxs[0] |
-								// p->normal[2]*emaxs[2]
-	faddp	%st(0),%st(3)		//p->normal[2]*emins[2] |
-								// p->normal[1]*emins[1]+p->normal[0]*emins[0]|
-								// p->normal[0]*emaxs[0]+p->normal[1]*emaxs[1]|
-								// p->normal[2]*emaxs[2]
-	fxch	%st(3)				//p->normal[2]*emaxs[2] +
-								// p->normal[1]*emins[1]+p->normal[0]*emins[0]|
-								// p->normal[0]*emaxs[0]+p->normal[1]*emaxs[1]|
-								// p->normal[2]*emins[2]
-	faddp	%st(0),%st(2)		//p->normal[1]*emins[1]+p->normal[0]*emins[0]|
-								// dist1 | p->normal[2]*emins[2]
+        jmp LSetSides
 
-	jmp		LSetSides
+        // dist1= p->normal[0]*emins[0] + p->normal[1]*emaxs[1] +
+        // p->normal[2]*emaxs[2]; dist2= p->normal[0]*emaxs[0] +
+        // p->normal[1]*emins[1] + p->normal[2]*emins[2];
+        Lcase1 : fmuls(% ecx) // emins[0]
+                 flds pl_normal
+    +
+    4(% edx) fxch %
+        st(2) fmuls(% ebx) // emaxs[0]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 4(% ebx) // emaxs[1]
+        flds pl_normal
+    +
+    8(% edx) fxch %
+        st(2) fmuls 4(% ecx) // emins[1]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 8(% ebx) // emaxs[2]
+        fxch
+        % st(5) faddp % st(0),
+%
+    st(3) fmuls 8(% ecx) // emins[2]
+    fxch
+    % st(1) faddp % st(0),
+% st(3) fxch % st(3) faddp % st(0),
+% st(2)
 
-//dist1= p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-//dist2= p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-Lcase1:
-	fmuls	(%ecx)				// emins[0]
-	flds	pl_normal+4(%edx)
-	fxch	%st(2)
-	fmuls	(%ebx)				// emaxs[0]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	4(%ebx)				// emaxs[1]
-	flds	pl_normal+8(%edx)
-	fxch	%st(2)
-	fmuls	4(%ecx)				// emins[1]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	8(%ebx)				// emaxs[2]
-	fxch	%st(5)
-	faddp	%st(0),%st(3)
-	fmuls	8(%ecx)				// emins[2]
-	fxch	%st(1)
-	faddp	%st(0),%st(3)
-	fxch	%st(3)
-	faddp	%st(0),%st(2)
+            jmp LSetSides
 
-	jmp		LSetSides
+        // dist1= p->normal[0]*emaxs[0] + p->normal[1]*emins[1] +
+        // p->normal[2]*emaxs[2]; dist2= p->normal[0]*emins[0] +
+        // p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+        Lcase2 : fmuls(% ebx) // emaxs[0]
+                 flds pl_normal
+    +
+    4(% edx) fxch %
+        st(2) fmuls(% ecx) // emins[0]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 4(% ecx) // emins[1]
+        flds pl_normal
+    +
+    8(% edx) fxch %
+        st(2) fmuls 4(% ebx) // emaxs[1]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 8(% ebx) // emaxs[2]
+        fxch
+        % st(5) faddp % st(0),
+%
+    st(3) fmuls 8(% ecx) // emins[2]
+    fxch
+    % st(1) faddp % st(0),
+% st(3) fxch % st(3) faddp % st(0),
+% st(2)
 
-//dist1= p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-//dist2= p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-Lcase2:
-	fmuls	(%ebx)				// emaxs[0]
-	flds	pl_normal+4(%edx)
-	fxch	%st(2)
-	fmuls	(%ecx)				// emins[0]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	4(%ecx)				// emins[1]
-	flds	pl_normal+8(%edx)
-	fxch	%st(2)
-	fmuls	4(%ebx)				// emaxs[1]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	8(%ebx)				// emaxs[2]
-	fxch	%st(5)
-	faddp	%st(0),%st(3)
-	fmuls	8(%ecx)				// emins[2]
-	fxch	%st(1)
-	faddp	%st(0),%st(3)
-	fxch	%st(3)
-	faddp	%st(0),%st(2)
+            jmp LSetSides
 
-	jmp		LSetSides
+        // dist1= p->normal[0]*emins[0] + p->normal[1]*emins[1] +
+        // p->normal[2]*emaxs[2]; dist2= p->normal[0]*emaxs[0] +
+        // p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+        Lcase3 : fmuls(% ecx) // emins[0]
+                 flds pl_normal
+    +
+    4(% edx) fxch %
+        st(2) fmuls(% ebx) // emaxs[0]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 4(% ecx) // emins[1]
+        flds pl_normal
+    +
+    8(% edx) fxch %
+        st(2) fmuls 4(% ebx) // emaxs[1]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 8(% ebx) // emaxs[2]
+        fxch
+        % st(5) faddp % st(0),
+%
+    st(3) fmuls 8(% ecx) // emins[2]
+    fxch
+    % st(1) faddp % st(0),
+% st(3) fxch % st(3) faddp % st(0),
+% st(2)
 
-//dist1= p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-//dist2= p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-Lcase3:
-	fmuls	(%ecx)				// emins[0]
-	flds	pl_normal+4(%edx)
-	fxch	%st(2)
-	fmuls	(%ebx)				// emaxs[0]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	4(%ecx)				// emins[1]
-	flds	pl_normal+8(%edx)
-	fxch	%st(2)
-	fmuls	4(%ebx)				// emaxs[1]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	8(%ebx)				// emaxs[2]
-	fxch	%st(5)
-	faddp	%st(0),%st(3)
-	fmuls	8(%ecx)				// emins[2]
-	fxch	%st(1)
-	faddp	%st(0),%st(3)
-	fxch	%st(3)
-	faddp	%st(0),%st(2)
+            jmp LSetSides
 
-	jmp		LSetSides
+        // dist1= p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] +
+        // p->normal[2]*emins[2]; dist2= p->normal[0]*emins[0] +
+        // p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+        Lcase4 : fmuls(% ebx) // emaxs[0]
+                 flds pl_normal
+    +
+    4(% edx) fxch %
+        st(2) fmuls(% ecx) // emins[0]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 4(% ebx) // emaxs[1]
+        flds pl_normal
+    +
+    8(% edx) fxch %
+        st(2) fmuls 4(% ecx) // emins[1]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 8(% ecx) // emins[2]
+        fxch
+        % st(5) faddp % st(0),
+%
+    st(3) fmuls 8(% ebx) // emaxs[2]
+    fxch
+    % st(1) faddp % st(0),
+% st(3) fxch % st(3) faddp % st(0),
+% st(2)
 
-//dist1= p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-//dist2= p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-Lcase4:
-	fmuls	(%ebx)				// emaxs[0]
-	flds	pl_normal+4(%edx)
-	fxch	%st(2)
-	fmuls	(%ecx)				// emins[0]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	4(%ebx)				// emaxs[1]
-	flds	pl_normal+8(%edx)
-	fxch	%st(2)
-	fmuls	4(%ecx)				// emins[1]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	8(%ecx)				// emins[2]
-	fxch	%st(5)
-	faddp	%st(0),%st(3)
-	fmuls	8(%ebx)				// emaxs[2]
-	fxch	%st(1)
-	faddp	%st(0),%st(3)
-	fxch	%st(3)
-	faddp	%st(0),%st(2)
+            jmp LSetSides
 
-	jmp		LSetSides
+        // dist1= p->normal[0]*emins[0] + p->normal[1]*emaxs[1] +
+        // p->normal[2]*emins[2]; dist2= p->normal[0]*emaxs[0] +
+        // p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+        Lcase5 : fmuls(% ecx) // emins[0]
+                 flds pl_normal
+    +
+    4(% edx) fxch %
+        st(2) fmuls(% ebx) // emaxs[0]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 4(% ebx) // emaxs[1]
+        flds pl_normal
+    +
+    8(% edx) fxch %
+        st(2) fmuls 4(% ecx) // emins[1]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 8(% ecx) // emins[2]
+        fxch
+        % st(5) faddp % st(0),
+%
+    st(3) fmuls 8(% ebx) // emaxs[2]
+    fxch
+    % st(1) faddp % st(0),
+% st(3) fxch % st(3) faddp % st(0),
+% st(2)
 
-//dist1= p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-//dist2= p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-Lcase5:
-	fmuls	(%ecx)				// emins[0]
-	flds	pl_normal+4(%edx)
-	fxch	%st(2)
-	fmuls	(%ebx)				// emaxs[0]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	4(%ebx)				// emaxs[1]
-	flds	pl_normal+8(%edx)
-	fxch	%st(2)
-	fmuls	4(%ecx)				// emins[1]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	8(%ecx)				// emins[2]
-	fxch	%st(5)
-	faddp	%st(0),%st(3)
-	fmuls	8(%ebx)				// emaxs[2]
-	fxch	%st(1)
-	faddp	%st(0),%st(3)
-	fxch	%st(3)
-	faddp	%st(0),%st(2)
+            jmp LSetSides
 
-	jmp		LSetSides
+        // dist1= p->normal[0]*emaxs[0] + p->normal[1]*emins[1] +
+        // p->normal[2]*emins[2]; dist2= p->normal[0]*emins[0] +
+        // p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+        Lcase6 : fmuls(% ebx) // emaxs[0]
+                 flds pl_normal
+    +
+    4(% edx) fxch %
+        st(2) fmuls(% ecx) // emins[0]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 4(% ecx) // emins[1]
+        flds pl_normal
+    +
+    8(% edx) fxch %
+        st(2) fmuls 4(% ebx) // emaxs[1]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 8(% ecx) // emins[2]
+        fxch
+        % st(5) faddp % st(0),
+%
+    st(3) fmuls 8(% ebx) // emaxs[2]
+    fxch
+    % st(1) faddp % st(0),
+% st(3) fxch % st(3) faddp % st(0),
+% st(2)
 
-//dist1= p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-//dist2= p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-Lcase6:
-	fmuls	(%ebx)				// emaxs[0]
-	flds	pl_normal+4(%edx)
-	fxch	%st(2)
-	fmuls	(%ecx)				// emins[0]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	4(%ecx)				// emins[1]
-	flds	pl_normal+8(%edx)
-	fxch	%st(2)
-	fmuls	4(%ebx)				// emaxs[1]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	8(%ecx)				// emins[2]
-	fxch	%st(5)
-	faddp	%st(0),%st(3)
-	fmuls	8(%ebx)				// emaxs[2]
-	fxch	%st(1)
-	faddp	%st(0),%st(3)
-	fxch	%st(3)
-	faddp	%st(0),%st(2)
+            jmp LSetSides
 
-	jmp		LSetSides
+        // dist1= p->normal[0]*emins[0] + p->normal[1]*emins[1] +
+        // p->normal[2]*emins[2]; dist2= p->normal[0]*emaxs[0] +
+        // p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+        Lcase7 : fmuls(% ecx) // emins[0]
+                 flds pl_normal
+    +
+    4(% edx) fxch %
+        st(2) fmuls(% ebx) // emaxs[0]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 4(% ecx) // emins[1]
+        flds pl_normal
+    +
+    8(% edx) fxch %
+        st(2) fmuls 4(% ebx) // emaxs[1]
+        fxch
+        % st(2) fld %
+        st(0) fmuls 8(% ecx) // emins[2]
+        fxch
+        % st(5) faddp % st(0),
+%
+    st(3) fmuls 8(% ebx) // emaxs[2]
+    fxch
+    % st(1) faddp % st(0),
+% st(3) fxch % st(3) faddp % st(0), %
+                                        st(2)
 
-//dist1= p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-//dist2= p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-Lcase7:
-	fmuls	(%ecx)				// emins[0]
-	flds	pl_normal+4(%edx)
-	fxch	%st(2)
-	fmuls	(%ebx)				// emaxs[0]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	4(%ecx)				// emins[1]
-	flds	pl_normal+8(%edx)
-	fxch	%st(2)
-	fmuls	4(%ebx)				// emaxs[1]
-	fxch	%st(2)
-	fld		%st(0)
-	fmuls	8(%ecx)				// emins[2]
-	fxch	%st(5)
-	faddp	%st(0),%st(3)
-	fmuls	8(%ebx)				// emaxs[2]
-	fxch	%st(1)
-	faddp	%st(0),%st(3)
-	fxch	%st(3)
-	faddp	%st(0),%st(2)
+                                            LSetSides :
 
-LSetSides:
+    //	sides = 0;
+    //	if (dist1 >= p->dist)
+    //		sides = 1;
+    //	if (dist2 < p->dist)
+    //		sides |= 2;
 
-//	sides = 0;
-//	if (dist1 >= p->dist)
-//		sides = 1;
-//	if (dist2 < p->dist)
-//		sides |= 2;
+    faddp
+    %
+    st(0),
+%
+    st(2) // dist1 | dist2
+    fcomps pl_dist(% edx) xorl
+    % ecx,
+% ecx fnstsw % ax fcomps pl_dist(% edx) andb $1, % ah xorb $1, % ah addb % ah,
+%
+    cl
 
-	faddp	%st(0),%st(2)		// dist1 | dist2
-	fcomps	pl_dist(%edx)
-	xorl	%ecx,%ecx
-	fnstsw	%ax
-	fcomps	pl_dist(%edx)
-	andb	$1,%ah
-	xorb	$1,%ah
-	addb	%ah,%cl
+    fnstsw
+    % ax andb $1,
+% ah addb % ah, % ah addb % ah, %
+                                    cl
 
-	fnstsw	%ax
-	andb	$1,%ah
-	addb	%ah,%ah
-	addb	%ah,%cl
+                                    //	return sides;
 
-//	return sides;
+                                    popl
+                                    % ebx movl % ecx,
+% eax // return status
 
-	popl	%ebx
-	movl	%ecx,%eax	// return status
+    ret
 
-	ret
+    Lerror : movl 1,
+% eax ret
 
-
-Lerror:
-	movl	1, %eax
-	ret
-
-#endif	// id386
+#endif // id386

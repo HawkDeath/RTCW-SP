@@ -15,7 +15,6 @@
 /*                                                                         */
 /***************************************************************************/
 
-
 #ifndef TTCMAP_H
 #define TTCMAP_H
 
@@ -25,21 +24,16 @@
 extern "C" {
 #endif
 
+LOCAL_DEF
+FT_Error TT_CharMap_Load(TT_Face face, TT_CMapTable *cmap, FT_Stream input);
 
 LOCAL_DEF
-FT_Error  TT_CharMap_Load( TT_Face face,
-						   TT_CMapTable*  cmap,
-						   FT_Stream input );
-
-LOCAL_DEF
-FT_Error  TT_CharMap_Free( TT_Face face,
-						   TT_CMapTable*  cmap );
+FT_Error TT_CharMap_Free(TT_Face face, TT_CMapTable *cmap);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* TTCMAP_H */
-
 
 /* END */

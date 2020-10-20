@@ -15,14 +15,11 @@
 /*                                                                         */
 /***************************************************************************/
 
-
 #ifndef FTTYPES_H
 #define FTTYPES_H
 
-
-#include "ftsystem.h"
 #include "ftimage.h"
-
+#include "ftsystem.h"
 
 /*************************************************************************/
 /*                                                                       */
@@ -34,7 +31,6 @@
 /*                                                                       */
 typedef unsigned char FT_Bool;
 
-
 /*************************************************************************/
 /*                                                                       */
 /* <Type>                                                                */
@@ -44,8 +40,7 @@ typedef unsigned char FT_Bool;
 /*    A signed 16-bit integer used to store a distance in original font  */
 /*    units.                                                             */
 /*                                                                       */
-typedef signed short FT_FWord;      /* distance in FUnits */
-
+typedef signed short FT_FWord; /* distance in FUnits */
 
 /*************************************************************************/
 /*                                                                       */
@@ -56,8 +51,7 @@ typedef signed short FT_FWord;      /* distance in FUnits */
 /*    An unsigned 16-bit integer used to store a distance in original    */
 /*    font units.                                                        */
 /*                                                                       */
-typedef unsigned short FT_UFWord;     /* unsigned distance */
-
+typedef unsigned short FT_UFWord; /* unsigned distance */
 
 /*************************************************************************/
 /*                                                                       */
@@ -69,7 +63,6 @@ typedef unsigned short FT_UFWord;     /* unsigned distance */
 /*                                                                       */
 typedef signed char FT_Char;
 
-
 /*************************************************************************/
 /*                                                                       */
 /* <Type>                                                                */
@@ -79,7 +72,6 @@ typedef signed char FT_Char;
 /*    A simple typedef for the _unsigned_ char type.                     */
 /*                                                                       */
 typedef unsigned char FT_Byte;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -91,7 +83,6 @@ typedef unsigned char FT_Byte;
 /*                                                                       */
 typedef char FT_String;
 
-
 /*************************************************************************/
 /*                                                                       */
 /* <Type>                                                                */
@@ -101,7 +92,6 @@ typedef char FT_String;
 /*    A typedef for signed short.                                        */
 /*                                                                       */
 typedef signed short FT_Short;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -113,7 +103,6 @@ typedef signed short FT_Short;
 /*                                                                       */
 typedef unsigned short FT_UShort;
 
-
 /*************************************************************************/
 /*                                                                       */
 /* <Type>                                                                */
@@ -123,7 +112,6 @@ typedef unsigned short FT_UShort;
 /*    A typedef for the int type.                                        */
 /*                                                                       */
 typedef int FT_Int;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -135,7 +123,6 @@ typedef int FT_Int;
 /*                                                                       */
 typedef unsigned int FT_UInt;
 
-
 /*************************************************************************/
 /*                                                                       */
 /* <Type>                                                                */
@@ -145,7 +132,6 @@ typedef unsigned int FT_UInt;
 /*    A typedef for signed long.                                         */
 /*                                                                       */
 typedef signed long FT_Long;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -157,7 +143,6 @@ typedef signed long FT_Long;
 /*                                                                       */
 typedef unsigned long FT_ULong;
 
-
 /*************************************************************************/
 /*                                                                       */
 /* <Type>                                                                */
@@ -167,7 +152,6 @@ typedef unsigned long FT_ULong;
 /*    A signed 2.14 fixed float type used for unit vectors.              */
 /*                                                                       */
 typedef signed short FT_F2Dot14;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -180,7 +164,6 @@ typedef signed short FT_F2Dot14;
 /*                                                                       */
 typedef signed long FT_F26Dot6;
 
-
 /*************************************************************************/
 /*                                                                       */
 /* <Type>                                                                */
@@ -191,7 +174,6 @@ typedef signed long FT_F26Dot6;
 /*    or matrix coefficients.                                            */
 /*                                                                       */
 typedef signed long FT_Fixed;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -204,7 +186,6 @@ typedef signed long FT_Fixed;
 /*                                                                       */
 typedef int FT_Error;
 
-
 /*************************************************************************/
 /*                                                                       */
 /* <Type>                                                                */
@@ -213,8 +194,7 @@ typedef int FT_Error;
 /* <Description>                                                         */
 /*    A simple typedef for a typeless pointer.                           */
 /*                                                                       */
-typedef void*  FT_Pointer;
-
+typedef void *FT_Pointer;
 
 /*************************************************************************/
 /*                                                                       */
@@ -230,13 +210,11 @@ typedef void*  FT_Pointer;
 /*                                                                       */
 /*    y :: Vertical coordinate.                                          */
 /*                                                                       */
-typedef struct  FT_UnitVector_
-{
-	FT_F2Dot14 x;
-	FT_F2Dot14 y;
+typedef struct FT_UnitVector_ {
+  FT_F2Dot14 x;
+  FT_F2Dot14 y;
 
 } FT_UnitVector;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -261,13 +239,11 @@ typedef struct  FT_UnitVector_
 /*                                                                       */
 /*    yy :: Matrix coefficient.                                          */
 /*                                                                       */
-typedef struct  FT_Matrix_
-{
-	FT_Fixed xx, xy;
-	FT_Fixed yx, yy;
+typedef struct FT_Matrix_ {
+  FT_Fixed xx, xy;
+  FT_Fixed yx, yy;
 
 } FT_Matrix;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -288,13 +264,11 @@ typedef struct  FT_Matrix_
 /*                                                                       */
 /*    yMax :: The vertical maximum (top-most).                           */
 /*                                                                       */
-typedef struct  FT_BBox_
-{
-	FT_Pos xMin, yMin;
-	FT_Pos xMax, yMax;
+typedef struct FT_BBox_ {
+  FT_Pos xMin, yMin;
+  FT_Pos xMax, yMax;
 
 } FT_BBox;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -305,12 +279,9 @@ typedef struct  FT_BBox_
 /*    This macro converts four letter tags which are used to label       */
 /*    TrueType tables into an unsigned long to be used within FreeType.  */
 /*                                                                       */
-#define FT_MAKE_TAG( _x1, _x2, _x3, _x4 ) \
-	( ( (FT_ULong)_x1 << 24 ) |		\
-	  ( (FT_ULong)_x2 << 16 ) |		\
-	  ( (FT_ULong)_x3 <<  8 ) |		\
-	  (FT_ULong)_x4         )
-
+#define FT_MAKE_TAG(_x1, _x2, _x3, _x4)                                        \
+  (((FT_ULong)_x1 << 24) | ((FT_ULong)_x2 << 16) | ((FT_ULong)_x3 << 8) |      \
+   (FT_ULong)_x4)
 
 /*************************************************************************/
 /*************************************************************************/
@@ -319,7 +290,6 @@ typedef struct  FT_BBox_
 /*                                                                       */
 /*************************************************************************/
 /*************************************************************************/
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -331,8 +301,7 @@ typedef struct  FT_BBox_
 /*     FT_List record (see FT_ListRec).  As its name suggests, a         */
 /*     FT_ListNode is a handle to a single list element.                 */
 /*                                                                       */
-typedef struct FT_ListNodeRec_*  FT_ListNode;
-
+typedef struct FT_ListNodeRec_ *FT_ListNode;
 
 /*************************************************************************/
 /*                                                                       */
@@ -342,8 +311,7 @@ typedef struct FT_ListNodeRec_*  FT_ListNode;
 /* <Description>                                                         */
 /*    A handle to a list record (see FT_ListRec).                        */
 /*                                                                       */
-typedef struct FT_ListRec_*  FT_List;
-
+typedef struct FT_ListRec_ *FT_List;
 
 /*************************************************************************/
 /*                                                                       */
@@ -360,14 +328,12 @@ typedef struct FT_ListRec_*  FT_List;
 /*                                                                       */
 /*    data :: A typeless pointer to the listed object.                   */
 /*                                                                       */
-typedef struct  FT_ListNodeRec_
-{
-	FT_ListNode prev;
-	FT_ListNode next;
-	void*        data;
+typedef struct FT_ListNodeRec_ {
+  FT_ListNode prev;
+  FT_ListNode next;
+  void *data;
 
 } FT_ListNodeRec;
-
 
 /*************************************************************************/
 /*                                                                       */
@@ -383,18 +349,14 @@ typedef struct  FT_ListNodeRec_
 /*                                                                       */
 /*    tail :: The tail (last element) of doubly-linked list.             */
 /*                                                                       */
-typedef struct  FT_ListRec_
-{
-	FT_ListNode head;
-	FT_ListNode tail;
+typedef struct FT_ListRec_ {
+  FT_ListNode head;
+  FT_ListNode tail;
 
 } FT_ListRec;
 
-
-#define FT_IS_EMPTY( list )  ( ( list ).head == 0 )
-
+#define FT_IS_EMPTY(list) ((list).head == 0)
 
 #endif /* FTTYPES_H */
-
 
 /* END */

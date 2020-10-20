@@ -15,7 +15,6 @@
 /*                                                                         */
 /***************************************************************************/
 
-
 #ifndef FTRASTER_H
 #define FTRASTER_H
 
@@ -25,7 +24,6 @@ extern "C" {
 
 #include "ftimage.h"
 
-
 /*************************************************************************/
 /*                                                                       */
 /* Uncomment the following line if you are using ftraster.c as a         */
@@ -34,17 +32,15 @@ extern "C" {
 /* #define _STANDALONE_ */
 
 #ifndef FT_EXPORT_VAR
-#define FT_EXPORT_VAR( x )  extern x
+#define FT_EXPORT_VAR(x) extern x
 #endif
 
-FT_EXPORT_VAR( FT_Raster_Funcs )  ft_standard_raster;
+FT_EXPORT_VAR(FT_Raster_Funcs) ft_standard_raster;
 
 #ifdef __cplusplus
 }
 #endif
 
-
 #endif /* FTRASTER_H */
-
 
 /* END */
