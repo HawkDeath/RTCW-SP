@@ -1,25 +1,13 @@
-﻿< ? xml version = "1.0" encoding =
-        "utf-8" ? > <Project ToolsVersion = "4.0" xmlns =
-                         "http://schemas.microsoft.com/developer/msbuild/2003">
-                      <ItemGroup><Filter Include = "Source Files">
-                      <UniqueIdentifier>{390069ad - 7aad - 4544 - 83a5 -
-                                         1efe969e959f}</ UniqueIdentifier>
-                      <Extensions> cpp;
-c;
-cxx;
-rc;
-def;
-r;
-odl;
-idl;
-hpj;
-bat</ Extensions></ Filter><Filter Include = "Header Files"><UniqueIdentifier>{
-    d01996d6 - 9cdb - 4fc0 - 8c7d - 8379fe7ed1a6}</ UniqueIdentifier>
-    <Extensions> h;
-hpp;
-hxx;
-hm;
-inl</Extensions>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{390069ad-7aad-4544-83a5-1efe969e959f}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{d01996d6-9cdb-4fc0-8c7d-8379fe7ed1a6}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="jpeg">
       <UniqueIdentifier>{95c7959b-8dd8-4609-b850-3c577efd5ff0}</UniqueIdentifier>

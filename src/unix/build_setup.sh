@@ -1,59 +1,74 @@
-#!/ bin / sh
+#!/bin/sh
 
-usage(){echo "syntax: build_setup.sh <setup directory> <version>" echo
-             "  builds an SP demo version setup"}
-
-check_brandelf() {
-#make sure brandelf is installed to avoid any problem when building the setups
-  BRAND =`which brandelf`;
-  if
-    [-n "$BRAND"] && [-x "$BRAND"] then echo
-        "brandelf is present: $BRAND" else echo "brandelf not found" exit fi
+usage()
+{
+echo "syntax: build_setup.sh <setup directory> <version>"
+echo "  builds an SP demo version setup"
 }
 
-#safe checks
+check_brandelf()
+{
+  # make sure brandelf is installed to avoid any problem when building the setups
+  BRAND=`which brandelf`;
+  if [ -n "$BRAND" ] && [ -x "$BRAND" ]
+  then
+    echo "brandelf is present: $BRAND"
+  else
+    echo "brandelf not found"
+    exit
+  fi
+}
+
+# safe checks
 check_brandelf
 
-#process command line
-    if[$ # - ne 2] then echo "bad options" usage exit fi WOLFBIN = $1 VERSION =
-        $2
+# process command line
+if [ $# -ne 2 ]
+then
+  echo "bad options"
+  usage
+  exit
+fi
+WOLFBIN=$1
+VERSION=$2
 
-            echo "Building setup ================================" echo
-                 "Version              :$VERSION" echo
-                 "Binaries Directory   :$WOLFBIN" echo
-                 "Building Single Player demo setup" echo
-                 "==============================================="
+echo "Building setup ================================"
+echo "Version              :$VERSION"
+echo "Binaries Directory   :$WOLFBIN"
+echo "Building Single Player demo setup"
+echo "==============================================="
 
-#media
-#NOTE TTimo : I maintain this directly in my local CVS
-#module name is : WolfMedia - < version>
-    WOLFMEDIA =../../../../ WolfMedia - SPdemo BASEGAME = demomain
+# media
+# NOTE TTimo: I maintain this directly in my local CVS
+# module name is: WolfMedia-<version>
+WOLFMEDIA=../../../../WolfMedia-SPdemo
+BASEGAME=demomain
 
-#location of the setup dir(for graphical installer and makeself)
-#IMPORTANT NOTE : the same reference tree is used for both full and demo setups
-                   SETUPDIR = setup - 1.5.8 -
-                              Id
+# location of the setup dir (for graphical installer and makeself)
+# IMPORTANT NOTE: the same reference tree is used for both full and demo setups
+SETUPDIR=setup-1.5.8-Id
 
-#copy all the relevant data in the relevant places
-                              prepare_core() {
-  echo "Cleaning up and rebuilding $TMPDIR" rm -
-      rf $TMPDIR
+# copy all the relevant data in the relevant places
+prepare_core()
+{
+  echo "Cleaning up and rebuilding $TMPDIR"
+  rm -rf $TMPDIR
 
-#binaries, copy and strip
-          mkdir -
-      p $TMPDIR / bin / x86 cp $WOLFBIN / wolfsp.x86 $TMPDIR / bin / x86 /
-          wolfsp.x86 strip $TMPDIR / bin / x86 / wolfsp.x86 brandelf -
-      t Linux $TMPDIR / bin / x86 / wolfsp.x86 mkdir $TMPDIR /
-          $BASEGAME cp $WOLFBIN / $BASEGAME / qagamei386.so $TMPDIR /
-          $BASEGAME strip $TMPDIR / $BASEGAME / qagamei386.so cp $WOLFBIN /
-          $BASEGAME / cgamei386.so $TMPDIR / $BASEGAME strip $TMPDIR /
-          $BASEGAME / cgamei386.so cp $WOLFBIN / $BASEGAME / uii386.so $TMPDIR /
-          $BASEGAME strip $TMPDIR / $BASEGAME /
-          uii386.so
+  # binaries, copy and strip
+  mkdir -p $TMPDIR/bin/x86
+  cp $WOLFBIN/wolfsp.x86 $TMPDIR/bin/x86/wolfsp.x86
+  strip $TMPDIR/bin/x86/wolfsp.x86
+  brandelf -t Linux $TMPDIR/bin/x86/wolfsp.x86
+  mkdir $TMPDIR/$BASEGAME
+  cp $WOLFBIN/$BASEGAME/qagamei386.so $TMPDIR/$BASEGAME
+  strip $TMPDIR/$BASEGAME/qagamei386.so
+  cp $WOLFBIN/$BASEGAME/cgamei386.so $TMPDIR/$BASEGAME
+  strip $TMPDIR/$BASEGAME/cgamei386.so
+  cp $WOLFBIN/$BASEGAME/uii386.so $TMPDIR/$BASEGAME
+  strip $TMPDIR/$BASEGAME/uii386.so
 
-#copy various accompagnying media files
-              cp -
-      R $WOLFMEDIA/* $TMPDIR
+  # copy various accompagnying media files
+  cp -R $WOLFMEDIA/* $TMPDIR
   # the demo is a bit tricky, we don't copy the main pak systematically
   # cp doesn't provide easy exclusion based on name
   # so we just copy in full and take out the pak0.pk3 afterwards (yuck)

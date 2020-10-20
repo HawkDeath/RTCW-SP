@@ -80,7 +80,9 @@
 /*                                                                       */
 /*************************************************************************/
 
-#include <string.h> /* for memcpy() */
+
+#include <string.h>             /* for memcpy() */
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -88,51 +90,53 @@
 /* parameter of the FT_TRACE() and FT_ERROR() macros, used to print/log  */
 /* messages during execution.                                            */
 /*                                                                       */
-#undef FT_COMPONENT
-#define FT_COMPONENT trace_aaraster
+#undef  FT_COMPONENT
+#define FT_COMPONENT  trace_aaraster
+
 
 #ifdef _STANDALONE_
 
-#define ErrRaster_Invalid_Mode -2
-#define ErrRaster_Invalid_Outline -1
 
-#include "ftgrays.h"
+#define ErrRaster_Invalid_Mode     -2
+#define ErrRaster_Invalid_Outline  -1
+
 #include "ftimage.h"
+#include "ftgrays.h"
 
 /* This macro is used to indicate that a function parameter is unused. */
 /* Its purpose is simply to reduce compiler warnings.  Note also that  */
 /* simply defining it as `(void)x' doesn't avoid warnings with certain */
 /* ANSI compilers (e.g. LCC).                                          */
-#define FT_UNUSED(x) (x) = (x)
+#define FT_UNUSED( x )  ( x ) = ( x )
 
 /* Disable the tracing mechanism for simplicity -- developers can      */
 /* activate it easily by redefining these two macros.                  */
 #ifndef FT_ERROR
-#define FT_ERROR(x)                                                            \
-  do                                                                           \
-    ;                                                                          \
-  while (0) /* nothing */
+#define FT_ERROR( x )  do ;while ( 0 )      /* nothing */
 #endif
 
 #ifndef FT_TRACE
-#define FT_TRACE(x)                                                            \
-  do                                                                           \
-    ;                                                                          \
-  while (0) /* nothing */
+#define FT_TRACE( x )  do ;while ( 0 )      /* nothing */
 #endif
+
 
 #else /* _STANDALONE_ */
 
+
+
 #include "ftgrays.h"
 
-#include "ftdebug.h" /* for FT_TRACE() and FT_ERROR() */
-#include "ftobjs.h"  /* for FT_UNUSED()               */
-#include "ftoutln.h" /* for FT_Outline_Decompose()    */
 
-#define ErrRaster_Invalid_Mode FT_Err_Cannot_Render_Glyph
-#define ErrRaster_Invalid_Outline FT_Err_Invalid_Outline
+#include "ftobjs.h"  /* for FT_UNUSED()               */
+#include "ftdebug.h" /* for FT_TRACE() and FT_ERROR() */
+#include "ftoutln.h"          /* for FT_Outline_Decompose()    */
+
+#define ErrRaster_Invalid_Mode     FT_Err_Cannot_Render_Glyph
+#define ErrRaster_Invalid_Outline  FT_Err_Invalid_Outline
+
 
 #endif /* _STANDALONE_ */
+
 
 /* define this to dump debugging information */
 #define xxxDEBUG_GRAYS
@@ -141,42 +145,47 @@
 
 #ifndef FT_STATIC_RASTER
 
-#define RAS_ARG PRaster raster
-#define RAS_ARG_ PRaster raster,
 
-#define RAS_VAR raster
-#define RAS_VAR_ raster,
+#define RAS_ARG   PRaster raster
+#define RAS_ARG_  PRaster raster,
 
-#define ras (*raster)
+#define RAS_VAR   raster
+#define RAS_VAR_  raster,
+
+#define ras       ( *raster )
+
 
 #else /* FT_STATIC_RASTER */
 
-#define RAS_ARG  /* empty */
-#define RAS_ARG_ /* empty */
-#define RAS_VAR  /* empty */
-#define RAS_VAR_ /* empty */
+
+#define RAS_ARG   /* empty */
+#define RAS_ARG_  /* empty */
+#define RAS_VAR   /* empty */
+#define RAS_VAR_  /* empty */
 
 static TRaster ras;
 
+
 #endif /* FT_STATIC_RASTER */
 
-/* must be at least 6 bits! */
-#define PIXEL_BITS 8
 
-#define ONE_PIXEL (1L << PIXEL_BITS)
-#define PIXEL_MASK (-1L << PIXEL_BITS)
-#define TRUNC(x) ((x) >> PIXEL_BITS)
-#define SUBPIXELS(x) ((x) << PIXEL_BITS)
-#define FLOOR(x) ((x) & -ONE_PIXEL)
-#define CEILING(x) (((x) + ONE_PIXEL - 1) & -ONE_PIXEL)
-#define ROUND(x) (((x) + ONE_PIXEL / 2) & -ONE_PIXEL)
+/* must be at least 6 bits! */
+#define PIXEL_BITS  8
+
+#define ONE_PIXEL       ( 1L << PIXEL_BITS )
+#define PIXEL_MASK      ( -1L << PIXEL_BITS )
+#define TRUNC( x )      ( ( x ) >> PIXEL_BITS )
+#define SUBPIXELS( x )  ( ( x ) << PIXEL_BITS )
+#define FLOOR( x )      ( ( x ) & - ONE_PIXEL )
+#define CEILING( x )    ( ( ( x ) + ONE_PIXEL - 1 ) & - ONE_PIXEL )
+#define ROUND( x )      ( ( ( x ) + ONE_PIXEL / 2 ) & - ONE_PIXEL )
 
 #if PIXEL_BITS >= 6
-#define UPSCALE(x) ((x) << (PIXEL_BITS - 6))
-#define DOWNSCALE(x) ((x) >> (PIXEL_BITS - 6))
+#define UPSCALE( x )    ( ( x ) << ( PIXEL_BITS - 6 ) )
+#define DOWNSCALE( x )  ( ( x ) >> ( PIXEL_BITS - 6 ) )
 #else
-#define UPSCALE(x) ((x) >> (6 - PIXEL_BITS))
-#define DOWNSCALE(x) ((x) << (6 - PIXEL_BITS))
+#define UPSCALE( x )    ( ( x ) >> ( 6 - PIXEL_BITS ) )
+#define DOWNSCALE( x )  ( ( x ) << ( 6 - PIXEL_BITS ) )
 #endif
 
 /* Define this if you want to use a more compact storage scheme.  This   */
@@ -185,738 +194,806 @@ static TRaster ras;
 /* render pool.                                                          */
 #define xxxGRAYS_COMPACT
 
+
 /*************************************************************************/
 /*                                                                       */
 /*   TYPE DEFINITIONS                                                    */
 /*                                                                       */
-typedef int TScan; /* integer scanline/pixel coordinate */
-typedef long TPos; /* sub-pixel coordinate              */
+typedef int TScan;       /* integer scanline/pixel coordinate */
+typedef long TPos;       /* sub-pixel coordinate              */
 
 /* maximal number of gray spans in a call to the span callback */
-#define FT_MAX_GRAY_SPANS 32
+#define FT_MAX_GRAY_SPANS  32
+
 
 #ifdef GRAYS_COMPACT
 
-typedef struct TCell_ {
-  short x : 14;
-  short y : 14;
-  int cover : PIXEL_BITS + 2;
-  int area : PIXEL_BITS * 2 + 2;
+typedef struct  TCell_
+{
+	short x     : 14;
+	short y     : 14;
+	int cover : PIXEL_BITS + 2;
+	int area  : PIXEL_BITS * 2 + 2;
 
 } TCell, *PCell;
 
 #else /* GRAYS_COMPACT */
 
-typedef struct TCell_ {
-  TScan x;
-  TScan y;
-  int cover;
-  int area;
+typedef struct  TCell_
+{
+	TScan x;
+	TScan y;
+	int cover;
+	int area;
 
 } TCell, *PCell;
 
 #endif /* GRAYS_COMPACT */
 
-typedef struct TRaster_ {
-  PCell cells;
-  int max_cells;
-  int num_cells;
 
-  TScan min_ex, max_ex;
-  TScan min_ey, max_ey;
+typedef struct  TRaster_
+{
+	PCell cells;
+	int max_cells;
+	int num_cells;
 
-  int area;
-  int cover;
-  int invalid;
+	TScan min_ex, max_ex;
+	TScan min_ey, max_ey;
 
-  TScan ex, ey;
-  TScan cx, cy;
-  TPos x, y;
+	int area;
+	int cover;
+	int invalid;
 
-  TScan last_ey;
+	TScan ex, ey;
+	TScan cx, cy;
+	TPos x,  y;
 
-  FT_Vector bez_stack[32 * 3];
-  int lev_stack[32];
+	TScan last_ey;
 
-  FT_Outline outline;
-  FT_Bitmap target;
+	FT_Vector bez_stack[32 * 3];
+	int lev_stack[32];
 
-  FT_Span gray_spans[FT_MAX_GRAY_SPANS];
-  int num_gray_spans;
+	FT_Outline outline;
+	FT_Bitmap target;
 
-  FT_Raster_Span_Func render_span;
-  void *render_span_data;
-  int span_y;
+	FT_Span gray_spans[FT_MAX_GRAY_SPANS];
+	int num_gray_spans;
 
-  int band_size;
-  int band_shoot;
-  int conic_level;
-  int cubic_level;
+	FT_Raster_Span_Func render_span;
+	void*                render_span_data;
+	int span_y;
 
-  void *memory;
+	int band_size;
+	int band_shoot;
+	int conic_level;
+	int cubic_level;
+
+	void*  memory;
 
 } TRaster, *PRaster;
+
 
 /*************************************************************************/
 /*                                                                       */
 /* Initialize the cells table.                                           */
 /*                                                                       */
-static void init_cells(RAS_ARG_ void *buffer, long byte_size) {
-  ras.cells = (PCell)buffer;
-  ras.max_cells = byte_size / sizeof(TCell);
-  ras.num_cells = 0;
-  ras.area = 0;
-  ras.cover = 0;
-  ras.invalid = 1;
+static
+void  init_cells( RAS_ARG_ void*  buffer,
+				  long byte_size ) {
+	ras.cells     = (PCell)buffer;
+	ras.max_cells = byte_size / sizeof( TCell );
+	ras.num_cells = 0;
+	ras.area      = 0;
+	ras.cover     = 0;
+	ras.invalid   = 1;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
 /* Compute the outline bounding box.                                     */
 /*                                                                       */
-static void compute_cbox(RAS_ARG_ FT_Outline *outline) {
-  FT_Vector *vec = outline->points;
-  FT_Vector *limit = vec + outline->n_points;
+static
+void  compute_cbox( RAS_ARG_ FT_Outline*  outline ) {
+	FT_Vector*  vec   = outline->points;
+	FT_Vector*  limit = vec + outline->n_points;
 
-  if (outline->n_points <= 0) {
-    ras.min_ex = ras.max_ex = 0;
-    ras.min_ey = ras.max_ey = 0;
-    return;
-  }
 
-  ras.min_ex = ras.max_ex = vec->x;
-  ras.min_ey = ras.max_ey = vec->y;
+	if ( outline->n_points <= 0 ) {
+		ras.min_ex = ras.max_ex = 0;
+		ras.min_ey = ras.max_ey = 0;
+		return;
+	}
 
-  vec++;
+	ras.min_ex = ras.max_ex = vec->x;
+	ras.min_ey = ras.max_ey = vec->y;
 
-  for (; vec < limit; vec++) {
-    TPos x = vec->x;
-    TPos y = vec->y;
+	vec++;
 
-    if (x < ras.min_ex) {
-      ras.min_ex = x;
-    }
-    if (x > ras.max_ex) {
-      ras.max_ex = x;
-    }
-    if (y < ras.min_ey) {
-      ras.min_ey = y;
-    }
-    if (y > ras.max_ey) {
-      ras.max_ey = y;
-    }
-  }
+	for ( ; vec < limit; vec++ )
+	{
+		TPos x = vec->x;
+		TPos y = vec->y;
 
-  /* truncate the bounding box to integer pixels */
-  ras.min_ex = ras.min_ex >> 6;
-  ras.min_ey = ras.min_ey >> 6;
-  ras.max_ex = (ras.max_ex + 63) >> 6;
-  ras.max_ey = (ras.max_ey + 63) >> 6;
+
+		if ( x < ras.min_ex ) {
+			ras.min_ex = x;
+		}
+		if ( x > ras.max_ex ) {
+			ras.max_ex = x;
+		}
+		if ( y < ras.min_ey ) {
+			ras.min_ey = y;
+		}
+		if ( y > ras.max_ey ) {
+			ras.max_ey = y;
+		}
+	}
+
+	/* truncate the bounding box to integer pixels */
+	ras.min_ex = ras.min_ex >> 6;
+	ras.min_ey = ras.min_ey >> 6;
+	ras.max_ex = ( ras.max_ex + 63 ) >> 6;
+	ras.max_ey = ( ras.max_ey + 63 ) >> 6;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
 /* Record the current cell in the table.                                 */
 /*                                                                       */
-static int record_cell(RAS_ARG) {
-  PCell cell;
+static
+int  record_cell( RAS_ARG ) {
+	PCell cell;
 
-  if (!ras.invalid && (ras.area | ras.cover)) {
-    if (ras.num_cells >= ras.max_cells) {
-      return 1;
-    }
 
-    cell = ras.cells + ras.num_cells++;
-    cell->x = ras.ex - ras.min_ex;
-    cell->y = ras.ey - ras.min_ey;
-    cell->area = ras.area;
-    cell->cover = ras.cover;
-  }
+	if ( !ras.invalid && ( ras.area | ras.cover ) ) {
+		if ( ras.num_cells >= ras.max_cells ) {
+			return 1;
+		}
 
-  return 0;
+		cell        = ras.cells + ras.num_cells++;
+		cell->x     = ras.ex - ras.min_ex;
+		cell->y     = ras.ey - ras.min_ey;
+		cell->area  = ras.area;
+		cell->cover = ras.cover;
+	}
+
+	return 0;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
 /* Set the current cell to a new position.                               */
 /*                                                                       */
-static int set_cell(RAS_ARG_ TScan ex, TScan ey) {
-  int invalid, record, clean;
+static
+int  set_cell( RAS_ARG_ TScan ex,
+			   TScan ey ) {
+	int invalid, record, clean;
 
-  /* Move the cell pointer to a new position.  We set the `invalid'      */
-  /* flag to indicate that the cell isn't part of those we're interested */
-  /* in during the render phase.  This means that:                       */
-  /*                                                                     */
-  /* . the new vertical position must be within min_ey..max_ey-1.        */
-  /* . the new horizontal position must be strictly less than max_ex     */
-  /*                                                                     */
-  /* Note that if a cell is to the left of the clipping region, it is    */
-  /* actually set to the (min_ex-1) horizontal position.                 */
 
-  record = 0;
-  clean = 1;
+	/* Move the cell pointer to a new position.  We set the `invalid'      */
+	/* flag to indicate that the cell isn't part of those we're interested */
+	/* in during the render phase.  This means that:                       */
+	/*                                                                     */
+	/* . the new vertical position must be within min_ey..max_ey-1.        */
+	/* . the new horizontal position must be strictly less than max_ex     */
+	/*                                                                     */
+	/* Note that if a cell is to the left of the clipping region, it is    */
+	/* actually set to the (min_ex-1) horizontal position.                 */
 
-  invalid = (ey < ras.min_ey || ey >= ras.max_ey || ex >= ras.max_ex);
-  if (!invalid) {
-    /* All cells that are on the left of the clipping region go to the */
-    /* min_ex - 1 horizontal position.                                 */
-    if (ex < ras.min_ex) {
-      ex = ras.min_ex - 1;
-    }
+	record  = 0;
+	clean   = 1;
 
-    /* if our position is new, then record the previous cell */
-    if (ex != ras.ex || ey != ras.ey) {
-      record = 1;
-    } else {
-      clean = ras.invalid; /* do not clean if we didn't move from */
-    }
-    /* a valid cell                        */
-  }
+	invalid = ( ey < ras.min_ey || ey >= ras.max_ey || ex >= ras.max_ex );
+	if ( !invalid ) {
+		/* All cells that are on the left of the clipping region go to the */
+		/* min_ex - 1 horizontal position.                                 */
+		if ( ex < ras.min_ex ) {
+			ex = ras.min_ex - 1;
+		}
 
-  /* record the previous cell if needed (i.e., if we changed the cell */
-  /* position, of changed the `invalid' flag)                         */
-  if ((ras.invalid != invalid || record) && record_cell(RAS_VAR)) {
-    return 1;
-  }
+		/* if our position is new, then record the previous cell */
+		if ( ex != ras.ex || ey != ras.ey ) {
+			record = 1;
+		} else {
+			clean = ras.invalid; /* do not clean if we didn't move from */
+		}
+		/* a valid cell                        */
+	}
 
-  if (clean) {
-    ras.area = 0;
-    ras.cover = 0;
-  }
+	/* record the previous cell if needed (i.e., if we changed the cell */
+	/* position, of changed the `invalid' flag)                         */
+	if ( ( ras.invalid != invalid || record ) && record_cell( RAS_VAR ) ) {
+		return 1;
+	}
 
-  ras.invalid = invalid;
-  ras.ex = ex;
-  ras.ey = ey;
-  return 0;
+	if ( clean ) {
+		ras.area  = 0;
+		ras.cover = 0;
+	}
+
+	ras.invalid = invalid;
+	ras.ex      = ex;
+	ras.ey      = ey;
+	return 0;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
 /* Start a new contour at a given cell.                                  */
 /*                                                                       */
-static void start_cell(RAS_ARG_ TScan ex, TScan ey) {
-  if (ex < ras.min_ex) {
-    ex = ras.min_ex - 1;
-  }
+static
+void  start_cell( RAS_ARG_ TScan ex,
+				  TScan ey ) {
+	if ( ex < ras.min_ex ) {
+		ex = ras.min_ex - 1;
+	}
 
-  ras.area = 0;
-  ras.cover = 0;
-  ras.ex = ex;
-  ras.ey = ey;
-  ras.last_ey = SUBPIXELS(ey);
-  ras.invalid = 0;
+	ras.area    = 0;
+	ras.cover   = 0;
+	ras.ex      = ex;
+	ras.ey      = ey;
+	ras.last_ey = SUBPIXELS( ey );
+	ras.invalid = 0;
 
-  (void)set_cell(RAS_VAR_ ex, ey);
+	(void)set_cell( RAS_VAR_ ex, ey );
 }
+
 
 /*************************************************************************/
 /*                                                                       */
 /* Render a scanline as one or more cells.                               */
 /*                                                                       */
-static int render_scanline(RAS_ARG_ TScan ey, TPos x1, TScan y1, TPos x2,
-                           TScan y2) {
-  TScan ex1, ex2, fx1, fx2, delta;
-  long p, first, dx;
-  int incr, lift, mod, rem;
+static
+int  render_scanline( RAS_ARG_ TScan ey,
+					  TPos x1,
+					  TScan y1,
+					  TPos x2,
+					  TScan y2 ) {
+	TScan ex1, ex2, fx1, fx2, delta;
+	long p, first, dx;
+	int incr, lift, mod, rem;
 
-  dx = x2 - x1;
 
-  ex1 = TRUNC(x1); /* if (ex1 >= ras.max_ex) ex1 = ras.max_ex-1; */
-  ex2 = TRUNC(x2); /* if (ex2 >= ras.max_ex) ex2 = ras.max_ex-1; */
-  fx1 = x1 - SUBPIXELS(ex1);
-  fx2 = x2 - SUBPIXELS(ex2);
+	dx = x2 - x1;
 
-  /* trivial case.  Happens often */
-  if (y1 == y2) {
-    return set_cell(RAS_VAR_ ex2, ey);
-  }
+	ex1 = TRUNC( x1 ); /* if (ex1 >= ras.max_ex) ex1 = ras.max_ex-1; */
+	ex2 = TRUNC( x2 ); /* if (ex2 >= ras.max_ex) ex2 = ras.max_ex-1; */
+	fx1 = x1 - SUBPIXELS( ex1 );
+	fx2 = x2 - SUBPIXELS( ex2 );
 
-  /* everything is located in a single cell.  That is easy! */
-  /*                                                        */
-  if (ex1 == ex2) {
-    delta = y2 - y1;
-    ras.area += (fx1 + fx2) * delta;
-    ras.cover += delta;
-    return 0;
-  }
+	/* trivial case.  Happens often */
+	if ( y1 == y2 ) {
+		return set_cell( RAS_VAR_ ex2, ey );
+	}
 
-  /* ok, we'll have to render a run of adjacent cells on the same */
-  /* scanline...                                                  */
-  /*                                                              */
-  p = (ONE_PIXEL - fx1) * (y2 - y1);
-  first = ONE_PIXEL;
-  incr = 1;
+	/* everything is located in a single cell.  That is easy! */
+	/*                                                        */
+	if ( ex1 == ex2 ) {
+		delta      = y2 - y1;
+		ras.area  += ( fx1 + fx2 ) * delta;
+		ras.cover += delta;
+		return 0;
+	}
 
-  if (dx < 0) {
-    p = fx1 * (y2 - y1);
-    first = 0;
-    incr = -1;
-    dx = -dx;
-  }
+	/* ok, we'll have to render a run of adjacent cells on the same */
+	/* scanline...                                                  */
+	/*                                                              */
+	p     = ( ONE_PIXEL - fx1 ) * ( y2 - y1 );
+	first = ONE_PIXEL;
+	incr  = 1;
 
-  delta = p / dx;
-  mod = p % dx;
-  if (mod < 0) {
-    delta--;
-    mod += dx;
-  }
+	if ( dx < 0 ) {
+		p     = fx1 * ( y2 - y1 );
+		first = 0;
+		incr  = -1;
+		dx    = -dx;
+	}
 
-  ras.area += (fx1 + first) * delta;
-  ras.cover += delta;
+	delta = p / dx;
+	mod   = p % dx;
+	if ( mod < 0 ) {
+		delta--;
+		mod += dx;
+	}
 
-  ex1 += incr;
-  if (set_cell(RAS_VAR_ ex1, ey)) {
-    goto Error;
-  }
-  y1 += delta;
+	ras.area  += ( fx1 + first ) * delta;
+	ras.cover += delta;
 
-  if (ex1 != ex2) {
-    p = ONE_PIXEL * (y2 - y1);
-    lift = p / dx;
-    rem = p % dx;
-    if (rem < 0) {
-      lift--;
-      rem += dx;
-    }
+	ex1 += incr;
+	if ( set_cell( RAS_VAR_ ex1, ey ) ) {
+		goto Error;
+	}
+	y1  += delta;
 
-    mod -= dx;
+	if ( ex1 != ex2 ) {
+		p     = ONE_PIXEL * ( y2 - y1 );
+		lift  = p / dx;
+		rem   = p % dx;
+		if ( rem < 0 ) {
+			lift--;
+			rem += dx;
+		}
 
-    while (ex1 != ex2) {
-      delta = lift;
-      mod += rem;
-      if (mod >= 0) {
-        mod -= dx;
-        delta++;
-      }
+		mod -= dx;
 
-      ras.area += ONE_PIXEL * delta;
-      ras.cover += delta;
-      y1 += delta;
-      ex1 += incr;
-      if (set_cell(RAS_VAR_ ex1, ey)) {
-        goto Error;
-      }
-    }
-  }
+		while ( ex1 != ex2 )
+		{
+			delta = lift;
+			mod  += rem;
+			if ( mod >= 0 ) {
+				mod -= dx;
+				delta++;
+			}
 
-  delta = y2 - y1;
-  ras.area += (fx2 + ONE_PIXEL - first) * delta;
-  ras.cover += delta;
+			ras.area  += ONE_PIXEL * delta;
+			ras.cover += delta;
+			y1        += delta;
+			ex1       += incr;
+			if ( set_cell( RAS_VAR_ ex1, ey ) ) {
+				goto Error;
+			}
+		}
+	}
 
-  return 0;
+	delta      = y2 - y1;
+	ras.area  += ( fx2 + ONE_PIXEL - first ) * delta;
+	ras.cover += delta;
+
+	return 0;
 
 Error:
-  return 1;
+	return 1;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
 /* Render a given line as a series of scanlines.                         */
 /*                                                                       */
-static int render_line(RAS_ARG_ TPos to_x, TPos to_y) {
-  TScan ey1, ey2, fy1, fy2;
-  TPos dx, dy, x, x2;
-  int p, rem, mod, lift, delta, first, incr;
+static
+int  render_line( RAS_ARG_ TPos to_x,
+				  TPos to_y ) {
+	TScan ey1, ey2, fy1, fy2;
+	TPos dx, dy, x, x2;
+	int p, rem, mod, lift, delta, first, incr;
 
-  ey1 = TRUNC(ras.last_ey);
-  ey2 = TRUNC(to_y); /* if (ey2 >= ras.max_ey) ey2 = ras.max_ey-1; */
-  fy1 = ras.y - ras.last_ey;
-  fy2 = to_y - SUBPIXELS(ey2);
 
-  dx = to_x - ras.x;
-  dy = to_y - ras.y;
+	ey1 = TRUNC( ras.last_ey );
+	ey2 = TRUNC( to_y ); /* if (ey2 >= ras.max_ey) ey2 = ras.max_ey-1; */
+	fy1 = ras.y - ras.last_ey;
+	fy2 = to_y - SUBPIXELS( ey2 );
 
-  /* XXX: we should do something about the trivial case where dx == 0, */
-  /*      as it happens very often!                                    */
+	dx = to_x - ras.x;
+	dy = to_y - ras.y;
 
-  /* perform vertical clipping */
-  {
-    TScan min, max;
+	/* XXX: we should do something about the trivial case where dx == 0, */
+	/*      as it happens very often!                                    */
 
-    min = ey1;
-    max = ey2;
-    if (ey1 > ey2) {
-      min = ey2;
-      max = ey1;
-    }
-    if (min >= ras.max_ey || max < ras.min_ey) {
-      goto End;
-    }
-  }
+	/* perform vertical clipping */
+	{
+		TScan min, max;
 
-  /* everything is on a single scanline */
-  if (ey1 == ey2) {
-    if (render_scanline(RAS_VAR_ ey1, ras.x, fy1, to_x, fy2)) {
-      goto Error;
-    }
-    goto End;
-  }
 
-  /* ok, we have to render several scanlines */
-  p = (ONE_PIXEL - fy1) * dx;
-  first = ONE_PIXEL;
-  incr = 1;
+		min = ey1;
+		max = ey2;
+		if ( ey1 > ey2 ) {
+			min = ey2;
+			max = ey1;
+		}
+		if ( min >= ras.max_ey || max < ras.min_ey ) {
+			goto End;
+		}
+	}
 
-  if (dy < 0) {
-    p = fy1 * dx;
-    first = 0;
-    incr = -1;
-    dy = -dy;
-  }
+	/* everything is on a single scanline */
+	if ( ey1 == ey2 ) {
+		if ( render_scanline( RAS_VAR_ ey1, ras.x, fy1, to_x, fy2 ) ) {
+			goto Error;
+		}
+		goto End;
+	}
 
-  delta = p / dy;
-  mod = p % dy;
-  if (mod < 0) {
-    delta--;
-    mod += dy;
-  }
+	/* ok, we have to render several scanlines */
+	p     = ( ONE_PIXEL - fy1 ) * dx;
+	first = ONE_PIXEL;
+	incr  = 1;
 
-  x = ras.x + delta;
-  if (render_scanline(RAS_VAR_ ey1, ras.x, fy1, x, first)) {
-    goto Error;
-  }
+	if ( dy < 0 ) {
+		p     = fy1 * dx;
+		first = 0;
+		incr  = -1;
+		dy    = -dy;
+	}
 
-  ey1 += incr;
-  if (set_cell(RAS_VAR_ TRUNC(x), ey1)) {
-    goto Error;
-  }
+	delta = p / dy;
+	mod   = p % dy;
+	if ( mod < 0 ) {
+		delta--;
+		mod += dy;
+	}
 
-  if (ey1 != ey2) {
-    p = ONE_PIXEL * dx;
-    lift = p / dy;
-    rem = p % dy;
-    if (rem < 0) {
-      lift--;
-      rem += dy;
-    }
-    mod -= dy;
+	x = ras.x + delta;
+	if ( render_scanline( RAS_VAR_ ey1, ras.x, fy1, x, first ) ) {
+		goto Error;
+	}
 
-    while (ey1 != ey2) {
-      delta = lift;
-      mod += rem;
-      if (mod >= 0) {
-        mod -= dy;
-        delta++;
-      }
+	ey1 += incr;
+	if ( set_cell( RAS_VAR_ TRUNC( x ), ey1 ) ) {
+		goto Error;
+	}
 
-      x2 = x + delta;
-      if (render_scanline(RAS_VAR_ ey1, x, ONE_PIXEL - first, x2, first)) {
-        goto Error;
-      }
-      x = x2;
-      ey1 += incr;
-      if (set_cell(RAS_VAR_ TRUNC(x), ey1)) {
-        goto Error;
-      }
-    }
-  }
+	if ( ey1 != ey2 ) {
+		p     = ONE_PIXEL * dx;
+		lift  = p / dy;
+		rem   = p % dy;
+		if ( rem < 0 ) {
+			lift--;
+			rem += dy;
+		}
+		mod -= dy;
 
-  if (render_scanline(RAS_VAR_ ey1, x, ONE_PIXEL - first, to_x, fy2)) {
-    goto Error;
-  }
+		while ( ey1 != ey2 )
+		{
+			delta = lift;
+			mod  += rem;
+			if ( mod >= 0 ) {
+				mod -= dy;
+				delta++;
+			}
+
+			x2 = x + delta;
+			if ( render_scanline( RAS_VAR_ ey1,
+								  x, ONE_PIXEL - first, x2, first ) ) {
+				goto Error;
+			}
+			x = x2;
+			ey1 += incr;
+			if ( set_cell( RAS_VAR_ TRUNC( x ), ey1 ) ) {
+				goto Error;
+			}
+		}
+	}
+
+	if ( render_scanline( RAS_VAR_ ey1,
+						  x, ONE_PIXEL - first, to_x, fy2 ) ) {
+		goto Error;
+	}
 
 End:
-  ras.x = to_x;
-  ras.y = to_y;
-  ras.last_ey = SUBPIXELS(ey2);
+	ras.x       = to_x;
+	ras.y       = to_y;
+	ras.last_ey = SUBPIXELS( ey2 );
 
-  return 0;
+	return 0;
 
 Error:
-  return 1;
+	return 1;
 }
 
-static void split_conic(FT_Vector *base) {
-  TPos a, b;
 
-  base[4].x = base[2].x;
-  b = base[1].x;
-  a = base[3].x = (base[2].x + b) / 2;
-  b = base[1].x = (base[0].x + b) / 2;
-  base[2].x = (a + b) / 2;
+static
+void  split_conic( FT_Vector*  base ) {
+	TPos a, b;
 
-  base[4].y = base[2].y;
-  b = base[1].y;
-  a = base[3].y = (base[2].y + b) / 2;
-  b = base[1].y = (base[0].y + b) / 2;
-  base[2].y = (a + b) / 2;
+
+	base[4].x = base[2].x;
+	b = base[1].x;
+	a = base[3].x = ( base[2].x + b ) / 2;
+	b = base[1].x = ( base[0].x + b ) / 2;
+	base[2].x = ( a + b ) / 2;
+
+	base[4].y = base[2].y;
+	b = base[1].y;
+	a = base[3].y = ( base[2].y + b ) / 2;
+	b = base[1].y = ( base[0].y + b ) / 2;
+	base[2].y = ( a + b ) / 2;
 }
 
-static int render_conic(RAS_ARG_ FT_Vector *control, FT_Vector *to) {
-  TPos dx, dy;
-  int top, level;
-  int *levels;
-  FT_Vector *arc;
 
-  dx = DOWNSCALE(ras.x) + to->x - (control->x << 1);
-  if (dx < 0) {
-    dx = -dx;
-  }
-  dy = DOWNSCALE(ras.y) + to->y - (control->y << 1);
-  if (dy < 0) {
-    dy = -dy;
-  }
-  if (dx < dy) {
-    dx = dy;
-  }
+static
+int  render_conic( RAS_ARG_ FT_Vector*  control,
+				   FT_Vector*  to ) {
+	TPos dx, dy;
+	int top, level;
+	int*        levels;
+	FT_Vector*  arc;
 
-  level = 1;
-  dx = dx / ras.conic_level;
-  while (dx > 0) {
-    dx >>= 1;
-    level++;
-  }
 
-  /* a shortcut to speed things up */
-  if (level <= 1) {
-    /* we compute the mid-point directly in order to avoid */
-    /* calling split_conic()                               */
-    TPos to_x, to_y, mid_x, mid_y;
+	dx = DOWNSCALE( ras.x ) + to->x - ( control->x << 1 );
+	if ( dx < 0 ) {
+		dx = -dx;
+	}
+	dy = DOWNSCALE( ras.y ) + to->y - ( control->y << 1 );
+	if ( dy < 0 ) {
+		dy = -dy;
+	}
+	if ( dx < dy ) {
+		dx = dy;
+	}
 
-    to_x = UPSCALE(to->x);
-    to_y = UPSCALE(to->y);
-    mid_x = (ras.x + to_x + 2 * UPSCALE(control->x)) / 4;
-    mid_y = (ras.y + to_y + 2 * UPSCALE(control->y)) / 4;
+	level = 1;
+	dx = dx / ras.conic_level;
+	while ( dx > 0 )
+	{
+		dx >>= 1;
+		level++;
+	}
 
-    return render_line(RAS_VAR_ mid_x, mid_y) ||
-           render_line(RAS_VAR_ to_x, to_y);
-  }
+	/* a shortcut to speed things up */
+	if ( level <= 1 ) {
+		/* we compute the mid-point directly in order to avoid */
+		/* calling split_conic()                               */
+		TPos to_x, to_y, mid_x, mid_y;
 
-  arc = ras.bez_stack;
-  levels = ras.lev_stack;
-  top = 0;
-  levels[0] = level;
 
-  arc[0].x = UPSCALE(to->x);
-  arc[0].y = UPSCALE(to->y);
-  arc[1].x = UPSCALE(control->x);
-  arc[1].y = UPSCALE(control->y);
-  arc[2].x = ras.x;
-  arc[2].y = ras.y;
+		to_x  = UPSCALE( to->x );
+		to_y  = UPSCALE( to->y );
+		mid_x = ( ras.x + to_x + 2 * UPSCALE( control->x ) ) / 4;
+		mid_y = ( ras.y + to_y + 2 * UPSCALE( control->y ) ) / 4;
 
-  while (top >= 0) {
-    level = levels[top];
-    if (level > 1) {
-      /* check that the arc crosses the current band */
-      TPos min, max, y;
+		return render_line( RAS_VAR_ mid_x, mid_y ) ||
+			   render_line( RAS_VAR_ to_x, to_y );
+	}
 
-      min = max = arc[0].y;
+	arc       = ras.bez_stack;
+	levels    = ras.lev_stack;
+	top       = 0;
+	levels[0] = level;
 
-      y = arc[1].y;
-      if (y < min) {
-        min = y;
-      }
-      if (y > max) {
-        max = y;
-      }
+	arc[0].x = UPSCALE( to->x );
+	arc[0].y = UPSCALE( to->y );
+	arc[1].x = UPSCALE( control->x );
+	arc[1].y = UPSCALE( control->y );
+	arc[2].x = ras.x;
+	arc[2].y = ras.y;
 
-      y = arc[2].y;
-      if (y < min) {
-        min = y;
-      }
-      if (y > max) {
-        max = y;
-      }
+	while ( top >= 0 )
+	{
+		level = levels[top];
+		if ( level > 1 ) {
+			/* check that the arc crosses the current band */
+			TPos min, max, y;
 
-      if (TRUNC(min) >= ras.max_ey || TRUNC(max) < 0) {
-        goto Draw;
-      }
 
-      split_conic(arc);
-      arc += 2;
-      top++;
-      levels[top] = levels[top - 1] = level - 1;
-      continue;
-    }
+			min = max = arc[0].y;
 
-  Draw : {
-    TPos to_x, to_y, mid_x, mid_y;
+			y = arc[1].y;
+			if ( y < min ) {
+				min = y;
+			}
+			if ( y > max ) {
+				max = y;
+			}
 
-    to_x = arc[0].x;
-    to_y = arc[0].y;
-    mid_x = (ras.x + to_x + 2 * arc[1].x) / 4;
-    mid_y = (ras.y + to_y + 2 * arc[1].y) / 4;
+			y = arc[2].y;
+			if ( y < min ) {
+				min = y;
+			}
+			if ( y > max ) {
+				max = y;
+			}
 
-    if (render_line(RAS_VAR_ mid_x, mid_y) ||
-        render_line(RAS_VAR_ to_x, to_y)) {
-      return 1;
-    }
+			if ( TRUNC( min ) >= ras.max_ey || TRUNC( max ) < 0 ) {
+				goto Draw;
+			}
 
-    top--;
-    arc -= 2;
-  }
-  }
-  return 0;
+			split_conic( arc );
+			arc += 2;
+			top++;
+			levels[top] = levels[top - 1] = level - 1;
+			continue;
+		}
+
+Draw:
+		{
+			TPos to_x, to_y, mid_x, mid_y;
+
+
+			to_x  = arc[0].x;
+			to_y  = arc[0].y;
+			mid_x = ( ras.x + to_x + 2 * arc[1].x ) / 4;
+			mid_y = ( ras.y + to_y + 2 * arc[1].y ) / 4;
+
+			if ( render_line( RAS_VAR_ mid_x, mid_y ) ||
+				 render_line( RAS_VAR_ to_x, to_y )   ) {
+				return 1;
+			}
+
+			top--;
+			arc -= 2;
+		}
+	}
+	return 0;
 }
 
-static void split_cubic(FT_Vector *base) {
-  TPos a, b, c, d;
 
-  base[6].x = base[3].x;
-  c = base[1].x;
-  d = base[2].x;
-  base[1].x = a = (base[0].x + c) / 2;
-  base[5].x = b = (base[3].x + d) / 2;
-  c = (c + d) / 2;
-  base[2].x = a = (a + c) / 2;
-  base[4].x = b = (b + c) / 2;
-  base[3].x = (a + b) / 2;
+static
+void  split_cubic( FT_Vector*  base ) {
+	TPos a, b, c, d;
 
-  base[6].y = base[3].y;
-  c = base[1].y;
-  d = base[2].y;
-  base[1].y = a = (base[0].y + c) / 2;
-  base[5].y = b = (base[3].y + d) / 2;
-  c = (c + d) / 2;
-  base[2].y = a = (a + c) / 2;
-  base[4].y = b = (b + c) / 2;
-  base[3].y = (a + b) / 2;
+
+	base[6].x = base[3].x;
+	c = base[1].x;
+	d = base[2].x;
+	base[1].x = a = ( base[0].x + c ) / 2;
+	base[5].x = b = ( base[3].x + d ) / 2;
+	c = ( c + d ) / 2;
+	base[2].x = a = ( a + c ) / 2;
+	base[4].x = b = ( b + c ) / 2;
+	base[3].x = ( a + b ) / 2;
+
+	base[6].y = base[3].y;
+	c = base[1].y;
+	d = base[2].y;
+	base[1].y = a = ( base[0].y + c ) / 2;
+	base[5].y = b = ( base[3].y + d ) / 2;
+	c = ( c + d ) / 2;
+	base[2].y = a = ( a + c ) / 2;
+	base[4].y = b = ( b + c ) / 2;
+	base[3].y = ( a + b ) / 2;
 }
 
-static int render_cubic(RAS_ARG_ FT_Vector *control1, FT_Vector *control2,
-                        FT_Vector *to) {
-  TPos dx, dy, da, db;
-  int top, level;
-  int *levels;
-  FT_Vector *arc;
 
-  dx = DOWNSCALE(ras.x) + to->x - (control1->x << 1);
-  if (dx < 0) {
-    dx = -dx;
-  }
-  dy = DOWNSCALE(ras.y) + to->y - (control1->y << 1);
-  if (dy < 0) {
-    dy = -dy;
-  }
-  if (dx < dy) {
-    dx = dy;
-  }
-  da = dx;
+static
+int  render_cubic( RAS_ARG_ FT_Vector*  control1,
+				   FT_Vector*  control2,
+				   FT_Vector*  to ) {
+	TPos dx, dy, da, db;
+	int top, level;
+	int*        levels;
+	FT_Vector*  arc;
 
-  dx = DOWNSCALE(ras.x) + to->x - 3 * (control1->x + control2->x);
-  if (dx < 0) {
-    dx = -dx;
-  }
-  dy = DOWNSCALE(ras.y) + to->y - 3 * (control1->x + control2->y);
-  if (dy < 0) {
-    dy = -dy;
-  }
-  if (dx < dy) {
-    dx = dy;
-  }
-  db = dx;
 
-  level = 1;
-  da = da / ras.cubic_level;
-  db = db / ras.conic_level;
-  while (da > 0 || db > 0) {
-    da >>= 1;
-    db >>= 2;
-    level++;
-  }
+	dx = DOWNSCALE( ras.x ) + to->x - ( control1->x << 1 );
+	if ( dx < 0 ) {
+		dx = -dx;
+	}
+	dy = DOWNSCALE( ras.y ) + to->y - ( control1->y << 1 );
+	if ( dy < 0 ) {
+		dy = -dy;
+	}
+	if ( dx < dy ) {
+		dx = dy;
+	}
+	da = dx;
 
-  if (level <= 1) {
-    TPos to_x, to_y, mid_x, mid_y;
+	dx = DOWNSCALE( ras.x ) + to->x - 3 * ( control1->x + control2->x );
+	if ( dx < 0 ) {
+		dx = -dx;
+	}
+	dy = DOWNSCALE( ras.y ) + to->y - 3 * ( control1->x + control2->y );
+	if ( dy < 0 ) {
+		dy = -dy;
+	}
+	if ( dx < dy ) {
+		dx = dy;
+	}
+	db = dx;
 
-    to_x = UPSCALE(to->x);
-    to_y = UPSCALE(to->y);
-    mid_x = (ras.x + to_x + 3 * UPSCALE(control1->x + control2->x)) / 8;
-    mid_y = (ras.y + to_y + 3 * UPSCALE(control1->y + control2->y)) / 8;
+	level = 1;
+	da    = da / ras.cubic_level;
+	db    = db / ras.conic_level;
+	while ( da > 0 || db > 0 )
+	{
+		da >>= 1;
+		db >>= 2;
+		level++;
+	}
 
-    return render_line(RAS_VAR_ mid_x, mid_y) ||
-           render_line(RAS_VAR_ to_x, to_y);
-  }
+	if ( level <= 1 ) {
+		TPos to_x, to_y, mid_x, mid_y;
 
-  arc = ras.bez_stack;
-  arc[0].x = UPSCALE(to->x);
-  arc[0].y = UPSCALE(to->y);
-  arc[1].x = UPSCALE(control2->x);
-  arc[1].y = UPSCALE(control2->y);
-  arc[2].x = UPSCALE(control1->x);
-  arc[2].y = UPSCALE(control1->y);
-  arc[3].x = ras.x;
-  arc[3].y = ras.y;
 
-  levels = ras.lev_stack;
-  top = 0;
-  levels[0] = level;
+		to_x  = UPSCALE( to->x );
+		to_y  = UPSCALE( to->y );
+		mid_x = ( ras.x + to_x +
+				  3 * UPSCALE( control1->x + control2->x ) ) / 8;
+		mid_y = ( ras.y + to_y +
+				  3 * UPSCALE( control1->y + control2->y ) ) / 8;
 
-  while (top >= 0) {
-    level = levels[top];
-    if (level > 1) {
-      /* check that the arc crosses the current band */
-      TPos min, max, y;
+		return render_line( RAS_VAR_ mid_x, mid_y ) ||
+			   render_line( RAS_VAR_ to_x, to_y );
+	}
 
-      min = max = arc[0].y;
-      y = arc[1].y;
-      if (y < min) {
-        min = y;
-      }
-      if (y > max) {
-        max = y;
-      }
-      y = arc[2].y;
-      if (y < min) {
-        min = y;
-      }
-      if (y > max) {
-        max = y;
-      }
-      y = arc[3].y;
-      if (y < min) {
-        min = y;
-      }
-      if (y > max) {
-        max = y;
-      }
-      if (TRUNC(min) >= ras.max_ey || TRUNC(max) < 0) {
-        goto Draw;
-      }
-      split_cubic(arc);
-      arc += 3;
-      top++;
-      levels[top] = levels[top - 1] = level - 1;
-      continue;
-    }
+	arc      = ras.bez_stack;
+	arc[0].x = UPSCALE( to->x );
+	arc[0].y = UPSCALE( to->y );
+	arc[1].x = UPSCALE( control2->x );
+	arc[1].y = UPSCALE( control2->y );
+	arc[2].x = UPSCALE( control1->x );
+	arc[2].y = UPSCALE( control1->y );
+	arc[3].x = ras.x;
+	arc[3].y = ras.y;
 
-  Draw : {
-    TPos to_x, to_y, mid_x, mid_y;
+	levels    = ras.lev_stack;
+	top       = 0;
+	levels[0] = level;
 
-    to_x = arc[0].x;
-    to_y = arc[0].y;
-    mid_x = (ras.x + to_x + 3 * (arc[1].x + arc[2].x)) / 8;
-    mid_y = (ras.y + to_y + 3 * (arc[1].y + arc[2].y)) / 8;
+	while ( top >= 0 )
+	{
+		level = levels[top];
+		if ( level > 1 ) {
+			/* check that the arc crosses the current band */
+			TPos min, max, y;
 
-    if (render_line(RAS_VAR_ mid_x, mid_y) ||
-        render_line(RAS_VAR_ to_x, to_y)) {
-      return 1;
-    }
-    top--;
-    arc -= 3;
-  }
-  }
-  return 0;
+
+			min = max = arc[0].y;
+			y = arc[1].y;
+			if ( y < min ) {
+				min = y;
+			}
+			if ( y > max ) {
+				max = y;
+			}
+			y = arc[2].y;
+			if ( y < min ) {
+				min = y;
+			}
+			if ( y > max ) {
+				max = y;
+			}
+			y = arc[3].y;
+			if ( y < min ) {
+				min = y;
+			}
+			if ( y > max ) {
+				max = y;
+			}
+			if ( TRUNC( min ) >= ras.max_ey || TRUNC( max ) < 0 ) {
+				goto Draw;
+			}
+			split_cubic( arc );
+			arc += 3;
+			top++;
+			levels[top] = levels[top - 1] = level - 1;
+			continue;
+		}
+
+Draw:
+		{
+			TPos to_x, to_y, mid_x, mid_y;
+
+
+			to_x  = arc[0].x;
+			to_y  = arc[0].y;
+			mid_x = ( ras.x + to_x + 3 * ( arc[1].x + arc[2].x ) ) / 8;
+			mid_y = ( ras.y + to_y + 3 * ( arc[1].y + arc[2].y ) ) / 8;
+
+			if ( render_line( RAS_VAR_ mid_x, mid_y ) ||
+				 render_line( RAS_VAR_ to_x, to_y )   ) {
+				return 1;
+			}
+			top--;
+			arc -= 3;
+		}
+	}
+	return 0;
 }
+
 
 /* a macro comparing two cell pointers.  Returns true if a <= b. */
 #if 1
 
-#define PACK(a) (((long)(a)->y << 16) + (a)->x)
-#define LESS_THAN(a, b) (PACK(a) < PACK(b))
+#define PACK( a )          ( ( (long)( a )->y << 16 ) + ( a )->x )
+#define LESS_THAN( a, b )  ( PACK( a ) < PACK( b ) )
 
 #else /* 1 */
 
-#define LESS_THAN(a, b)                                                        \
-  ((a)->y < (b)->y || ((a)->y == (b)->y && (a)->x < (b)->x))
+#define LESS_THAN( a, b )  ( ( a )->y < ( b )->y ||	\
+							 ( ( a )->y == ( b )->y && ( a )->x < ( b )->x ) )
 
 #endif /* 1 */
 
-#define SWAP_CELLS(a, b, temp)                                                 \
-  do {                                                                         \
-    temp = *(a);                                                               \
-    *(a) = *(b);                                                               \
-    *(b) = temp;                                                               \
-  } while (0)
+#define SWAP_CELLS( a, b, temp )  do			 \
+	{			   \
+		temp = *( a ); \
+		*( a ) = *( b ); \
+		*( b ) = temp; \
+	} while ( 0 )
 #define DEBUG_SORT
 #define QUICK_SORT
 
@@ -924,35 +1001,43 @@ static int render_cubic(RAS_ARG_ FT_Vector *control1, FT_Vector *control2,
 
 /* a simple shell sort algorithm that works directly on our */
 /* cells table                                              */
-static void shell_sort(PCell cells, int count) {
-  PCell i, j, limit = cells + count;
-  TCell temp;
-  int gap;
+static
+void  shell_sort( PCell cells,
+				  int count ) {
+	PCell i, j, limit = cells + count;
+	TCell temp;
+	int gap;
 
-  /* compute initial gap */
-  for (gap = 0; ++gap < count; gap *= 3)
-    ;
 
-  while (gap /= 3) {
-    for (i = cells + gap; i < limit; i++) {
-      for (j = i - gap;; j -= gap) {
-        PCell k = j + gap;
+	/* compute initial gap */
+	for ( gap = 0; ++gap < count; gap *= 3 )
+		;
 
-        if (LESS_THAN(j, k)) {
-          break;
-        }
+	while ( gap /= 3 )
+	{
+		for ( i = cells + gap; i < limit; i++ )
+		{
+			for ( j = i - gap; ; j -= gap )
+			{
+				PCell k = j + gap;
 
-        SWAP_CELLS(j, k, temp);
 
-        if (j < cells + gap) {
-          break;
-        }
-      }
-    }
-  }
+				if ( LESS_THAN( j, k ) ) {
+					break;
+				}
+
+				SWAP_CELLS( j, k, temp );
+
+				if ( j < cells + gap ) {
+					break;
+				}
+			}
+		}
+	}
 }
 
 #endif /* SHELL_SORT */
+
 
 #ifdef QUICK_SORT
 
@@ -960,366 +1045,423 @@ static void shell_sort(PCell cells, int count) {
 /* array.  It should be faster than calling the stdlib qsort(), and we   */
 /* can even tailor our insertion threshold...                            */
 
-#define QSORT_THRESHOLD 9 /* below this size, a sub-array will be sorted */
-                          /* through a normal insertion sort             */
+#define QSORT_THRESHOLD  9  /* below this size, a sub-array will be sorted */
+							/* through a normal insertion sort             */
 
-static void quick_sort(PCell cells, int count) {
-  PCell stack[40]; /* should be enough ;-) */
-  PCell *top;      /* top of stack */
-  PCell base, limit;
-  TCell temp;
+static
+void  quick_sort( PCell cells,
+				  int count ) {
+	PCell stack[40];    /* should be enough ;-) */
+	PCell*  top;        /* top of stack */
+	PCell base, limit;
+	TCell temp;
 
-  limit = cells + count;
-  base = cells;
-  top = stack;
 
-  for (;;) {
-    int len = limit - base;
-    PCell i, j, pivot;
+	limit = cells + count;
+	base  = cells;
+	top   = stack;
 
-    if (len > QSORT_THRESHOLD) {
-      /* we use base + len/2 as the pivot */
-      pivot = base + len / 2;
-      SWAP_CELLS(base, pivot, temp);
+	for (;; )
+	{
+		int len = limit - base;
+		PCell i, j, pivot;
 
-      i = base + 1;
-      j = limit - 1;
 
-      /* now ensure that *i <= *base <= *j */
-      if (LESS_THAN(j, i)) {
-        SWAP_CELLS(i, j, temp);
-      }
+		if ( len > QSORT_THRESHOLD ) {
+			/* we use base + len/2 as the pivot */
+			pivot = base + len / 2;
+			SWAP_CELLS( base, pivot, temp );
 
-      if (LESS_THAN(base, i)) {
-        SWAP_CELLS(base, i, temp);
-      }
+			i = base + 1;
+			j = limit - 1;
 
-      if (LESS_THAN(j, base)) {
-        SWAP_CELLS(base, j, temp);
-      }
+			/* now ensure that *i <= *base <= *j */
+			if ( LESS_THAN( j, i ) ) {
+				SWAP_CELLS( i, j, temp );
+			}
 
-      for (;;) {
-        do
-          i++;
-        while (LESS_THAN(i, base));
-        do
-          j--;
-        while (LESS_THAN(base, j));
+			if ( LESS_THAN( base, i ) ) {
+				SWAP_CELLS( base, i, temp );
+			}
 
-        if (i > j) {
-          break;
-        }
+			if ( LESS_THAN( j, base ) ) {
+				SWAP_CELLS( base, j, temp );
+			}
 
-        SWAP_CELLS(i, j, temp);
-      }
+			for (;; )
+			{
+				do i++;while ( LESS_THAN( i, base ) );
+				do j--;while ( LESS_THAN( base, j ) );
 
-      SWAP_CELLS(base, j, temp);
+				if ( i > j ) {
+					break;
+				}
 
-      /* now, push the largest sub-array */
-      if (j - base > limit - i) {
-        top[0] = base;
-        top[1] = j;
-        base = i;
-      } else {
-        top[0] = i;
-        top[1] = limit;
-        limit = j;
-      }
-      top += 2;
-    } else {
-      /* the sub-array is small, perform insertion sort */
-      j = base;
-      i = j + 1;
+				SWAP_CELLS( i, j, temp );
+			}
 
-      for (; i < limit; j = i, i++) {
-        for (; LESS_THAN(j + 1, j); j--) {
-          SWAP_CELLS(j + 1, j, temp);
-          if (j == base) {
-            break;
-          }
-        }
-      }
-      if (top > stack) {
-        top -= 2;
-        base = top[0];
-        limit = top[1];
-      } else {
-        break;
-      }
-    }
-  }
+			SWAP_CELLS( base, j, temp );
+
+			/* now, push the largest sub-array */
+			if ( j - base > limit - i ) {
+				top[0] = base;
+				top[1] = j;
+				base   = i;
+			} else
+			{
+				top[0] = i;
+				top[1] = limit;
+				limit  = j;
+			}
+			top += 2;
+		} else
+		{
+			/* the sub-array is small, perform insertion sort */
+			j = base;
+			i = j + 1;
+
+			for ( ; i < limit; j = i, i++ )
+			{
+				for ( ; LESS_THAN( j + 1, j ); j-- )
+				{
+					SWAP_CELLS( j + 1, j, temp );
+					if ( j == base ) {
+						break;
+					}
+				}
+			}
+			if ( top > stack ) {
+				top  -= 2;
+				base  = top[0];
+				limit = top[1];
+			} else {
+				break;
+			}
+		}
+	}
 }
 
 #endif /* QUICK_SORT */
 
+
 #ifdef DEBUG_GRAYS
 #ifdef DEBUG_SORT
 
-static int check_sort(PCell cells, int count) {
-  PCell p, q;
+static
+int  check_sort( PCell cells,
+				 int count ) {
+	PCell p, q;
 
-  for (p = cells + count - 2; p >= cells; p--) {
-    q = p + 1;
-    if (!LESS_THAN(p, q)) {
-      return 0;
-    }
-  }
-  return 1;
+
+	for ( p = cells + count - 2; p >= cells; p-- )
+	{
+		q = p + 1;
+		if ( !LESS_THAN( p, q ) ) {
+			return 0;
+		}
+	}
+	return 1;
 }
 
 #endif /* DEBUG_SORT */
 #endif /* DEBUG_GRAYS */
 
-static int Move_To(FT_Vector *to, FT_Raster raster) {
-  TPos x, y;
 
-  /* record current cell, if any */
-  record_cell((PRaster)raster);
+static
+int  Move_To( FT_Vector*  to,
+			  FT_Raster raster ) {
+	TPos x, y;
 
-  /* start to a new position */
-  x = UPSCALE(to->x);
-  y = UPSCALE(to->y);
-  start_cell((PRaster)raster, TRUNC(x), TRUNC(y));
-  ((PRaster)raster)->x = x;
-  ((PRaster)raster)->y = y;
-  return 0;
+
+	/* record current cell, if any */
+	record_cell( (PRaster)raster );
+
+	/* start to a new position */
+	x = UPSCALE( to->x );
+	y = UPSCALE( to->y );
+	start_cell( (PRaster)raster, TRUNC( x ), TRUNC( y ) );
+	( (PRaster)raster )->x = x;
+	( (PRaster)raster )->y = y;
+	return 0;
 }
 
-static int Line_To(FT_Vector *to, FT_Raster raster) {
-  return render_line((PRaster)raster, UPSCALE(to->x), UPSCALE(to->y));
+
+static
+int  Line_To( FT_Vector*  to,
+			  FT_Raster raster ) {
+	return render_line( (PRaster)raster,
+						UPSCALE( to->x ), UPSCALE( to->y ) );
 }
 
-static int Conic_To(FT_Vector *control, FT_Vector *to, FT_Raster raster) {
-  return render_conic((PRaster)raster, control, to);
+
+static
+int  Conic_To( FT_Vector*  control,
+			   FT_Vector*  to,
+			   FT_Raster raster ) {
+	return render_conic( (PRaster)raster, control, to );
 }
 
-static int Cubic_To(FT_Vector *control1, FT_Vector *control2, FT_Vector *to,
-                    FT_Raster raster) {
-  return render_cubic((PRaster)raster, control1, control2, to);
+
+static
+int  Cubic_To( FT_Vector*  control1,
+			   FT_Vector*  control2,
+			   FT_Vector*  to,
+			   FT_Raster raster ) {
+	return render_cubic( (PRaster)raster, control1, control2, to );
 }
 
-static void grays_render_span(int y, int count, FT_Span *spans,
-                              PRaster raster) {
-  unsigned char *p;
-  FT_Bitmap *map = &raster->target;
 
-  /* first of all, compute the scanline offset */
-  p = (unsigned char *)map->buffer - y * map->pitch;
-  if (map->pitch >= 0) {
-    p += (map->rows - 1) * map->pitch;
-  }
+static
+void  grays_render_span( int y,
+						 int count,
+						 FT_Span*  spans,
+						 PRaster raster ) {
+	unsigned char*  p;
+	FT_Bitmap*      map = &raster->target;
 
-  for (; count > 0; count--, spans++) {
-    if (spans->coverage)
+
+	/* first of all, compute the scanline offset */
+	p = (unsigned char*)map->buffer - y * map->pitch;
+	if ( map->pitch >= 0 ) {
+		p += ( map->rows - 1 ) * map->pitch;
+	}
+
+	for ( ; count > 0; count--, spans++ )
+	{
+		if ( spans->coverage )
 #if 1
-    {
-      memset(p + spans->x, (unsigned char)spans->coverage, spans->len);
-    }
-#else  /* 1 */
-    {
-      q = p + spans->x;
-      limit = q + spans->len;
-      for (; q < limit; q++)
-        q[0] = (unsigned char)spans->coverage;
-    }
+		{ memset( p + spans->x, (unsigned char)spans->coverage, spans->len );}
+#else /* 1 */
+		{
+			q     = p + spans->x;
+			limit = q + spans->len;
+			for ( ; q < limit; q++ )
+				q[0] = (unsigned char)spans->coverage;
+		}
 #endif /* 1 */
-  }
+	}
 }
+
 
 #ifdef DEBUG_GRAYS
 
 #include <stdio.h>
 
-static void dump_cells(RAS_ARG) {
-  PCell cell, limit;
-  int y = -1;
+static
+void  dump_cells( RAS_ARG ) {
+	PCell cell, limit;
+	int y = -1;
 
-  cell = ras.cells;
-  limit = cell + ras.num_cells;
 
-  for (; cell < limit; cell++) {
-    if (cell->y != y) {
-      fprintf(stderr, "\n%2d: ", cell->y);
-      y = cell->y;
-    }
-    fprintf(stderr, "[%d %d %d]", cell->x, cell->area, cell->cover);
-  }
-  fprintf(stderr, "\n");
+	cell  = ras.cells;
+	limit = cell + ras.num_cells;
+
+	for ( ; cell < limit; cell++ )
+	{
+		if ( cell->y != y ) {
+			fprintf( stderr, "\n%2d: ", cell->y );
+			y = cell->y;
+		}
+		fprintf( stderr, "[%d %d %d]",
+				 cell->x, cell->area, cell->cover );
+	}
+	fprintf( stderr, "\n" );
 }
 
 #endif /* DEBUG_GRAYS */
 
-static void grays_hline(RAS_ARG_ TScan x, TScan y, TPos area, int acount) {
-  FT_Span *span;
-  int count;
-  int coverage;
 
-  /* compute the coverage line's coverage, depending on the    */
-  /* outline fill rule                                         */
-  /*                                                           */
-  /* the coverage percentage is area/(PIXEL_BITS*PIXEL_BITS*2) */
-  /*                                                           */
-  coverage = area >> (PIXEL_BITS * 2 + 1 - 8); /* use range 0..256 */
+static
+void  grays_hline( RAS_ARG_ TScan x,
+				   TScan y,
+				   TPos area,
+				   int acount ) {
+	FT_Span*   span;
+	int count;
+	int coverage;
 
-  if (ras.outline.flags & ft_outline_even_odd_fill) {
-    if (coverage < 0) {
-      coverage = -coverage;
-    }
 
-    while (coverage >= 512)
-      coverage -= 512;
+	/* compute the coverage line's coverage, depending on the    */
+	/* outline fill rule                                         */
+	/*                                                           */
+	/* the coverage percentage is area/(PIXEL_BITS*PIXEL_BITS*2) */
+	/*                                                           */
+	coverage = area >> ( PIXEL_BITS * 2 + 1 - 8 );  /* use range 0..256 */
 
-    if (coverage > 256) {
-      coverage = 512 - coverage;
-    } else if (coverage == 256) {
-      coverage = 255;
-    }
-  } else {
-    /* normal non-zero winding rule */
-    if (coverage < 0) {
-      coverage = -coverage;
-    }
+	if ( ras.outline.flags & ft_outline_even_odd_fill ) {
+		if ( coverage < 0 ) {
+			coverage = -coverage;
+		}
 
-    if (coverage >= 256) {
-      coverage = 255;
-    }
-  }
+		while ( coverage >= 512 )
+			coverage -= 512;
 
-  y += ras.min_ey;
-  x += ras.min_ex;
+		if ( coverage > 256 ) {
+			coverage = 512 - coverage;
+		} else if ( coverage == 256 ) {
+			coverage = 255;
+		}
+	} else
+	{
+		/* normal non-zero winding rule */
+		if ( coverage < 0 ) {
+			coverage = -coverage;
+		}
 
-  if (coverage) {
-    /* see if we can add this span to the current list */
-    count = ras.num_gray_spans;
-    span = ras.gray_spans + count - 1;
-    if (count > 0 && ras.span_y == y && (int)span->x + span->len == (int)x &&
-        span->coverage == coverage) {
-      span->len += acount;
-      return;
-    }
+		if ( coverage >= 256 ) {
+			coverage = 255;
+		}
+	}
 
-    if (ras.span_y != y || count >= FT_MAX_GRAY_SPANS) {
-      if (ras.render_span) {
-        ras.render_span(ras.span_y, count, ras.gray_spans,
-                        ras.render_span_data);
-      }
-      /* ras.render_span( span->y, ras.gray_spans, count ); */
+	y += ras.min_ey;
+	x += ras.min_ex;
+
+	if ( coverage ) {
+		/* see if we can add this span to the current list */
+		count = ras.num_gray_spans;
+		span  = ras.gray_spans + count - 1;
+		if ( count > 0                          &&
+			 ras.span_y == y                    &&
+			 (int)span->x + span->len == (int)x &&
+			 span->coverage == coverage ) {
+			span->len += acount;
+			return;
+		}
+
+		if ( ras.span_y != y || count >= FT_MAX_GRAY_SPANS ) {
+			if ( ras.render_span ) {
+				ras.render_span( ras.span_y, count, ras.gray_spans,
+								 ras.render_span_data );
+			}
+			/* ras.render_span( span->y, ras.gray_spans, count ); */
 
 #ifdef DEBUG_GRAYS
 
-      if (ras.span_y >= 0) {
-        int n;
+			if ( ras.span_y >= 0 ) {
+				int n;
 
-        fprintf(stderr, "y=%3d ", ras.span_y);
-        span = ras.gray_spans;
-        for (n = 0; n < count; n++, span++)
-          fprintf(stderr, "[%d..%d]:%02x ", span->x, span->x + span->len - 1,
-                  span->coverage);
-        fprintf(stderr, "\n");
-      }
+
+				fprintf( stderr, "y=%3d ", ras.span_y );
+				span = ras.gray_spans;
+				for ( n = 0; n < count; n++, span++ )
+					fprintf( stderr, "[%d..%d]:%02x ",
+							 span->x, span->x + span->len - 1, span->coverage );
+				fprintf( stderr, "\n" );
+			}
 
 #endif /* DEBUG_GRAYS */
 
-      ras.num_gray_spans = 0;
-      ras.span_y = y;
+			ras.num_gray_spans = 0;
+			ras.span_y         = y;
 
-      count = 0;
-      span = ras.gray_spans;
-    } else {
-      span++;
-    }
+			count = 0;
+			span  = ras.gray_spans;
+		} else {
+			span++;
+		}
 
-    /* add a gray span to the current list */
-    span->x = (short)x;
-    span->len = (unsigned short)acount;
-    span->coverage = (unsigned char)coverage;
-    ras.num_gray_spans++;
-  }
+		/* add a gray span to the current list */
+		span->x        = (short)x;
+		span->len      = (unsigned short)acount;
+		span->coverage = (unsigned char)coverage;
+		ras.num_gray_spans++;
+	}
 }
 
-static void grays_sweep(RAS_ARG_ FT_Bitmap *target) {
-  TScan x, y, cover, area;
-  PCell start, cur, limit;
 
-  FT_UNUSED(target);
+static
+void  grays_sweep( RAS_ARG_ FT_Bitmap*  target ) {
+	TScan x, y, cover, area;
+	PCell start, cur, limit;
 
-  cur = ras.cells;
-  limit = cur + ras.num_cells;
+	FT_UNUSED( target );
 
-  cover = 0;
-  ras.span_y = -1;
-  ras.num_gray_spans = 0;
 
-  for (;;) {
-    start = cur;
-    y = start->y;
-    x = start->x;
+	cur   = ras.cells;
+	limit = cur + ras.num_cells;
 
-    area = start->area;
-    cover += start->cover;
+	cover              = 0;
+	ras.span_y         = -1;
+	ras.num_gray_spans = 0;
 
-    /* accumulate all start cells */
-    for (;;) {
-      ++cur;
-      if (cur >= limit || cur->y != start->y || cur->x != start->x) {
-        break;
-      }
+	for (;; )
+	{
+		start  = cur;
+		y      = start->y;
+		x      = start->x;
 
-      area += cur->area;
-      cover += cur->cover;
-    }
+		area   = start->area;
+		cover += start->cover;
 
-    /* if the start cell has a non-null area, we must draw an */
-    /* individual gray pixel there                            */
-    if (area && x >= 0) {
-      grays_hline(RAS_VAR_ x, y, cover * (ONE_PIXEL * 2) - area, 1);
-      x++;
-    }
+		/* accumulate all start cells */
+		for (;; )
+		{
+			++cur;
+			if ( cur >= limit || cur->y != start->y || cur->x != start->x ) {
+				break;
+			}
 
-    if (x < 0) {
-      x = 0;
-    }
+			area  += cur->area;
+			cover += cur->cover;
+		}
 
-    if (cur < limit && start->y == cur->y) {
-      /* draw a gray span between the start cell and the current one */
-      if (cur->x > x) {
-        grays_hline(RAS_VAR_ x, y, cover * (ONE_PIXEL * 2), cur->x - x);
-      }
-    } else {
-      /* draw a gray span until the end of the clipping region */
-      if (cover && x < ras.max_ex - ras.min_ex) {
-        grays_hline(RAS_VAR_ x, y, cover * (ONE_PIXEL * 2),
-                    ras.max_ex - x - ras.min_ex);
-      }
-      cover = 0;
-    }
+		/* if the start cell has a non-null area, we must draw an */
+		/* individual gray pixel there                            */
+		if ( area && x >= 0 ) {
+			grays_hline( RAS_VAR_ x, y, cover * ( ONE_PIXEL * 2 ) - area, 1 );
+			x++;
+		}
 
-    if (cur >= limit) {
-      break;
-    }
-  }
+		if ( x < 0 ) {
+			x = 0;
+		}
 
-  if (ras.render_span && ras.num_gray_spans > 0) {
-    ras.render_span(ras.span_y, ras.num_gray_spans, ras.gray_spans,
-                    ras.render_span_data);
-  }
+		if ( cur < limit && start->y == cur->y ) {
+			/* draw a gray span between the start cell and the current one */
+			if ( cur->x > x ) {
+				grays_hline( RAS_VAR_ x, y,
+							 cover * ( ONE_PIXEL * 2 ), cur->x - x );
+			}
+		} else
+		{
+			/* draw a gray span until the end of the clipping region */
+			if ( cover && x < ras.max_ex - ras.min_ex ) {
+				grays_hline( RAS_VAR_ x, y,
+							 cover * ( ONE_PIXEL * 2 ),
+							 ras.max_ex - x - ras.min_ex );
+			}
+			cover = 0;
+		}
+
+		if ( cur >= limit ) {
+			break;
+		}
+	}
+
+	if ( ras.render_span && ras.num_gray_spans > 0 ) {
+		ras.render_span( ras.span_y, ras.num_gray_spans,
+						 ras.gray_spans, ras.render_span_data );
+	}
 
 #ifdef DEBUG_GRAYS
 
-  {
-    int n;
-    FT_Span *span;
+	{
+		int n;
+		FT_Span*  span;
 
-    fprintf(stderr, "y=%3d ", ras.span_y);
-    span = ras.gray_spans;
-    for (n = 0; n < ras.num_gray_spans; n++, span++)
-      fprintf(stderr, "[%d..%d]:%02x ", span->x, span->x + span->len - 1,
-              span->coverage);
-    fprintf(stderr, "\n");
-  }
+
+		fprintf( stderr, "y=%3d ", ras.span_y );
+		span = ras.gray_spans;
+		for ( n = 0; n < ras.num_gray_spans; n++, span++ )
+			fprintf( stderr, "[%d..%d]:%02x ",
+					 span->x, span->x + span->len - 1, span->coverage );
+		fprintf( stderr, "\n" );
+	}
 
 #endif /* DEBUG_GRAYS */
+
 }
+
 
 #ifdef _STANDALONE_
 
@@ -1354,453 +1496,501 @@ static void grays_sweep(RAS_ARG_ FT_Bitmap *target) {
 /* <Return>                                                              */
 /*    Error code.  0 means sucess.                                       */
 /*                                                                       */
-static int FT_Outline_Decompose(FT_Outline *outline,
-                                FT_Outline_Funcs *interface, void *user) {
+static
+int  FT_Outline_Decompose( FT_Outline*        outline,
+						   FT_Outline_Funcs*  interface,
+						   void*              user ) {
 #undef SCALED
-#define SCALED(x) (((x) << shift) - delta)
+#define SCALED( x )  ( ( ( x ) << shift ) - delta )
 
-  FT_Vector v_last;
-  FT_Vector v_control;
-  FT_Vector v_start;
+	FT_Vector v_last;
+	FT_Vector v_control;
+	FT_Vector v_start;
 
-  FT_Vector *point;
-  FT_Vector *limit;
-  char *tags;
+	FT_Vector*  point;
+	FT_Vector*  limit;
+	char*       tags;
 
-  int n;     /* index of contour in outline     */
-  int first; /* index of first point in contour */
-  int error;
-  char tag; /* current point's state           */
+	int n;             /* index of contour in outline     */
+	int first;         /* index of first point in contour */
+	int error;
+	char tag;          /* current point's state           */
 
-  int shift = interface->shift;
-  FT_Pos delta = interface->delta;
+	int shift = interface->shift;
+	FT_Pos delta = interface->delta;
 
-  first = 0;
 
-  for (n = 0; n < outline->n_contours; n++) {
-    int last; /* index of last point in contour */
+	first = 0;
 
-    last = outline->contours[n];
-    limit = outline->points + last;
+	for ( n = 0; n < outline->n_contours; n++ )
+	{
+		int last; /* index of last point in contour */
 
-    v_start = outline->points[first];
-    v_last = outline->points[last];
 
-    v_start.x = SCALED(v_start.x);
-    v_start.y = SCALED(v_start.y);
-    v_last.x = SCALED(v_last.x);
-    v_last.y = SCALED(v_last.y);
+		last  = outline->contours[n];
+		limit = outline->points + last;
 
-    v_control = v_start;
+		v_start = outline->points[first];
+		v_last  = outline->points[last];
 
-    point = outline->points + first;
-    tags = outline->tags + first;
-    tag = FT_CURVE_TAG(tags[0]);
+		v_start.x = SCALED( v_start.x ); v_start.y = SCALED( v_start.y );
+		v_last.x  = SCALED( v_last.x );  v_last.y  = SCALED( v_last.y );
 
-    /* A contour cannot start with a cubic control point! */
-    if (tag == FT_Curve_Tag_Cubic) {
-      goto Invalid_Outline;
-    }
+		v_control = v_start;
 
-    /* check first point to determine origin */
-    if (tag == FT_Curve_Tag_Conic) {
-      /* first point is conic control.  Yes, this happens. */
-      if (FT_CURVE_TAG(outline->tags[last]) == FT_Curve_Tag_On) {
-        /* start at last point if it is on the curve */
-        v_start = v_last;
-        limit--;
-      } else {
-        /* if both first and last points are conic,         */
-        /* start at their middle and record its position    */
-        /* for closure                                      */
-        v_start.x = (v_start.x + v_last.x) / 2;
-        v_start.y = (v_start.y + v_last.y) / 2;
+		point = outline->points + first;
+		tags  = outline->tags  + first;
+		tag   = FT_CURVE_TAG( tags[0] );
 
-        v_last = v_start;
-      }
-      point--;
-      tags--;
-    }
+		/* A contour cannot start with a cubic control point! */
+		if ( tag == FT_Curve_Tag_Cubic ) {
+			goto Invalid_Outline;
+		}
 
-    error = interface->move_to(&v_start, user);
-    if (error) {
-      goto Exit;
-    }
+		/* check first point to determine origin */
+		if ( tag == FT_Curve_Tag_Conic ) {
+			/* first point is conic control.  Yes, this happens. */
+			if ( FT_CURVE_TAG( outline->tags[last] ) == FT_Curve_Tag_On ) {
+				/* start at last point if it is on the curve */
+				v_start = v_last;
+				limit--;
+			} else
+			{
+				/* if both first and last points are conic,         */
+				/* start at their middle and record its position    */
+				/* for closure                                      */
+				v_start.x = ( v_start.x + v_last.x ) / 2;
+				v_start.y = ( v_start.y + v_last.y ) / 2;
 
-    while (point < limit) {
-      point++;
-      tags++;
+				v_last = v_start;
+			}
+			point--;
+			tags--;
+		}
 
-      tag = FT_CURVE_TAG(tags[0]);
-      switch (tag) {
-      case FT_Curve_Tag_On: /* emit a single line_to */
-      {
-        FT_Vector vec;
+		error = interface->move_to( &v_start, user );
+		if ( error ) {
+			goto Exit;
+		}
 
-        vec.x = SCALED(point->x);
-        vec.y = SCALED(point->y);
+		while ( point < limit )
+		{
+			point++;
+			tags++;
 
-        error = interface->line_to(&vec, user);
-        if (error) {
-          goto Exit;
-        }
-        continue;
-      }
+			tag = FT_CURVE_TAG( tags[0] );
+			switch ( tag )
+			{
+			case FT_Curve_Tag_On: /* emit a single line_to */
+			{
+				FT_Vector vec;
 
-      case FT_Curve_Tag_Conic: /* consume conic arcs */
-      {
-        v_control.x = SCALED(point->x);
-        v_control.y = SCALED(point->y);
 
-      Do_Conic:
-        if (point < limit) {
-          FT_Vector vec;
-          FT_Vector v_middle;
+				vec.x = SCALED( point->x );
+				vec.y = SCALED( point->y );
 
-          point++;
-          tags++;
-          tag = FT_CURVE_TAG(tags[0]);
+				error = interface->line_to( &vec, user );
+				if ( error ) {
+					goto Exit;
+				}
+				continue;
+			}
 
-          vec.x = SCALED(point->x);
-          vec.y = SCALED(point->y);
+			case FT_Curve_Tag_Conic: /* consume conic arcs */
+			{
+				v_control.x = SCALED( point->x );
+				v_control.y = SCALED( point->y );
 
-          if (tag == FT_Curve_Tag_On) {
-            error = interface->conic_to(&v_control, &vec, user);
-            if (error) {
-              goto Exit;
-            }
-            continue;
-          }
+Do_Conic:
+				if ( point < limit ) {
+					FT_Vector vec;
+					FT_Vector v_middle;
 
-          if (tag != FT_Curve_Tag_Conic) {
-            goto Invalid_Outline;
-          }
 
-          v_middle.x = (v_control.x + vec.x) / 2;
-          v_middle.y = (v_control.y + vec.y) / 2;
+					point++;
+					tags++;
+					tag = FT_CURVE_TAG( tags[0] );
 
-          error = interface->conic_to(&v_control, &v_middle, user);
-          if (error) {
-            goto Exit;
-          }
+					vec.x = SCALED( point->x );
+					vec.y = SCALED( point->y );
 
-          v_control = vec;
-          goto Do_Conic;
-        }
+					if ( tag == FT_Curve_Tag_On ) {
+						error = interface->conic_to( &v_control, &vec, user );
+						if ( error ) {
+							goto Exit;
+						}
+						continue;
+					}
 
-        error = interface->conic_to(&v_control, &v_start, user);
-        goto Close;
-      }
+					if ( tag != FT_Curve_Tag_Conic ) {
+						goto Invalid_Outline;
+					}
 
-      default: /* FT_Curve_Tag_Cubic */
-      {
-        FT_Vector vec1, vec2;
+					v_middle.x = ( v_control.x + vec.x ) / 2;
+					v_middle.y = ( v_control.y + vec.y ) / 2;
 
-        if (point + 1 > limit || FT_CURVE_TAG(tags[1]) != FT_Curve_Tag_Cubic) {
-          goto Invalid_Outline;
-        }
+					error = interface->conic_to( &v_control, &v_middle, user );
+					if ( error ) {
+						goto Exit;
+					}
 
-        point += 2;
-        tags += 2;
+					v_control = vec;
+					goto Do_Conic;
+				}
 
-        vec1.x = SCALED(point[-2].x);
-        vec1.y = SCALED(point[-2].y);
-        vec2.x = SCALED(point[-1].x);
-        vec2.y = SCALED(point[-1].y);
+				error = interface->conic_to( &v_control, &v_start, user );
+				goto Close;
+			}
 
-        if (point <= limit) {
-          FT_Vector vec;
+			default: /* FT_Curve_Tag_Cubic */
+			{
+				FT_Vector vec1, vec2;
 
-          vec.x = SCALED(point->x);
-          vec.y = SCALED(point->y);
 
-          error = interface->cubic_to(&vec1, &vec2, &vec, user);
-          if (error) {
-            goto Exit;
-          }
-          continue;
-        }
+				if ( point + 1 > limit                             ||
+					 FT_CURVE_TAG( tags[1] ) != FT_Curve_Tag_Cubic ) {
+					goto Invalid_Outline;
+				}
 
-        error = interface->cubic_to(&vec1, &vec2, &v_start, user);
-        goto Close;
-      }
-      }
-    }
+				point += 2;
+				tags  += 2;
 
-    /* close the contour with a line segment */
-    error = interface->line_to(&v_start, user);
+				vec1.x = SCALED( point[-2].x ); vec1.y = SCALED( point[-2].y );
+				vec2.x = SCALED( point[-1].x ); vec2.y = SCALED( point[-1].y );
 
-  Close:
-    if (error) {
-      goto Exit;
-    }
+				if ( point <= limit ) {
+					FT_Vector vec;
 
-    first = last + 1;
-  }
 
-  return 0;
+					vec.x = SCALED( point->x );
+					vec.y = SCALED( point->y );
+
+					error = interface->cubic_to( &vec1, &vec2, &vec, user );
+					if ( error ) {
+						goto Exit;
+					}
+					continue;
+				}
+
+				error = interface->cubic_to( &vec1, &vec2, &v_start, user );
+				goto Close;
+			}
+			}
+		}
+
+		/* close the contour with a line segment */
+		error = interface->line_to( &v_start, user );
+
+Close:
+		if ( error ) {
+			goto Exit;
+		}
+
+		first = last + 1;
+	}
+
+	return 0;
 
 Exit:
-  return error;
+	return error;
 
 Invalid_Outline:
-  return ErrRaster_Invalid_Outline;
+	return ErrRaster_Invalid_Outline;
 }
 
 #endif /* _STANDALONE_ */
 
-typedef struct TBand_ {
-  FT_Pos min, max;
+
+typedef struct  TBand_
+{
+	FT_Pos min, max;
 
 } TBand;
 
-static int grays_convert_glyph(RAS_ARG_ FT_Outline *outline) {
-  static FT_Outline_Funcs interface = {(FT_Outline_MoveTo_Func)Move_To,
-                                       (FT_Outline_LineTo_Func)Line_To,
-                                       (FT_Outline_ConicTo_Func)Conic_To,
-                                       (FT_Outline_CubicTo_Func)Cubic_To,
-                                       0,
-                                       0};
 
-  TBand bands[40], *band;
-  int n, num_bands;
-  TPos min, max, max_y;
+static
+int  grays_convert_glyph( RAS_ARG_ FT_Outline*  outline ) {
+	static
+	FT_Outline_Funcs interface =
+	{
+		(FT_Outline_MoveTo_Func) Move_To,
+		(FT_Outline_LineTo_Func) Line_To,
+		(FT_Outline_ConicTo_Func)Conic_To,
+		(FT_Outline_CubicTo_Func)Cubic_To,
+		0,
+		0
+	};
 
-  /* Set up state in the raster object */
-  compute_cbox(RAS_VAR_ outline);
+	TBand bands[40], *band;
+	int n, num_bands;
+	TPos min, max, max_y;
 
-  /* clip to target bitmap, exit if nothing to do */
-  if (ras.max_ex <= 0 || ras.min_ex >= ras.target.width || ras.max_ey <= 0 ||
-      ras.min_ey >= ras.target.rows) {
-    return 0;
-  }
 
-  if (ras.min_ex < 0) {
-    ras.min_ex = 0;
-  }
-  if (ras.min_ey < 0) {
-    ras.min_ey = 0;
-  }
+	/* Set up state in the raster object */
+	compute_cbox( RAS_VAR_ outline );
 
-  if (ras.max_ex > ras.target.width) {
-    ras.max_ex = ras.target.width;
-  }
-  if (ras.max_ey > ras.target.rows) {
-    ras.max_ey = ras.target.rows;
-  }
+	/* clip to target bitmap, exit if nothing to do */
+	if ( ras.max_ex <= 0 || ras.min_ex >= ras.target.width ||
+		 ras.max_ey <= 0 || ras.min_ey >= ras.target.rows  ) {
+		return 0;
+	}
 
-  /* simple heuristic used to speed-up the bezier decomposition -- see */
-  /* the code in render_conic() and render_cubic() for more details    */
-  ras.conic_level = 32;
-  ras.cubic_level = 16;
+	if ( ras.min_ex < 0 ) {
+		ras.min_ex = 0;
+	}
+	if ( ras.min_ey < 0 ) {
+		ras.min_ey = 0;
+	}
 
-  {
-    int level = 0;
+	if ( ras.max_ex > ras.target.width ) {
+		ras.max_ex = ras.target.width;
+	}
+	if ( ras.max_ey > ras.target.rows ) {
+		ras.max_ey = ras.target.rows;
+	}
 
-    if (ras.max_ex > 24 || ras.max_ey > 24) {
-      level++;
-    }
-    if (ras.max_ex > 120 || ras.max_ey > 120) {
-      level += 2;
-    }
+	/* simple heuristic used to speed-up the bezier decomposition -- see */
+	/* the code in render_conic() and render_cubic() for more details    */
+	ras.conic_level = 32;
+	ras.cubic_level = 16;
 
-    ras.conic_level <<= level;
-    ras.cubic_level <<= level;
-  }
+	{
+		int level = 0;
 
-  /* setup vertical bands */
-  num_bands = (ras.max_ey - ras.min_ey) / ras.band_size;
-  if (num_bands == 0) {
-    num_bands = 1;
-  }
-  if (num_bands >= 39) {
-    num_bands = 39;
-  }
 
-  ras.band_shoot = 0;
+		if ( ras.max_ex > 24 || ras.max_ey > 24 ) {
+			level++;
+		}
+		if ( ras.max_ex > 120 || ras.max_ey > 120 ) {
+			level += 2;
+		}
 
-  min = ras.min_ey;
-  max_y = ras.max_ey;
+		ras.conic_level <<= level;
+		ras.cubic_level <<= level;
+	}
 
-  for (n = 0; n < num_bands; n++, min = max) {
-    max = min + ras.band_size;
-    if (n == num_bands - 1 || max > max_y) {
-      max = max_y;
-    }
+	/* setup vertical bands */
+	num_bands = ( ras.max_ey - ras.min_ey ) / ras.band_size;
+	if ( num_bands == 0 ) {
+		num_bands = 1;
+	}
+	if ( num_bands >= 39 ) {
+		num_bands = 39;
+	}
 
-    bands[0].min = min;
-    bands[0].max = max;
-    band = bands;
+	ras.band_shoot = 0;
 
-    while (band >= bands) {
-      FT_Pos bottom, top, middle;
-      int error;
+	min   = ras.min_ey;
+	max_y = ras.max_ey;
 
-      ras.num_cells = 0;
-      ras.invalid = 1;
-      ras.min_ey = band->min;
-      ras.max_ey = band->max;
+	for ( n = 0; n < num_bands; n++, min = max )
+	{
+		max = min + ras.band_size;
+		if ( n == num_bands - 1 || max > max_y ) {
+			max = max_y;
+		}
 
-      error = FT_Outline_Decompose(outline, &interface, &ras) ||
-              record_cell(RAS_VAR);
+		bands[0].min = min;
+		bands[0].max = max;
+		band         = bands;
 
-      if (!error) {
+		while ( band >= bands )
+		{
+			FT_Pos bottom, top, middle;
+			int error;
+
+
+			ras.num_cells = 0;
+			ras.invalid   = 1;
+			ras.min_ey    = band->min;
+			ras.max_ey    = band->max;
+
+			error = FT_Outline_Decompose( outline, &interface, &ras ) ||
+					record_cell( RAS_VAR );
+
+			if ( !error ) {
 #ifdef SHELL_SORT
-        shell_sort(ras.cells, ras.num_cells);
+				shell_sort( ras.cells, ras.num_cells );
 #else
-        quick_sort(ras.cells, ras.num_cells);
+				quick_sort( ras.cells, ras.num_cells );
 #endif
 
 #ifdef DEBUG_GRAYS
-        check_sort(ras.cells, ras.num_cells);
-        dump_cells(RAS_VAR);
+				check_sort( ras.cells, ras.num_cells );
+				dump_cells( RAS_VAR );
 #endif
 
-        grays_sweep(RAS_VAR_ & ras.target);
-        band--;
-        continue;
-      }
+				grays_sweep( RAS_VAR_  & ras.target );
+				band--;
+				continue;
+			}
 
-      /* render pool overflow, we will reduce the render band by half */
-      bottom = band->min;
-      top = band->max;
-      middle = bottom + ((top - bottom) >> 1);
+			/* render pool overflow, we will reduce the render band by half */
+			bottom = band->min;
+			top    = band->max;
+			middle = bottom + ( ( top - bottom ) >> 1 );
 
-      /* waoow! This is too complex for a single scanline, something */
-      /* must be really rotten here!                                 */
-      if (middle == bottom) {
+			/* waoow! This is too complex for a single scanline, something */
+			/* must be really rotten here!                                 */
+			if ( middle == bottom ) {
 #ifdef DEBUG_GRAYS
-        fprintf(stderr, "Rotten glyph!\n");
+				fprintf( stderr, "Rotten glyph!\n" );
 #endif
-        return 1;
-      }
+				return 1;
+			}
 
-      if (bottom - top >= ras.band_size) {
-        ras.band_shoot++;
-      }
+			if ( bottom - top >= ras.band_size ) {
+				ras.band_shoot++;
+			}
 
-      band[1].min = bottom;
-      band[1].max = middle;
-      band[0].min = middle;
-      band[0].max = top;
-      band++;
-    }
-  }
+			band[1].min = bottom;
+			band[1].max = middle;
+			band[0].min = middle;
+			band[0].max = top;
+			band++;
+		}
+	}
 
-  if (ras.band_shoot > 8 && ras.band_size > 16) {
-    ras.band_size = ras.band_size / 2;
-  }
+	if ( ras.band_shoot > 8 && ras.band_size > 16 ) {
+		ras.band_size = ras.band_size / 2;
+	}
 
-  return 0;
+	return 0;
 }
 
-extern int grays_raster_render(PRaster raster, FT_Raster_Params *params) {
-  FT_Outline *outline = (FT_Outline *)params->source;
-  FT_Bitmap *target_map = params->target;
 
-  if (!raster || !raster->cells || !raster->max_cells) {
-    return -1;
-  }
+extern
+int  grays_raster_render( PRaster raster,
+						  FT_Raster_Params*  params ) {
+	FT_Outline*  outline = (FT_Outline*)params->source;
+	FT_Bitmap*   target_map = params->target;
 
-  /* return immediately if the outline is empty */
-  if (outline->n_points == 0 || outline->n_contours <= 0) {
-    return 0;
-  }
 
-  if (!outline || !outline->contours || !outline->points) {
-    return ErrRaster_Invalid_Outline;
-  }
+	if ( !raster || !raster->cells || !raster->max_cells ) {
+		return -1;
+	}
 
-  if (outline->n_points != outline->contours[outline->n_contours - 1] + 1) {
-    return ErrRaster_Invalid_Outline;
-  }
+	/* return immediately if the outline is empty */
+	if ( outline->n_points == 0 || outline->n_contours <= 0 ) {
+		return 0;
+	}
 
-  if (!target_map || !target_map->buffer) {
-    return -1;
-  }
+	if ( !outline || !outline->contours || !outline->points ) {
+		return ErrRaster_Invalid_Outline;
+	}
 
-  /* XXX: this version does not support monochrome rendering yet! */
-  if (!(params->flags & ft_raster_flag_aa)) {
-    return ErrRaster_Invalid_Mode;
-  }
+	if ( outline->n_points !=
+		 outline->contours[outline->n_contours - 1] + 1 ) {
+		return ErrRaster_Invalid_Outline;
+	}
 
-  ras.outline = *outline;
-  ras.target = *target_map;
-  ras.num_cells = 0;
-  ras.invalid = 1;
+	if ( !target_map || !target_map->buffer ) {
+		return -1;
+	}
 
-  ras.render_span = (FT_Raster_Span_Func)grays_render_span;
-  ras.render_span_data = &ras;
+	/* XXX: this version does not support monochrome rendering yet! */
+	if ( !( params->flags & ft_raster_flag_aa ) ) {
+		return ErrRaster_Invalid_Mode;
+	}
 
-  if (params->flags & ft_raster_flag_direct) {
-    ras.render_span = (FT_Raster_Span_Func)params->gray_spans;
-    ras.render_span_data = params->user;
-  }
+	ras.outline   = *outline;
+	ras.target    = *target_map;
+	ras.num_cells = 0;
+	ras.invalid   = 1;
 
-  return grays_convert_glyph((PRaster)raster, outline);
+	ras.render_span      = (FT_Raster_Span_Func)grays_render_span;
+	ras.render_span_data = &ras;
+
+	if ( params->flags & ft_raster_flag_direct ) {
+		ras.render_span      = (FT_Raster_Span_Func)params->gray_spans;
+		ras.render_span_data = params->user;
+	}
+
+	return grays_convert_glyph( (PRaster)raster, outline );
 }
+
 
 /**** RASTER OBJECT CREATION: In standalone mode, we simply use *****/
 /****                         a static object.                  *****/
 
 #ifdef _STANDALONE_
 
-static int grays_raster_new(void *memory, FT_Raster *araster) {
-  static TRaster the_raster;
+static
+int  grays_raster_new( void*       memory,
+					   FT_Raster*  araster ) {
+	static TRaster the_raster;
 
-  FT_UNUSED(memory);
+	FT_UNUSED( memory );
 
-  *araster = (FT_Raster)&the_raster;
-  memset(&the_raster, 0, sizeof(the_raster));
 
-  return 0;
+	*araster = ( FT_Raster ) & the_raster;
+	memset( &the_raster, 0, sizeof( the_raster ) );
+
+	return 0;
 }
 
-static void grays_raster_done(FT_Raster raster) {
-  /* nothing */
-  FT_UNUSED(raster);
+
+static
+void  grays_raster_done( FT_Raster raster ) {
+	/* nothing */
+	FT_UNUSED( raster );
 }
 
 #else /* _STANDALONE_ */
 
-static int grays_raster_new(FT_Memory memory, FT_Raster *araster) {
-  FT_Error error;
-  PRaster raster;
+static
+int  grays_raster_new( FT_Memory memory,
+					   FT_Raster*  araster ) {
+	FT_Error error;
+	PRaster raster;
 
-  *araster = 0;
-  if (!ALLOC(raster, sizeof(TRaster))) {
-    raster->memory = memory;
-    *araster = (FT_Raster)raster;
-  }
 
-  return error;
+	*araster = 0;
+	if ( !ALLOC( raster, sizeof( TRaster ) ) ) {
+		raster->memory = memory;
+		*araster = (FT_Raster)raster;
+	}
+
+	return error;
 }
 
-static void grays_raster_done(FT_Raster raster) {
-  FT_Memory memory = (FT_Memory)((PRaster)raster)->memory;
 
-  FREE(raster);
+static
+void grays_raster_done( FT_Raster raster ) {
+	FT_Memory memory = (FT_Memory)( (PRaster)raster )->memory;
+
+
+	FREE( raster );
 }
 
 #endif /* _STANDALONE_ */
 
-static void grays_raster_reset(FT_Raster raster, const char *pool_base,
-                               long pool_size) {
-  PRaster rast = (PRaster)raster;
 
-  if (raster && pool_base && pool_size >= 4096) {
-    init_cells(rast, (char *)pool_base, pool_size);
-  }
+static
+void  grays_raster_reset( FT_Raster raster,
+						  const char*  pool_base,
+						  long pool_size ) {
+	PRaster rast = (PRaster)raster;
 
-  rast->band_size = (pool_size / sizeof(TCell)) / 8;
+
+	if ( raster && pool_base && pool_size >= 4096 ) {
+		init_cells( rast, (char*)pool_base, pool_size );
+	}
+
+	rast->band_size  = ( pool_size / sizeof( TCell ) ) / 8;
 }
 
-FT_Raster_Funcs ft_grays_raster = {ft_glyph_format_outline,
 
-                                   (FT_Raster_New_Func)grays_raster_new,
-                                   (FT_Raster_Reset_Func)grays_raster_reset,
-                                   (FT_Raster_Set_Mode_Func)0,
-                                   (FT_Raster_Render_Func)grays_raster_render,
-                                   (FT_Raster_Done_Func)grays_raster_done};
+FT_Raster_Funcs ft_grays_raster =
+{
+	ft_glyph_format_outline,
+
+	(FT_Raster_New_Func)     grays_raster_new,
+	(FT_Raster_Reset_Func)   grays_raster_reset,
+	(FT_Raster_Set_Mode_Func)0,
+	(FT_Raster_Render_Func)  grays_raster_render,
+	(FT_Raster_Done_Func)    grays_raster_done
+};
+
 
 /* END */

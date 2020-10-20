@@ -22,9 +22,11 @@
 /*                                                                       */
 /*************************************************************************/
 
+
 #include "ftlist.h"
 #include "ftdebug.h"
 #include "ftobjs.h"
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -32,8 +34,9 @@
 /* parameter of the FT_TRACE() and FT_ERROR() macros, used to print/log  */
 /* messages during execution.                                            */
 /*                                                                       */
-#undef FT_COMPONENT
-#define FT_COMPONENT trace_list
+#undef  FT_COMPONENT
+#define FT_COMPONENT  trace_list
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -50,20 +53,25 @@
 /* <Return>                                                              */
 /*    List node.  NULL if it wasn't found.                               */
 /*                                                                       */
-BASE_FUNC(FT_ListNode) FT_List_Find(FT_List list, void *data) {
-  FT_ListNode cur;
+BASE_FUNC( FT_ListNode )  FT_List_Find( FT_List list,
+										void*    data )
+{
+	FT_ListNode cur;
 
-  cur = list->head;
-  while (cur) {
-    if (cur->data == data) {
-      return cur;
-    }
 
-    cur = cur->next;
-  }
+	cur = list->head;
+	while ( cur )
+	{
+		if ( cur->data == data ) {
+			return cur;
+		}
 
-  return (FT_ListNode)0;
+		cur = cur->next;
+	}
+
+	return (FT_ListNode)0;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -77,20 +85,24 @@ BASE_FUNC(FT_ListNode) FT_List_Find(FT_List list, void *data) {
 /*    list :: A pointer to the parent list.                              */
 /*    node :: The node to append.                                        */
 /*                                                                       */
-BASE_FUNC(void) FT_List_Add(FT_List list, FT_ListNode node) {
-  FT_ListNode before = list->tail;
+BASE_FUNC( void )  FT_List_Add( FT_List list,
+								FT_ListNode node )
+{
+	FT_ListNode before = list->tail;
 
-  node->next = 0;
-  node->prev = before;
 
-  if (before) {
-    before->next = node;
-  } else {
-    list->head = node;
-  }
+	node->next = 0;
+	node->prev = before;
 
-  list->tail = node;
+	if ( before ) {
+		before->next = node;
+	} else {
+		list->head = node;
+	}
+
+	list->tail = node;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -104,20 +116,24 @@ BASE_FUNC(void) FT_List_Add(FT_List list, FT_ListNode node) {
 /*    list :: A pointer to parent list.                                  */
 /*    node :: The node to insert.                                        */
 /*                                                                       */
-BASE_FUNC(void) FT_List_Insert(FT_List list, FT_ListNode node) {
-  FT_ListNode after = list->head;
+BASE_FUNC( void )  FT_List_Insert( FT_List list,
+								   FT_ListNode node )
+{
+	FT_ListNode after = list->head;
 
-  node->next = after;
-  node->prev = 0;
 
-  if (!after) {
-    list->tail = node;
-  } else {
-    after->prev = node;
-  }
+	node->next = after;
+	node->prev = 0;
 
-  list->head = node;
+	if ( !after ) {
+		list->tail = node;
+	} else {
+		after->prev = node;
+	}
+
+	list->head = node;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -134,24 +150,28 @@ BASE_FUNC(void) FT_List_Insert(FT_List list, FT_ListNode node) {
 /* <InOut>                                                               */
 /*    list :: A pointer to the parent list.                              */
 /*                                                                       */
-BASE_FUNC(void) FT_List_Remove(FT_List list, FT_ListNode node) {
-  FT_ListNode before, after;
+BASE_FUNC( void )  FT_List_Remove( FT_List list,
+								   FT_ListNode node )
+{
+	FT_ListNode before, after;
 
-  before = node->prev;
-  after = node->next;
 
-  if (before) {
-    before->next = after;
-  } else {
-    list->head = after;
-  }
+	before = node->prev;
+	after  = node->next;
 
-  if (after) {
-    after->prev = before;
-  } else {
-    list->tail = before;
-  }
+	if ( before ) {
+		before->next = after;
+	} else {
+		list->head = after;
+	}
+
+	if ( after ) {
+		after->prev = before;
+	} else {
+		list->tail = before;
+	}
 }
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -166,30 +186,34 @@ BASE_FUNC(void) FT_List_Remove(FT_List list, FT_ListNode node) {
 /*    list :: A pointer to the parent list.                              */
 /*    node :: The node to move.                                          */
 /*                                                                       */
-BASE_FUNC(void) FT_List_Up(FT_List list, FT_ListNode node) {
-  FT_ListNode before, after;
+BASE_FUNC( void )  FT_List_Up( FT_List list,
+							   FT_ListNode node )
+{
+	FT_ListNode before, after;
 
-  before = node->prev;
-  after = node->next;
 
-  /* check whether we are already on top of the list */
-  if (!before) {
-    return;
-  }
+	before = node->prev;
+	after  = node->next;
 
-  before->next = after;
+	/* check whether we are already on top of the list */
+	if ( !before ) {
+		return;
+	}
 
-  if (after) {
-    after->prev = before;
-  } else {
-    list->tail = before;
-  }
+	before->next = after;
 
-  node->prev = 0;
-  node->next = list->head;
-  list->head->prev = node;
-  list->head = node;
+	if ( after ) {
+		after->prev = before;
+	} else {
+		list->tail = before;
+	}
+
+	node->prev       = 0;
+	node->next       = list->head;
+	list->head->prev = node;
+	list->head       = node;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -211,24 +235,30 @@ BASE_FUNC(void) FT_List_Up(FT_List list, FT_ListNode node) {
 /* <Return>                                                              */
 /*    The result (a FreeType error code) of the last iterator call.      */
 /*                                                                       */
-BASE_FUNC(FT_Error)
-FT_List_Iterate(FT_List list, FT_List_Iterator iterator, void *user) {
-  FT_ListNode cur = list->head;
-  FT_Error error = FT_Err_Ok;
+BASE_FUNC( FT_Error )  FT_List_Iterate( FT_List list,
+										FT_List_Iterator iterator,
+										void*              user )
+{
+	FT_ListNode cur   = list->head;
+	FT_Error error = FT_Err_Ok;
 
-  while (cur) {
-    FT_ListNode next = cur->next;
 
-    error = iterator(cur, user);
-    if (error) {
-      break;
-    }
+	while ( cur )
+	{
+		FT_ListNode next = cur->next;
 
-    cur = next;
-  }
 
-  return error;
+		error = iterator( cur, user );
+		if ( error ) {
+			break;
+		}
+
+		cur = next;
+	}
+
+	return error;
 }
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -249,26 +279,32 @@ FT_List_Iterate(FT_List list, FT_List_Iterator iterator, void *user) {
 /*    user    :: A user-supplied field which is passed as the last       */
 /*               argument to the destructor.                             */
 /*                                                                       */
-BASE_FUNC(void)
-FT_List_Finalize(FT_List list, FT_List_Destructor destroy, FT_Memory memory,
-                 void *user) {
-  FT_ListNode cur;
+BASE_FUNC( void )  FT_List_Finalize( FT_List list,
+									 FT_List_Destructor destroy,
+									 FT_Memory memory,
+									 void*               user )
+{
+	FT_ListNode cur;
 
-  cur = list->head;
-  while (cur) {
-    FT_ListNode next = cur->next;
-    void *data = cur->data;
 
-    if (destroy) {
-      destroy(memory, data, user);
-    }
+	cur = list->head;
+	while ( cur )
+	{
+		FT_ListNode next = cur->next;
+		void*        data = cur->data;
 
-    FREE(cur);
-    cur = next;
-  }
 
-  list->head = 0;
-  list->tail = 0;
+		if ( destroy ) {
+			destroy( memory, data, user );
+		}
+
+		FREE( cur );
+		cur = next;
+	}
+
+	list->head = 0;
+	list->tail = 0;
 }
+
 
 /* END */

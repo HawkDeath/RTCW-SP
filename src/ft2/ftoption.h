@@ -15,8 +15,10 @@
 /*                                                                         */
 /***************************************************************************/
 
+
 #ifndef FTOPTION_H
 #define FTOPTION_H
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -36,6 +38,7 @@
 /*                                                                       */
 /*************************************************************************/
 
+
 /*************************************************************************/
 /*************************************************************************/
 /****                                                                 ****/
@@ -43,6 +46,7 @@
 /****                                                                 ****/
 /*************************************************************************/
 /*************************************************************************/
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -61,6 +65,7 @@
 /*   documentation.                                                      */
 /*                                                                       */
 #undef FT_CONFIG_OPTION_NO_CONVENIENCE_FUNCS
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -81,6 +86,7 @@
 /*   macro is undefined.                                                 */
 /*                                                                       */
 #define FT_CONFIG_OPTION_ALTERNATE_GLYPH_FORMATS
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -106,6 +112,7 @@
 /*                                                                       */
 #define FT_CONFIG_OPTION_POSTSCRIPT_NAMES
 
+
 /*************************************************************************/
 /*                                                                       */
 /* Postscript Names to Unicode Values support                            */
@@ -123,6 +130,7 @@
 /*                                                                       */
 #define FT_CONFIG_OPTION_ADOBE_GLYPH_LIST
 
+
 /*************************************************************************/
 /*                                                                       */
 /* Many compilers provide the non-ANSI `long long' 64-bit type.  You can */
@@ -131,6 +139,7 @@
 /* that in many cases the generated code will not be smaller or faster!  */
 /*                                                                       */
 #undef FTCALC_USE_LONG_LONG
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -170,6 +179,7 @@
 #undef FT_EXPORT_DEF
 #undef FT_EXPORT_FUNC
 
+
 /*************************************************************************/
 /*                                                                       */
 /* Debug level                                                           */
@@ -187,6 +197,7 @@
 //#define FT_DEBUG_LEVEL_ERROR
 //#define FT_DEBUG_LEVEL_TRACE
 
+
 /*************************************************************************/
 /*                                                                       */
 /* Computation Algorithms                                                */
@@ -196,6 +207,7 @@
 /*                                                                       */
 #define FT_CONFIG_OPTION_OLD_CALCS
 
+
 /*************************************************************************/
 /*                                                                       */
 /* The size in bytes of the render pool used by the scan-line converter  */
@@ -203,7 +215,8 @@
 /*                                                                       */
 /* This must be greater than 4kByte.                                     */
 /*                                                                       */
-#define FT_RENDER_POOL_SIZE 16384
+#define FT_RENDER_POOL_SIZE  16384
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -212,7 +225,8 @@
 /*   The maximum number of modules that can be registered in a single    */
 /*   FreeType library object.  16 is the default.                        */
 /*                                                                       */
-#define FT_MAX_MODULES 16
+#define FT_MAX_MODULES  16
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -224,7 +238,8 @@
 /*   If you don't know what this means, you certainly do not need to     */
 /*   change this value.                                                  */
 /*                                                                       */
-#define FT_MAX_EXTENSIONS 8
+#define FT_MAX_EXTENSIONS  8
+
 
 /*************************************************************************/
 /*************************************************************************/
@@ -234,6 +249,7 @@
 /*************************************************************************/
 /*************************************************************************/
 
+
 /*************************************************************************/
 /*                                                                       */
 /* Define TT_CONFIG_OPTION_EMBEDDED_BITMAPS if you want to support       */
@@ -241,6 +257,7 @@
 /* TrueType & OpenType).                                                 */
 /*                                                                       */
 #define TT_CONFIG_OPTION_EMBEDDED_BITMAPS
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -256,6 +273,7 @@
 /*                                                                       */
 #define TT_CONFIG_OPTION_POSTSCRIPT_NAMES
 
+
 /*************************************************************************/
 /*                                                                       */
 /* Define TT_CONFIG_OPTION_SFNT_NAMES if your applications need to       */
@@ -268,6 +286,7 @@
 /* `freetype/ftnames.h'.                                                 */
 /*                                                                       */
 #define TT_CONFIG_OPTION_SFNT_NAMES
+
 
 /*************************************************************************/
 /*************************************************************************/
@@ -286,7 +305,8 @@
 /* By undefining this, you will only compile the code necessary to load  */
 /* TrueType glyphs without hinting.                                      */
 /*                                                                       */
-#define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#define  TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -300,6 +320,7 @@
 /*                                                                       */
 #define TT_CONFIG_OPTION_INTERPRETER_SWITCH
 
+
 /*************************************************************************/
 /*************************************************************************/
 /****                                                                 ****/
@@ -308,12 +329,14 @@
 /*************************************************************************/
 /*************************************************************************/
 
+
 /*************************************************************************/
 /*                                                                       */
 /* T1_MAX_STACK_DEPTH is the maximal depth of the token stack used by    */
 /* the Type 1 parser (see t1load.c).  A minimum of 16 is required.       */
 /*                                                                       */
-#define T1_MAX_STACK_DEPTH 16
+#define T1_MAX_STACK_DEPTH  16
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -321,20 +344,23 @@
 /* arrays in the Type 1 stream (see t1load.c).  A minimum of 4 is        */
 /* required.                                                             */
 /*                                                                       */
-#define T1_MAX_DICT_DEPTH 5
+#define T1_MAX_DICT_DEPTH  5
+
 
 /*************************************************************************/
 /*                                                                       */
 /* T1_MAX_SUBRS_CALLS details the maximum number of nested sub-routine   */
 /* calls during glyph loading.                                           */
 /*                                                                       */
-#define T1_MAX_SUBRS_CALLS 8
+#define T1_MAX_SUBRS_CALLS  8
+
 
 /*************************************************************************/
 /*                                                                       */
 /* T1_MAX_CHARSTRING_OPERANDS is the charstring stack's capacity.        */
 /*                                                                       */
-#define T1_MAX_CHARSTRINGS_OPERANDS 32
+#define T1_MAX_CHARSTRINGS_OPERANDS  32
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -342,6 +368,7 @@
 /* driver with no hinter.  This can be useful to debug the parser.       */
 /*                                                                       */
 #undef T1_CONFIG_OPTION_DISABLE_HINTER
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -352,6 +379,7 @@
 /*                                                                       */
 #undef T1_CONFIG_OPTION_NO_AFM
 
+
 /*************************************************************************/
 /*                                                                       */
 /* Define this configuration macro if you want to prevent the            */
@@ -360,6 +388,8 @@
 /*                                                                       */
 #undef T1_CONFIG_OPTION_NO_MM_SUPPORT
 
+
 #endif /* FTOPTION_H */
+
 
 /* END */

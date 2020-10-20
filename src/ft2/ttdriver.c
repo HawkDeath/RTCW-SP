@@ -15,13 +15,16 @@
 /*                                                                         */
 /***************************************************************************/
 
+
 #include "ftdebug.h"
 #include "ftstream.h"
 #include "sfnt.h"
 #include "ttnameid.h"
 
+
 #include "ttdriver.h"
 #include "ttgload.h"
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -29,8 +32,9 @@
 /* parameter of the FT_TRACE() and FT_ERROR() macros, used to print/log  */
 /* messages during execution.                                            */
 /*                                                                       */
-#undef FT_COMPONENT
-#define FT_COMPONENT trace_ttdriver
+#undef  FT_COMPONENT
+#define FT_COMPONENT  trace_ttdriver
+
 
 /*************************************************************************/
 /*************************************************************************/
@@ -44,8 +48,11 @@
 /*************************************************************************/
 /*************************************************************************/
 
-#undef PAIR_TAG
-#define PAIR_TAG(left, right) (((FT_ULong)left << 16) | (FT_ULong)right)
+
+#undef  PAIR_TAG
+#define PAIR_TAG( left, right )  ( ( (FT_ULong)left << 16 ) | \
+								   (FT_ULong)right        )
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -79,53 +86,62 @@
 /*                                                                       */
 /*    They can be implemented by format-specific interfaces.             */
 /*                                                                       */
-static FT_Error Get_Kerning(TT_Face face, FT_UInt left_glyph,
-                            FT_UInt right_glyph, FT_Vector *kerning) {
-  TT_Kern_0_Pair *pair;
+static
+FT_Error  Get_Kerning( TT_Face face,
+					   FT_UInt left_glyph,
+					   FT_UInt right_glyph,
+					   FT_Vector*  kerning ) {
+	TT_Kern_0_Pair*  pair;
 
-  if (!face) {
-    return TT_Err_Invalid_Face_Handle;
-  }
 
-  kerning->x = 0;
-  kerning->y = 0;
+	if ( !face ) {
+		return TT_Err_Invalid_Face_Handle;
+	}
 
-  if (face->kern_pairs) {
-    /* there are some kerning pairs in this font file! */
-    FT_ULong search_tag = PAIR_TAG(left_glyph, right_glyph);
-    FT_Long left, right;
+	kerning->x = 0;
+	kerning->y = 0;
 
-    left = 0;
-    right = face->num_kern_pairs - 1;
+	if ( face->kern_pairs ) {
+		/* there are some kerning pairs in this font file! */
+		FT_ULong search_tag = PAIR_TAG( left_glyph, right_glyph );
+		FT_Long left, right;
 
-    while (left <= right) {
-      FT_Int middle = left + ((right - left) >> 1);
-      FT_ULong cur_pair;
 
-      pair = face->kern_pairs + middle;
-      cur_pair = PAIR_TAG(pair->left, pair->right);
+		left  = 0;
+		right = face->num_kern_pairs - 1;
 
-      if (cur_pair == search_tag) {
-        goto Found;
-      }
+		while ( left <= right )
+		{
+			FT_Int middle = left + ( ( right - left ) >> 1 );
+			FT_ULong cur_pair;
 
-      if (cur_pair < search_tag) {
-        left = middle + 1;
-      } else {
-        right = middle - 1;
-      }
-    }
-  }
+
+			pair     = face->kern_pairs + middle;
+			cur_pair = PAIR_TAG( pair->left, pair->right );
+
+			if ( cur_pair == search_tag ) {
+				goto Found;
+			}
+
+			if ( cur_pair < search_tag ) {
+				left = middle + 1;
+			} else {
+				right = middle - 1;
+			}
+		}
+	}
 
 Exit:
-  return TT_Err_Ok;
+	return TT_Err_Ok;
 
 Found:
-  kerning->x = pair->value;
-  goto Exit;
+	kerning->x = pair->value;
+	goto Exit;
 }
 
+
 #undef PAIR_TAG
+
 
 /*************************************************************************/
 /*************************************************************************/
@@ -138,6 +154,7 @@ Found:
 /*************************************************************************/
 /*************************************************************************/
 /*************************************************************************/
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -165,38 +182,43 @@ Found:
 /* <Return>                                                              */
 /*    FreeType error code.  0 means success.                             */
 /*                                                                       */
-static FT_Error Set_Char_Sizes(TT_Size size, FT_F26Dot6 char_width,
-                               FT_F26Dot6 char_height, FT_UInt horz_resolution,
-                               FT_UInt vert_resolution) {
-  FT_Size_Metrics *metrics = &size->root.metrics;
-  TT_Face face = (TT_Face)size->root.face;
-  FT_Long dim_x, dim_y;
+static
+FT_Error  Set_Char_Sizes( TT_Size size,
+						  FT_F26Dot6 char_width,
+						  FT_F26Dot6 char_height,
+						  FT_UInt horz_resolution,
+						  FT_UInt vert_resolution ) {
+	FT_Size_Metrics*  metrics = &size->root.metrics;
+	TT_Face face    = (TT_Face)size->root.face;
+	FT_Long dim_x, dim_y;
 
-  /* This bit flag, when set, indicates that the pixel size must be */
-  /* truncated to an integer.  Nearly all TrueType fonts have this  */
-  /* bit set, as hinting won't work really well otherwise.          */
-  /*                                                                */
-  /* However, for those rare fonts who do not set it, we override   */
-  /* the default computations performed by the base layer.  I       */
-  /* really don't know whether this is useful, but hey, that's the  */
-  /* spec :-)                                                       */
-  /*                                                                */
-  if ((face->header.Flags & 8) == 0) {
-    /* Compute pixel sizes in 26.6 units */
-    dim_x = (char_width * horz_resolution) / 72;
-    dim_y = (char_height * vert_resolution) / 72;
 
-    metrics->x_scale = FT_DivFix(dim_x, face->root.units_per_EM);
-    metrics->y_scale = FT_DivFix(dim_y, face->root.units_per_EM);
+	/* This bit flag, when set, indicates that the pixel size must be */
+	/* truncated to an integer.  Nearly all TrueType fonts have this  */
+	/* bit set, as hinting won't work really well otherwise.          */
+	/*                                                                */
+	/* However, for those rare fonts who do not set it, we override   */
+	/* the default computations performed by the base layer.  I       */
+	/* really don't know whether this is useful, but hey, that's the  */
+	/* spec :-)                                                       */
+	/*                                                                */
+	if ( ( face->header.Flags & 8 ) == 0 ) {
+		/* Compute pixel sizes in 26.6 units */
+		dim_x = ( char_width  * horz_resolution ) / 72;
+		dim_y = ( char_height * vert_resolution ) / 72;
 
-    metrics->x_ppem = (FT_UShort)(dim_x >> 6);
-    metrics->y_ppem = (FT_UShort)(dim_y >> 6);
-  }
+		metrics->x_scale = FT_DivFix( dim_x, face->root.units_per_EM );
+		metrics->y_scale = FT_DivFix( dim_y, face->root.units_per_EM );
 
-  size->ttmetrics.valid = FALSE;
+		metrics->x_ppem  = (FT_UShort)( dim_x >> 6 );
+		metrics->y_ppem  = (FT_UShort)( dim_y >> 6 );
+	}
 
-  return TT_Reset_Size(size);
+	size->ttmetrics.valid = FALSE;
+
+	return TT_Reset_Size( size );
 }
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -218,17 +240,20 @@ static FT_Error Set_Char_Sizes(TT_Size size, FT_F26Dot6 char_width,
 /* <Return>                                                              */
 /*    FreeType error code.  0 means success.                             */
 /*                                                                       */
-static FT_Error Set_Pixel_Sizes(TT_Size size, FT_UInt pixel_width,
-                                FT_UInt pixel_height) {
-  FT_UNUSED(pixel_width);
-  FT_UNUSED(pixel_height);
+static
+FT_Error  Set_Pixel_Sizes( TT_Size size,
+						   FT_UInt pixel_width,
+						   FT_UInt pixel_height ) {
+	FT_UNUSED( pixel_width );
+	FT_UNUSED( pixel_height );
 
-  /* many things have been pre-computed by the base layer */
+	/* many things have been pre-computed by the base layer */
 
-  size->ttmetrics.valid = FALSE;
+	size->ttmetrics.valid = FALSE;
 
-  return TT_Reset_Size(size);
+	return TT_Reset_Size( size );
 }
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -256,45 +281,50 @@ static FT_Error Set_Pixel_Sizes(TT_Size size, FT_UInt pixel_width,
 /* <Return>                                                              */
 /*    FreeType error code.  0 means success.                             */
 /*                                                                       */
-static FT_Error Load_Glyph(TT_GlyphSlot slot, TT_Size size,
-                           FT_UShort glyph_index, FT_UInt load_flags) {
-  FT_Error error;
+static
+FT_Error  Load_Glyph( TT_GlyphSlot slot,
+					  TT_Size size,
+					  FT_UShort glyph_index,
+					  FT_UInt load_flags ) {
+	FT_Error error;
 
-  if (!slot) {
-    return TT_Err_Invalid_Glyph_Handle;
-  }
 
-  /* check whether we want a scaled outline or bitmap */
-  if (!size) {
-    load_flags |= FT_LOAD_NO_SCALE | FT_LOAD_NO_HINTING;
-  }
+	if ( !slot ) {
+		return TT_Err_Invalid_Glyph_Handle;
+	}
 
-  if (load_flags & FT_LOAD_NO_SCALE) {
-    size = NULL;
-  }
+	/* check whether we want a scaled outline or bitmap */
+	if ( !size ) {
+		load_flags |= FT_LOAD_NO_SCALE | FT_LOAD_NO_HINTING;
+	}
 
-  /* reset the size object if necessary */
-  if (size) {
-    /* these two object must have the same parent */
-    if (size->root.face != slot->face) {
-      return TT_Err_Invalid_Face_Handle;
-    }
+	if ( load_flags & FT_LOAD_NO_SCALE ) {
+		size = NULL;
+	}
 
-    if (!size->ttmetrics.valid) {
-      if (FT_SET_ERROR(TT_Reset_Size(size))) {
-        return error;
-      }
-    }
-  }
+	/* reset the size object if necessary */
+	if ( size ) {
+		/* these two object must have the same parent */
+		if ( size->root.face != slot->face ) {
+			return TT_Err_Invalid_Face_Handle;
+		}
 
-  /* now load the glyph outline if necessary */
-  error = TT_Load_Glyph(size, slot, glyph_index, load_flags);
+		if ( !size->ttmetrics.valid ) {
+			if ( FT_SET_ERROR( TT_Reset_Size( size ) ) ) {
+				return error;
+			}
+		}
+	}
 
-  /* force drop-out mode to 2 - irrelevant now */
-  /* slot->outline.dropout_mode = 2; */
+	/* now load the glyph outline if necessary */
+	error = TT_Load_Glyph( size, slot, glyph_index, load_flags );
 
-  return error;
+	/* force drop-out mode to 2 - irrelevant now */
+	/* slot->outline.dropout_mode = 2; */
+
+	return error;
 }
+
 
 /*************************************************************************/
 /*************************************************************************/
@@ -323,32 +353,37 @@ static FT_Error Load_Glyph(TT_GlyphSlot slot, TT_Size size,
 /* <Return>                                                              */
 /*    Glyph index.  0 means `undefined character code'.                  */
 /*                                                                       */
-static FT_UInt Get_Char_Index(TT_CharMap charmap, FT_Long charcode) {
-  FT_Error error;
-  TT_Face face;
-  TT_CMapTable *cmap;
+static
+FT_UInt  Get_Char_Index( TT_CharMap charmap,
+						 FT_Long charcode ) {
+	FT_Error error;
+	TT_Face face;
+	TT_CMapTable*  cmap;
 
-  cmap = &charmap->cmap;
-  face = (TT_Face)charmap->root.face;
 
-  /* Load table if needed */
-  if (!cmap->loaded) {
-    SFNT_Interface *sfnt = (SFNT_Interface *)face->sfnt;
+	cmap = &charmap->cmap;
+	face = (TT_Face)charmap->root.face;
 
-    error = sfnt->load_charmap(face, cmap, face->root.stream);
-    if (error) {
-      return 0;
-    }
+	/* Load table if needed */
+	if ( !cmap->loaded ) {
+		SFNT_Interface*  sfnt = (SFNT_Interface*)face->sfnt;
 
-    cmap->loaded = TRUE;
-  }
 
-  if (cmap->get_index) {
-    return cmap->get_index(cmap, charcode);
-  } else {
-    return 0;
-  }
+		error = sfnt->load_charmap( face, cmap, face->root.stream );
+		if ( error ) {
+			return 0;
+		}
+
+		cmap->loaded = TRUE;
+	}
+
+	if ( cmap->get_index ) {
+		return cmap->get_index( cmap, charcode );
+	} else {
+		return 0;
+	}
 }
+
 
 /*************************************************************************/
 /*************************************************************************/
@@ -362,67 +397,78 @@ static FT_UInt Get_Char_Index(TT_CharMap charmap, FT_Long charcode) {
 /*************************************************************************/
 /*************************************************************************/
 
-static FT_Module_Interface tt_get_interface(TT_Driver driver,
-                                            const char *interface) {
-  FT_Module sfntd = FT_Get_Module(driver->root.root.library, "sfnt");
-  SFNT_Interface *sfnt;
 
-  /* only return the default interface from the SFNT module */
-  if (sfntd) {
-    sfnt = (SFNT_Interface *)(sfntd->clazz->module_interface);
-    if (sfnt) {
-      return sfnt->get_interface(FT_MODULE(driver), interface);
-    }
-  }
+static
+FT_Module_Interface  tt_get_interface( TT_Driver driver,
+									   const char*  interface ) {
+	FT_Module sfntd = FT_Get_Module( driver->root.root.library,
+									 "sfnt" );
+	SFNT_Interface*  sfnt;
 
-  return 0;
+
+	/* only return the default interface from the SFNT module */
+	if ( sfntd ) {
+		sfnt = ( SFNT_Interface* )( sfntd->clazz->module_interface );
+		if ( sfnt ) {
+			return sfnt->get_interface( FT_MODULE( driver ), interface );
+		}
+	}
+
+	return 0;
 }
+
 
 /* The FT_DriverInterface structure is defined in ftdriver.h. */
 
-const FT_Driver_Class tt_driver_class = {
-    {
-        ft_module_font_driver | ft_module_driver_scalable |
+const FT_Driver_Class tt_driver_class =
+{
+	{
+		ft_module_font_driver     |
+		ft_module_driver_scalable |
 #ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
-            ft_module_driver_has_hinter,
+		ft_module_driver_has_hinter,
 #else
-            0,
+		0,
 #endif
 
-        sizeof(TT_DriverRec),
+		sizeof( TT_DriverRec ),
 
-        "truetype", /* driver name                           */
-        0x10000L,   /* driver version == 1.0                 */
-        0x20000L,   /* driver requires FreeType 2.0 or above */
+		"truetype",   /* driver name                           */
+		0x10000L,      /* driver version == 1.0                 */
+		0x20000L,      /* driver requires FreeType 2.0 or above */
 
-        (void *)0, /* driver specific interface */
+		(void*)0,      /* driver specific interface */
 
-        (FT_Module_Constructor)TT_Init_Driver,
-        (FT_Module_Destructor)TT_Done_Driver,
-        (FT_Module_Requester)tt_get_interface,
-    },
+		(FT_Module_Constructor)TT_Init_Driver,
+		(FT_Module_Destructor) TT_Done_Driver,
+		(FT_Module_Requester)  tt_get_interface,
+	},
 
-    sizeof(TT_FaceRec),
-    sizeof(TT_SizeRec),
-    sizeof(FT_GlyphSlotRec),
+	sizeof( TT_FaceRec ),
+	sizeof( TT_SizeRec ),
+	sizeof( FT_GlyphSlotRec ),
 
-    (FTDriver_initFace)TT_Init_Face,
-    (FTDriver_doneFace)TT_Done_Face,
-    (FTDriver_initSize)TT_Init_Size,
-    (FTDriver_doneSize)TT_Done_Size,
-    (FTDriver_initGlyphSlot)0,
-    (FTDriver_doneGlyphSlot)0,
 
-    (FTDriver_setCharSizes)Set_Char_Sizes,
-    (FTDriver_setPixelSizes)Set_Pixel_Sizes,
-    (FTDriver_loadGlyph)Load_Glyph,
-    (FTDriver_getCharIndex)Get_Char_Index,
+	(FTDriver_initFace)     TT_Init_Face,
+	(FTDriver_doneFace)     TT_Done_Face,
+	(FTDriver_initSize)     TT_Init_Size,
+	(FTDriver_doneSize)     TT_Done_Size,
+	(FTDriver_initGlyphSlot)0,
+	(FTDriver_doneGlyphSlot)0,
 
-    (FTDriver_getKerning)Get_Kerning,
-    (FTDriver_attachFile)0,
-    (FTDriver_getAdvances)0};
+	(FTDriver_setCharSizes) Set_Char_Sizes,
+	(FTDriver_setPixelSizes)Set_Pixel_Sizes,
+	(FTDriver_loadGlyph)    Load_Glyph,
+	(FTDriver_getCharIndex) Get_Char_Index,
+
+	(FTDriver_getKerning)   Get_Kerning,
+	(FTDriver_attachFile)   0,
+	(FTDriver_getAdvances)  0
+};
+
 
 #ifdef FT_CONFIG_OPTION_DYNAMIC_DRIVERS
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -443,10 +489,13 @@ const FT_Driver_Class tt_driver_class = {
 /*    format-specific interface can then be retrieved through the method */
 /*    interface->get_format_interface.                                   */
 /*                                                                       */
-EXPORT_FUNC(const FT_Driver_Class *) getDriverClass(void) {
-  return &tt_driver_class;
+EXPORT_FUNC( const FT_Driver_Class* )  getDriverClass( void )
+{
+	return &tt_driver_class;
 }
 
+
 #endif /* CONFIG_OPTION_DYNAMIC_DRIVERS */
+
 
 /* END */

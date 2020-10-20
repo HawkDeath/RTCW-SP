@@ -15,13 +15,15 @@
 /*                                                                         */
 /***************************************************************************/
 
+
 #ifndef SFDRIVER_H
 #define SFDRIVER_H
 
 #include "ftmodule.h"
 
-FT_EXPORT_VAR(const FT_Module_Class) sfnt_module_class;
+FT_EXPORT_VAR( const FT_Module_Class )  sfnt_module_class;
 
 #endif /* SFDRIVER_H */
+
 
 /* END */

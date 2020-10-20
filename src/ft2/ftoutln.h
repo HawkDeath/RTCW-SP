@@ -16,14 +16,17 @@
 /*                                                                         */
 /***************************************************************************/
 
+
 #ifndef FTOUTLN_H
 #define FTOUTLN_H
+
 
 #include "freetype.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -49,9 +52,11 @@ extern "C" {
 /* <Return>                                                              */
 /*    FreeType error code.  0 means sucess.                              */
 /*                                                                       */
-FT_EXPORT_DEF(FT_Error)
-FT_Outline_Decompose(FT_Outline *outline, FT_Outline_Funcs *sinterface,
-                     void *user);
+FT_EXPORT_DEF( FT_Error )  FT_Outline_Decompose(
+	FT_Outline *        outline,
+	FT_Outline_Funcs *  sinterface,
+	void*              user );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -85,13 +90,18 @@ FT_Outline_Decompose(FT_Outline *outline, FT_Outline_Funcs *sinterface,
 /*    The reason why this function takes a `library' parameter is simply */
 /*    to use the library's memory allocator.                             */
 /*                                                                       */
-FT_EXPORT_DEF(FT_Error)
-FT_Outline_New(FT_Library library, FT_UInt numPoints, FT_Int numContours,
-               FT_Outline *outline);
+FT_EXPORT_DEF( FT_Error )  FT_Outline_New( FT_Library library,
+										   FT_UInt numPoints,
+										   FT_Int numContours,
+										   FT_Outline *  outline );
 
-FT_EXPORT_DEF(FT_Error)
-FT_Outline_New_Internal(FT_Memory memory, FT_UInt numPoints, FT_Int numContours,
-                        FT_Outline *outline);
+
+FT_EXPORT_DEF( FT_Error )  FT_Outline_New_Internal(
+	FT_Memory memory,
+	FT_UInt numPoints,
+	FT_Int numContours,
+	FT_Outline *  outline );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -120,11 +130,13 @@ FT_Outline_New_Internal(FT_Memory memory, FT_UInt numPoints, FT_Int numContours,
 /*    The reason why this function takes an `outline' parameter is       */
 /*    simply to use FT_Free().                                           */
 /*                                                                       */
-FT_EXPORT_DEF(FT_Error)
-FT_Outline_Done(FT_Library library, FT_Outline *outline);
+FT_EXPORT_DEF( FT_Error )  FT_Outline_Done( FT_Library library,
+											FT_Outline *  outline );
 
-FT_EXPORT_DEF(FT_Error)
-FT_Outline_Done_Internal(FT_Memory memory, FT_Outline *outline);
+
+FT_EXPORT_DEF( FT_Error )  FT_Outline_Done_Internal( FT_Memory memory,
+													 FT_Outline *  outline );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -152,7 +164,9 @@ FT_Outline_Done_Internal(FT_Memory memory, FT_Outline *outline);
 /* <MT-Note>                                                             */
 /*    Yes.                                                               */
 /*                                                                       */
-FT_EXPORT_DEF(void) FT_Outline_Get_CBox(FT_Outline *outline, FT_BBox *cbox);
+FT_EXPORT_DEF( void )  FT_Outline_Get_CBox( FT_Outline *  outline,
+											FT_BBox *     cbox );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -172,8 +186,10 @@ FT_EXPORT_DEF(void) FT_Outline_Get_CBox(FT_Outline *outline, FT_BBox *cbox);
 /* <MT-Note>                                                             */
 /*    Yes.                                                               */
 /*                                                                       */
-FT_EXPORT_DEF(void)
-FT_Outline_Translate(FT_Outline *outline, FT_Pos xOffset, FT_Pos yOffset);
+FT_EXPORT_DEF( void )  FT_Outline_Translate( FT_Outline *  outline,
+											 FT_Pos xOffset,
+											 FT_Pos yOffset );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -194,7 +210,9 @@ FT_Outline_Translate(FT_Outline *outline, FT_Pos xOffset, FT_Pos yOffset);
 /* <Return>                                                              */
 /*    FreeType error code.  0 means success.                             */
 /*                                                                       */
-FT_EXPORT_DEF(FT_Error) FT_Outline_Copy(FT_Outline *source, FT_Outline *target);
+FT_EXPORT_DEF( FT_Error )  FT_Outline_Copy( FT_Outline *  source,
+											FT_Outline *  target );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -216,8 +234,9 @@ FT_EXPORT_DEF(FT_Error) FT_Outline_Copy(FT_Outline *source, FT_Outline *target);
 /* <Note>                                                                */
 /*    The result is undefined if either `vector' or `matrix' is invalid. */
 /*                                                                       */
-FT_EXPORT_DEF(void)
-FT_Outline_Transform(FT_Outline *outline, FT_Matrix *matrix);
+FT_EXPORT_DEF( void )  FT_Outline_Transform( FT_Outline *  outline,
+											 FT_Matrix *   matrix );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -238,7 +257,8 @@ FT_Outline_Transform(FT_Outline *outline, FT_Matrix *matrix);
 /*    It shouldn't be used by a normal client application, unless it     */
 /*    knows what it is doing.                                            */
 /*                                                                       */
-FT_EXPORT_DEF(void) FT_Outline_Reverse(FT_Outline *outline);
+FT_EXPORT_DEF( void )  FT_Outline_Reverse( FT_Outline *  outline );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -269,9 +289,10 @@ FT_EXPORT_DEF(void) FT_Outline_Reverse(FT_Outline *outline);
 /*                                                                       */
 /*    It will use the raster correponding to the default glyph format.   */
 /*                                                                       */
-FT_EXPORT_DEF(FT_Error)
-FT_Outline_Get_Bitmap(FT_Library library, FT_Outline *outline,
-                      FT_Bitmap *bitmap);
+FT_EXPORT_DEF( FT_Error )  FT_Outline_Get_Bitmap( FT_Library library,
+												  FT_Outline *  outline,
+												  FT_Bitmap *   bitmap );
+
 
 /*************************************************************************/
 /*                                                                       */
@@ -307,14 +328,17 @@ FT_Outline_Get_Bitmap(FT_Library library, FT_Outline *outline,
 /*    converter is called, which means that the value you give to it is  */
 /*    actually ignored.                                                  */
 /*                                                                       */
-FT_EXPORT_DEF(FT_Error)
-FT_Outline_Render(FT_Library library, FT_Outline *outline,
-                  FT_Raster_Params *params);
+FT_EXPORT_DEF( FT_Error )  FT_Outline_Render( FT_Library library,
+											  FT_Outline *        outline,
+											  FT_Raster_Params *  params );
+
 
 #ifdef __cplusplus
 }
 #endif
 
+
 #endif /* FTOUTLN_H */
+
 
 /* END */

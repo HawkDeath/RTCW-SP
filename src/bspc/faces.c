@@ -2,10 +2,9 @@
 ===========================================================================
 
 Return to Castle Wolfenstein single player GPL Source Code
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company. 
 
-This file is part of the Return to Castle Wolfenstein single player GPL Source
-Code (RTCW SP Source Code).
+This file is part of the Return to Castle Wolfenstein single player GPL Source Code (RTCW SP Source Code).  
 
 RTCW SP Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,15 +19,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with RTCW SP Source Code.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, the RTCW SP Source Code is also subject to certain additional
-terms. You should have received a copy of these additional terms immediately
-following the terms and conditions of the GNU General Public License which
-accompanied the RTCW SP Source Code.  If not, please request a copy in writing
-from id Software at the address below.
+In addition, the RTCW SP Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the RTCW SP Source Code.  If not, please request a copy in writing from id Software at the address below.
 
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
-120, Rockville, Maryland 20850 USA.
+If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 ===========================================================================
 */
@@ -36,8 +29,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // NO LONGER USED
 // faces.c
 #if 0
-#include "l_mem.h"
 #include "qbsp.h"
+#include "l_mem.h"
 
 
 extern dvertex_t       *dvertexes;
@@ -58,9 +51,9 @@ extern texinfo_t texinfo[MAX_MAP_TEXINFO];
 // undefine for dumb linear searches
 #define USE_HASHING
 
-#define INTEGRAL_EPSILON 0.01
-#define POINT_EPSILON 0.5
-#define OFF_EPSILON 0.5
+#define INTEGRAL_EPSILON    0.01
+#define POINT_EPSILON       0.5
+#define OFF_EPSILON         0.5
 
 int c_merge;
 int c_subdivide;
@@ -73,7 +66,7 @@ int c_faceoverflows;
 int c_facecollapse;
 int c_badstartverts;
 
-#define MAX_SUPERVERTS 512
+#define MAX_SUPERVERTS  512
 int superverts[MAX_SUPERVERTS];
 int numsuperverts;
 
@@ -101,7 +94,8 @@ typedef struct hashvert_s
 	int num;
 } hashvert_t;
 
-#define HASH_SIZE 64
+
+#define HASH_SIZE   64
 
 
 int vertexchain[MAX_MAP_VERTS];     // the next vertex in a hash chain
@@ -341,6 +335,7 @@ void EmitVertexes_r( node_t *node ) {
 	for ( i = 0 ; i < 2 ; i++ )
 		EmitVertexes_r( node->children[i] );
 }
+
 
 #ifdef USE_HASHING
 /*
@@ -667,12 +662,12 @@ int GetEdge2( int v1, int v2,  face_t *f ) {
 				edgefaces[i][1] = f;
 				return -i;
 			}
-#if 0
+	#if 0
 			if ( v1 == edge->v[0] && v2 == edge->v[1] ) {
 				printf( "WARNING: multiple forward edge\n" );
 				return i;
 			}
-#endif
+	#endif
 		}
 	}
 

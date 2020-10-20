@@ -337,19 +337,16 @@ the test as follows:
 		esdctl on   # turn it back on
 
 
-Q. I try
-to run Q3Test,
-    but sound doesn 't work.  The console says "Can' t open / dev / dsp./ dev /
-        dsp : Can't allocate memory."
+Q. I try to run Q3Test, but sound doesn't work.  The console says "Can't
+open /dev/dsp.  /dev/dsp:  Can't allocate memory."
 
-              A.This can happen if the vmware kernel modules are loaded.You can
-                  unload them by typing when logged as root
-    : /
-      etc / rc.d / init.d /
-      vmware stop Assuming you are using a RedHat system
-          .
+A. This can happen if the vmware kernel modules are loaded.  You can unload
+them by typing when logged as root:
+	/etc/rc.d/init.d/vmware stop
+Assuming you are using a RedHat system.
 
-      Q.I was playing Q3Test and suddenly it quit and reported a signal error
-          .
 
-      A.This is probably a bug.Please report it.
+Q. I was playing Q3Test and suddenly it quit and reported a signal error.
+
+A. This is probably a bug. Please report it.
+

@@ -302,4 +302,5 @@ Q3Test has a Problem Icon that you may see on your screen from time to time. Whe
 == MESSAGE OF THE DAY     ==
 =======================
 
-When Quake 3 Arena starts a map up, it sends the GL_RENDERER string to the Message Of The Day server at id.  This responds back with a message of the day to the client.  If you wish to switch this option off, set CL_MOTD to 0 (+set CL_MOTD 0 from the command line).
+When Quake 3 Arena starts a map up, it sends the GL_RENDERER string to the Message Of The Day server at id.  This responds back with a message of the day to the client.  If you wish to switch this option off, set CL_MOTD to 0 (+set CL_MOTD 0 from the command line). 
+

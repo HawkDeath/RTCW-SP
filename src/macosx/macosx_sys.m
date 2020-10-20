@@ -2,10 +2,9 @@
 ===========================================================================
 
 Return to Castle Wolfenstein single player GPL Source Code
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company. 
 
-This file is part of the Return to Castle Wolfenstein single player GPL Source
-Code (RTCW SP Source Code).
+This file is part of the Return to Castle Wolfenstein single player GPL Source Code (RTCW SP Source Code).  
 
 RTCW SP Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,15 +19,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with RTCW SP Source Code.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, the RTCW SP Source Code is also subject to certain additional
-terms. You should have received a copy of these additional terms immediately
-following the terms and conditions of the GNU General Public License which
-accompanied the RTCW SP Source Code.  If not, please request a copy in writing
-from id Software at the address below.
+In addition, the RTCW SP Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the RTCW SP Source Code.  If not, please request a copy in writing from id Software at the address below.
 
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
-120, Rockville, Maryland 20850 USA.
+If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 ===========================================================================
 */
@@ -36,20 +29,20 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #import "../client/client.h"
 #import "macosx_local.h"
 
-#import "Q3Controller.h"
 #import "dlfcn.h"
+#import "Q3Controller.h"
 
 #import <AppKit/AppKit.h>
-#import <IOKit/IOBSD.h>
 #import <IOKit/IOKitLib.h>
+#import <IOKit/IOBSD.h>
 #import <IOKit/storage/IOCDMedia.h>
 #import <mach/mach_error.h>
 
-#import <sys/mount.h>
-#import <sys/param.h>
-#import <sys/sysctl.h>
 #import <sys/types.h>
 #import <unistd.h>
+#import <sys/param.h>
+#import <sys/mount.h>
+#import <sys/sysctl.h>
 
 #ifdef OMNI_TIMER
 #import "macosx_timers.h"
@@ -59,16 +52,16 @@ qboolean stdin_active = qfalse;
 
 //===========================================================================
 
-int main(int argc, const char *argv[]) {
+int main( int argc, const char *argv[] ) {
 #ifdef DEDICATED
-  Q3Controller *controller;
+	Q3Controller *controller;
 
-  stdin_active = qtrue;
-  controller = [[Q3Controller alloc] init];
-  [controller quakeMain];
-  return 0;
+	stdin_active = qtrue;
+	controller = [[Q3Controller alloc] init];
+	[controller quakeMain];
+	return 0;
 #else
-  return NSApplicationMain(argc, argv);
+	return NSApplicationMain( argc, argv );
 #endif
 }
 
@@ -80,11 +73,11 @@ Sys_UnloadDll
 
 =================
 */
-void Sys_UnloadDll(void *dllHandle) {
-  if (!dllHandle) {
-    return;
-  }
-  dlclose(dllHandle);
+void Sys_UnloadDll( void *dllHandle ) {
+	if ( !dllHandle ) {
+		return;
+	}
+	dlclose( dllHandle );
 }
 
 /*
@@ -94,84 +87,85 @@ Sys_LoadDll
 Used to load a development dll instead of a virtual machine
 =================
 */
-extern char *FS_BuildOSPath(const char *base, const char *game,
-                            const char *qpath);
+extern char     *FS_BuildOSPath( const char *base, const char *game, const char *qpath );
 
-void *Sys_LoadDll(const char *name, int (**entryPoint)(int, ...),
-                  int (*systemcalls)(int, ...)) {
-  void *libHandle;
-  void (*dllEntry)(int (*syscallptr)(int, ...));
-  NSString *bundlePath, *libraryPath;
-  const char *path;
+void *Sys_LoadDll( const char *name, int( **entryPoint ) ( int, ...),
+				   int ( *systemcalls )( int, ...) ) {
+	void *libHandle;
+	void ( *dllEntry )( int ( *syscallptr )( int, ...) );
+	NSString *bundlePath, *libraryPath;
+	const char *path;
 
-  bundlePath =
-      [[NSBundle mainBundle] pathForResource:[NSString stringWithCString:name]
-                                      ofType:@"bundle"];
-  //    libraryPath = [NSString stringWithFormat: @"%@/Contents/MacOS/%s",
-  //    bundlePath, name];
-  libraryPath =
-      [NSString stringWithFormat:@"%s.bundle/Contents/MacOS/%s", name, name];
-  if (!libraryPath) {
-    return NULL;
-  }
+	bundlePath = [[NSBundle mainBundle] pathForResource: [NSString stringWithCString: name] ofType: @"bundle"];
+//    libraryPath = [NSString stringWithFormat: @"%@/Contents/MacOS/%s", bundlePath, name];
+	libraryPath = [NSString stringWithFormat: @"%s.bundle/Contents/MacOS/%s", name, name];
+	if ( !libraryPath ) {
+		return NULL;
+	}
 
-  path = [libraryPath cString];
-  Com_Printf("Loading '%s'.\n", path);
-  libHandle = dlopen([libraryPath cString], RTLD_LAZY);
-  if (!libHandle) {
-    libHandle = dlopen(name, RTLD_LAZY);
-    if (!libHandle) {
-      Com_Printf("Error loading dll: %s\n", dlerror());
-      return NULL;
-    }
-  }
+	path = [libraryPath cString];
+	Com_Printf( "Loading '%s'.\n", path );
+	libHandle = dlopen( [libraryPath cString], RTLD_LAZY );
+	if ( !libHandle ) {
+		libHandle = dlopen( name, RTLD_LAZY );
+		if ( !libHandle ) {
+			Com_Printf( "Error loading dll: %s\n", dlerror() );
+			return NULL;
+		}
+	}
 
-  dllEntry = dlsym(libHandle, "_dllEntry");
-  if (!dllEntry) {
-    Com_Printf("Error loading dll:  No dllEntry symbol.\n");
-    dlclose(libHandle);
-    return NULL;
-  }
+	dllEntry = dlsym( libHandle, "_dllEntry" );
+	if ( !dllEntry ) {
+		Com_Printf( "Error loading dll:  No dllEntry symbol.\n" );
+		dlclose( libHandle );
+		return NULL;
+	}
 
-  *entryPoint = dlsym(libHandle, "_vmMain");
-  if (!*entryPoint) {
-    Com_Printf("Error loading dll:  No vmMain symbol.\n");
-    dlclose(libHandle);
-    return NULL;
-  }
+	*entryPoint = dlsym( libHandle, "_vmMain" );
+	if ( !*entryPoint ) {
+		Com_Printf( "Error loading dll:  No vmMain symbol.\n" );
+		dlclose( libHandle );
+		return NULL;
+	}
 
-  dllEntry(systemcalls);
-  return libHandle;
+	dllEntry( systemcalls );
+	return libHandle;
 }
 
 //===========================================================================
 
-char *Sys_GetClipboardData(void) { // FIXME
-  NSPasteboard *pasteboard;
-  NSArray *pasteboardTypes;
+char *Sys_GetClipboardData( void ) { // FIXME
+	NSPasteboard *pasteboard;
+	NSArray *pasteboardTypes;
 
-  pasteboard = [NSPasteboard generalPasteboard];
-  pasteboardTypes = [pasteboard types];
-  if ([pasteboardTypes containsObject:NSStringPboardType]) {
-    NSString *clipboardString;
+	pasteboard = [NSPasteboard generalPasteboard];
+	pasteboardTypes = [pasteboard types];
+	if ([pasteboardTypes containsObject : NSStringPboardType] ) {
+		NSString *clipboardString;
 
-    clipboardString = [pasteboard stringForType:NSStringPboardType];
-    if (clipboardString && [clipboardString length] > 0) {
-      return strdup([clipboardString cString]);
-    }
-  }
-  return NULL;
+		clipboardString = [pasteboard stringForType:NSStringPboardType];
+		if ( clipboardString && [clipboardString length] > 0 ) {
+			return strdup([clipboardString cString] );
+		}
+	}
+	return NULL;
 }
 
-char *Sys_GetWholeClipboard(void) { return NULL; }
+char *Sys_GetWholeClipboard( void ) {
+	return NULL;
+}
 
-void Sys_SetClipboard(const char *contents) {}
+void Sys_SetClipboard( const char *contents ) {
+}
+
 
 //===========================================================================
 
-void Sys_BeginProfiling(void) {}
+void Sys_BeginProfiling( void ) {
+}
 
-void Sys_EndProfiling(void) {}
+void Sys_EndProfiling( void ) {
+}
 
 //===========================================================================
 
@@ -182,14 +176,14 @@ Sys_Init
 The cvar and file system has been setup, so configurations are loaded
 ================
 */
-void Sys_Init(void) {
+void Sys_Init( void ) {
 #ifdef OMNI_TIMER
-  InitializeTimers();
-  OTStackPushRoot(rootNode);
+	InitializeTimers();
+	OTStackPushRoot( rootNode );
 #endif
 
-  NET_Init();
-  Sys_InitInput();
+	NET_Init();
+	Sys_InitInput();
 }
 
 /*
@@ -197,34 +191,32 @@ void Sys_Init(void) {
 Sys_Shutdown
 =================
 */
-void Sys_Shutdown(void) {
-  Com_Printf("----- Sys_Shutdown -----\n");
-  Sys_EndProfiling();
-  Sys_ShutdownInput();
-  Com_Printf("------------------------\n");
+void Sys_Shutdown( void ) {
+	Com_Printf( "----- Sys_Shutdown -----\n" );
+	Sys_EndProfiling();
+	Sys_ShutdownInput();
+	Com_Printf( "------------------------\n" );
 }
 
-void Sys_Error(const char *error, ...) {
-  va_list argptr;
-  NSString *formattedString;
+void Sys_Error( const char *error, ...) {
+	va_list argptr;
+	NSString *formattedString;
 
-  Sys_Shutdown();
+	Sys_Shutdown();
 
-  va_start(argptr, error);
-  formattedString =
-      [[NSString alloc] initWithFormat:[NSString stringWithCString:error]
-                             arguments:argptr];
-  va_end(argptr);
+	va_start( argptr,error );
+	formattedString = [[NSString alloc] initWithFormat:[NSString stringWithCString:error] arguments:argptr];
+	va_end( argptr );
 
-  NSLog(@"Sys_Error: %@", formattedString);
-  NSRunAlertPanel(@"Wolfenstein Error", formattedString, nil, nil, nil);
+	NSLog( @"Sys_Error: %@", formattedString );
+	NSRunAlertPanel( @"Wolfenstein Error", formattedString, nil, nil, nil );
 
-  Sys_Quit();
+	Sys_Quit();
 }
 
-void Sys_Quit(void) {
-  Sys_Shutdown();
-  [NSApp terminate:nil];
+void Sys_Quit( void ) {
+	Sys_Shutdown();
+	[NSApp terminate : nil];
 }
 
 /*
@@ -236,16 +228,17 @@ full screen and the dedicated console window is hidden.
 ================
 */
 
-char *ansiColors[8] = {"\033[30m",  /* ANSI Black */
-                       "\033[31m",  /* ANSI Red */
-                       "\033[32m",  /* ANSI Green */
-                       "\033[33m",  /* ANSI Yellow */
-                       "\033[34m",  /* ANSI Blue */
-                       "\033[36m",  /* ANSI Cyan */
-                       "\033[35m",  /* ANSI Magenta */
-                       "\033[37m"}; /* ANSI White */
+char *ansiColors[8] =
+{ "\033[30m",       /* ANSI Black */
+  "\033[31m",       /* ANSI Red */
+  "\033[32m",       /* ANSI Green */
+  "\033[33m",     /* ANSI Yellow */
+  "\033[34m",       /* ANSI Blue */
+  "\033[36m",     /* ANSI Cyan */
+  "\033[35m",       /* ANSI Magenta */
+  "\033[37m" };   /* ANSI White */
 
-void Sys_Print(const char *text) {
+void Sys_Print( const char *text ) {
 #if 0
 	/* Okay, this is a stupid hack, but what the hell, I was bored. ;) */
 	const char *scan = text;
@@ -284,9 +277,11 @@ void Sys_Print(const char *text) {
 	fputs( "\033[0m", stdout );
 
 #else
-  fputs(text, stdout);
+	fputs( text, stdout );
 #endif
 }
+
+
 
 /*
 ================
@@ -296,143 +291,134 @@ Return true if the proper CD is in the drive
 ================
 */
 
-qboolean Sys_ObjectIsCDRomDevice(io_object_t object) {
-  CFStringRef value;
-  kern_return_t krc;
-  CFDictionaryRef properties;
-  qboolean isCDROM = qfalse;
-  io_iterator_t parentIterator;
-  io_object_t parent;
+qboolean Sys_ObjectIsCDRomDevice( io_object_t object ) {
+	CFStringRef value;
+	kern_return_t krc;
+	CFDictionaryRef properties;
+	qboolean isCDROM = qfalse;
+	io_iterator_t parentIterator;
+	io_object_t parent;
 
-  krc = IORegistryEntryCreateCFProperties(object, &properties,
-                                          kCFAllocatorDefault, (IOOptionBits)0);
-  if (krc != KERN_SUCCESS) {
-    fprintf(stderr, "IORegistryEntryCreateCFProperties returned 0x%08x -- %s\n",
-            krc, mach_error_string(krc));
-    return qfalse;
-  }
+	krc = IORegistryEntryCreateCFProperties( object, &properties, kCFAllocatorDefault, (IOOptionBits)0 );
+	if ( krc != KERN_SUCCESS ) {
+		fprintf( stderr, "IORegistryEntryCreateCFProperties returned 0x%08x -- %s\n", krc, mach_error_string( krc ) );
+		return qfalse;
+	}
 
-  // NSLog(@"properties = %@", properties);
+	//NSLog(@"properties = %@", properties);
 
-  // See if this is a CD-ROM
-  value = CFDictionaryGetValue(properties, CFSTR(kIOCDMediaTypeKey));
-  if (value &&
-      CFStringCompare(value, CFSTR("CD-ROM"), 0) == kCFCompareEqualTo) {
-    isCDROM = qtrue;
-  }
-  CFRelease(properties);
+	// See if this is a CD-ROM
+	value = CFDictionaryGetValue( properties, CFSTR( kIOCDMediaTypeKey ) );
+	if ( value && CFStringCompare( value, CFSTR( "CD-ROM" ), 0 ) == kCFCompareEqualTo ) {
+		isCDROM = qtrue;
+	}
+	CFRelease( properties );
 
-  // If it isn't check each of its parents.  It seems that the parent enumerator
-  // only returns the immediate parent.  Maybe the plural indicates that an
-  // object can have multiple direct parents.  So, we'll call ourselves
-  // recursively for each parent.
-  if (!isCDROM) {
-    krc = IORegistryEntryGetParentIterator(object, kIOServicePlane,
-                                           &parentIterator);
-    if (krc != KERN_SUCCESS) {
-      fprintf(stderr, "IOServiceGetMatchingServices returned 0x%08x -- %s\n",
-              krc, mach_error_string(krc));
-    } else {
-      while (!isCDROM && (parent = IOIteratorNext(parentIterator))) {
-        if (Sys_ObjectIsCDRomDevice(parent)) {
-          isCDROM = qtrue;
-        }
-        IOObjectRelease(parent);
-      }
+	// If it isn't check each of its parents.  It seems that the parent enumerator only returns the immediate parent.  Maybe the plural indicates that an object can have multiple direct parents.  So, we'll call ourselves recursively for each parent.
+	if ( !isCDROM ) {
+		krc = IORegistryEntryGetParentIterator( object, kIOServicePlane, &parentIterator );
+		if ( krc != KERN_SUCCESS ) {
+			fprintf( stderr, "IOServiceGetMatchingServices returned 0x%08x -- %s\n",
+					 krc, mach_error_string( krc ) );
+		} else {
+			while ( !isCDROM && ( parent = IOIteratorNext( parentIterator ) ) ) {
+				if ( Sys_ObjectIsCDRomDevice( parent ) ) {
+					isCDROM = qtrue;
+				}
+				IOObjectRelease( parent );
+			}
 
-      IOObjectRelease(parentIterator);
-    }
-  }
+			IOObjectRelease( parentIterator );
+		}
+	}
 
-  // NSLog(@"Sys_ObjectIsCDRomDevice -> %d", isCDROM);
-  return isCDROM;
+	//NSLog(@"Sys_ObjectIsCDRomDevice -> %d", isCDROM);
+	return isCDROM;
 }
 
-qboolean Sys_IsCDROMDevice(const char *deviceName) {
-  kern_return_t krc;
-  io_iterator_t deviceIterator;
-  mach_port_t masterPort;
-  io_object_t object;
-  qboolean isCDROM = qfalse;
+qboolean Sys_IsCDROMDevice( const char *deviceName ) {
+	kern_return_t krc;
+	io_iterator_t deviceIterator;
+	mach_port_t masterPort;
+	io_object_t object;
+	qboolean isCDROM = qfalse;
 
-  krc = IOMasterPort(bootstrap_port, &masterPort);
-  if (krc != KERN_SUCCESS) {
-    fprintf(stderr, "IOMasterPort returned 0x%08x -- %s\n", krc,
-            mach_error_string(krc));
-    return qfalse;
-  }
+	krc = IOMasterPort( bootstrap_port, &masterPort );
+	if ( krc != KERN_SUCCESS ) {
+		fprintf( stderr, "IOMasterPort returned 0x%08x -- %s\n", krc, mach_error_string( krc ) );
+		return qfalse;
+	}
 
-  // Get an iterator for this BSD device.  If it is a CD, it will likely only be
-  // one partition of the larger CD-ROM device.
-  krc = IOServiceGetMatchingServices(
-      masterPort, IOBSDNameMatching(masterPort, 0, deviceName),
-      &deviceIterator);
-  if (krc != KERN_SUCCESS) {
-    fprintf(stderr, "IOServiceGetMatchingServices returned 0x%08x -- %s\n", krc,
-            mach_error_string(krc));
-    return qfalse;
-  }
+	// Get an iterator for this BSD device.  If it is a CD, it will likely only be one partition of the larger CD-ROM device.
+	krc = IOServiceGetMatchingServices( masterPort,
+										IOBSDNameMatching( masterPort, 0, deviceName ),
+										&deviceIterator );
+	if ( krc != KERN_SUCCESS ) {
+		fprintf( stderr, "IOServiceGetMatchingServices returned 0x%08x -- %s\n",
+				 krc, mach_error_string( krc ) );
+		return qfalse;
+	}
 
-  while (!isCDROM && (object = IOIteratorNext(deviceIterator))) {
-    if (Sys_ObjectIsCDRomDevice(object)) {
-      isCDROM = qtrue;
-    }
-    IOObjectRelease(object);
-  }
+	while ( !isCDROM && ( object = IOIteratorNext( deviceIterator ) ) ) {
+		if ( Sys_ObjectIsCDRomDevice( object ) ) {
+			isCDROM = qtrue;
+		}
+		IOObjectRelease( object );
+	}
 
-  IOObjectRelease(deviceIterator);
+	IOObjectRelease( deviceIterator );
 
-  // NSLog(@"Sys_IsCDROMDevice -> %d", isCDROM);
-  return isCDROM;
+	//NSLog(@"Sys_IsCDROMDevice -> %d", isCDROM);
+	return isCDROM;
 }
 
-qboolean Sys_CheckCD(void) {
-  // DO NOT just return success here if we have a library directory.
-  // Actually look for the CD.
+qboolean        Sys_CheckCD( void ) {
+	// DO NOT just return success here if we have a library directory.
+	// Actually look for the CD.
 
-  // We'll look through the actual mount points rather than just looking
-  // for a particular directory since (a) the mount point may change
-  // between OS version (/foo in Public Beta, /Volumes/foo after Public Beta)
-  // and (b) this way someone can't just create a directory and warez the files.
+	// We'll look through the actual mount points rather than just looking
+	// for a particular directory since (a) the mount point may change
+	// between OS version (/foo in Public Beta, /Volumes/foo after Public Beta)
+	// and (b) this way someone can't just create a directory and warez the files.
 
-  unsigned int mountCount;
-  struct statfs *mounts;
+	unsigned int mountCount;
+	struct statfs  *mounts;
 
-  mountCount = getmntinfo(&mounts, MNT_NOWAIT);
-  if (mountCount <= 0) {
-    perror("getmntinfo");
-#if 1 // Q3:TA doesn't need a CD, but we still need to locate it to allow for
-      // partial installs
-    return qtrue;
+	mountCount = getmntinfo( &mounts, MNT_NOWAIT );
+	if ( mountCount <= 0 ) {
+		perror( "getmntinfo" );
+#if 1 // Q3:TA doesn't need a CD, but we still need to locate it to allow for partial installs
+		return qtrue;
 #else
-    return qfalse;
+		return qfalse;
 #endif
-  }
+	}
 
-  while (mountCount--) {
-    const char *lastComponent;
+	while ( mountCount-- ) {
+		const char *lastComponent;
 
-    if ((mounts[mountCount].f_flags & MNT_RDONLY) != MNT_RDONLY) {
-      // Should have been a read only CD... this isn't it
-      continue;
-    }
+		if ( ( mounts[mountCount].f_flags & MNT_RDONLY ) != MNT_RDONLY ) {
+			// Should have been a read only CD... this isn't it
+			continue;
+		}
 
-    if ((mounts[mountCount].f_flags & MNT_LOCAL) != MNT_LOCAL) {
-      // Should have been a local filesystem
-      continue;
-    }
+		if ( ( mounts[mountCount].f_flags & MNT_LOCAL ) != MNT_LOCAL ) {
+			// Should have been a local filesystem
+			continue;
+		}
 
-    lastComponent = strrchr(mounts[mountCount].f_mntonname, '/');
-    if (!lastComponent) {
-      // No slash in the mount point!  How is that possible?
-      continue;
-    }
+		lastComponent = strrchr( mounts[mountCount].f_mntonname, '/' );
+		if ( !lastComponent ) {
+			// No slash in the mount point!  How is that possible?
+			continue;
+		}
 
-    // Skip the slash and look for the game name
-    lastComponent++;
-    if ((strcasecmp(lastComponent, "Quake3") != 0)) {
-      continue;
-    }
+		// Skip the slash and look for the game name
+		lastComponent++;
+		if ( ( strcasecmp( lastComponent, "Quake3" ) != 0 ) ) {
+			continue;
+		}
+
 
 #if 0
 		fprintf( stderr, "f_bsize: %d\n", mounts[mountCount].f_bsize );
@@ -445,46 +431,49 @@ qboolean Sys_CheckCD(void) {
 		fprintf( stderr, "\n\n" );
 #endif
 
-    lastComponent = strrchr(mounts[mountCount].f_mntfromname, '/');
-    if (!lastComponent) {
-      // No slash in the device name!  How is that possible?
-      continue;
-    }
-    lastComponent++;
-    if (!Sys_IsCDROMDevice(lastComponent)) {
-      continue;
-    }
+		lastComponent = strrchr( mounts[mountCount].f_mntfromname, '/' );
+		if ( !lastComponent ) {
+			// No slash in the device name!  How is that possible?
+			continue;
+		}
+		lastComponent++;
+		if ( !Sys_IsCDROMDevice( lastComponent ) ) {
+			continue;
+		}
 
-    // This looks good
-    Sys_SetDefaultCDPath(mounts[mountCount].f_mntonname);
-    return qtrue;
-  }
+		// This looks good
+		Sys_SetDefaultCDPath( mounts[mountCount].f_mntonname );
+		return qtrue;
+	}
 
-#if 1 // Q3:TA doesn't need a CD, but we still need to locate it to allow for
-      // partial installs
-  return qtrue;
+#if 1 // Q3:TA doesn't need a CD, but we still need to locate it to allow for partial installs
+	return qtrue;
 #else
-  return qfalse;
+	return qfalse;
 #endif
 }
 
+
 //===================================================================
 
-void Sys_BeginStreamedFile(fileHandle_t f, int readAhead) {}
-
-void Sys_EndStreamedFile(fileHandle_t f) {}
-
-int Sys_StreamedRead(void *buffer, int size, int count, fileHandle_t f) {
-  return FS_Read(buffer, size * count, f);
+void Sys_BeginStreamedFile( fileHandle_t f, int readAhead ) {
 }
 
-void Sys_StreamSeek(fileHandle_t f, int offset, int origin) {
-  FS_Seek(f, offset, origin);
+void Sys_EndStreamedFile( fileHandle_t f ) {
 }
 
-void OutputDebugString(char *s) {
+int Sys_StreamedRead( void *buffer, int size, int count, fileHandle_t f ) {
+	return FS_Read( buffer, size * count, f );
+}
+
+void Sys_StreamSeek( fileHandle_t f, int offset, int origin ) {
+	FS_Seek( f, offset, origin );
+}
+
+
+void OutputDebugString( char * s ) {
 #ifdef DEBUG
-  fprintf(stderr, "%s", s);
+	fprintf( stderr, "%s", s );
 #endif
 }
 
@@ -496,24 +485,25 @@ Sys_LowPhysicalMemory()
 #define MEM_THRESHOLD 96 * 1024 * 1024
 
 qboolean Sys_LowPhysicalMemory() {
-  return NSRealMemoryAvailable() <= MEM_THRESHOLD;
+	return NSRealMemoryAvailable() <= MEM_THRESHOLD;
 }
 
 static unsigned int _Sys_ProcessorCount = 0;
 
 unsigned int Sys_ProcessorCount() {
-  if (!_Sys_ProcessorCount) {
-    int name[] = {CTL_HW, HW_NCPU};
-    size_t size;
+	if ( !_Sys_ProcessorCount ) {
+		int name[] = {CTL_HW, HW_NCPU};
+		size_t size;
 
-    size = sizeof(_Sys_ProcessorCount);
-    if (sysctl(name, 2, &_Sys_ProcessorCount, &size, NULL, 0) < 0) {
-      perror("sysctl");
-      _Sys_ProcessorCount = 1;
-    } else {
-      Com_Printf("System processor count is %d\n", _Sys_ProcessorCount);
-    }
-  }
+		size = sizeof( _Sys_ProcessorCount );
+		if ( sysctl( name, 2, &_Sys_ProcessorCount, &size, NULL, 0 ) < 0 ) {
+			perror( "sysctl" );
+			_Sys_ProcessorCount = 1;
+		} else {
+			Com_Printf( "System processor count is %d\n", _Sys_ProcessorCount );
+		}
+	}
 
-  return _Sys_ProcessorCount;
+	return _Sys_ProcessorCount;
 }
+

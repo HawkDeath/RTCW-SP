@@ -1,15 +1,17 @@
-#!/ bin / sh
-#temporary script to build a tarball out of a build tree
+#!/bin/sh
+# temporary script to build a tarball out of a build tree
 
-IN_DIR = $1 VERSION = $2
+IN_DIR=$1
+VERSION=$2
 
-    TMP_DIR = wolf - $VERSION rm -
-              rf $TMP_DIR mkdir $TMP_DIR
+TMP_DIR=wolf-$VERSION
+rm -rf $TMP_DIR
+mkdir $TMP_DIR
 
-                  echo "Building tarball from $IN_DIR" echo "Version $VERSION"
+echo "Building tarball from $IN_DIR"
+echo "Version $VERSION"
 
-              cp -
-              R $IN_DIR/* $TMP_DIR
+cp -R $IN_DIR/* $TMP_DIR
 find $TMP_DIR -name '*.so' -exec strip {} \;
 strip $TMP_DIR/wolf.x86
 
