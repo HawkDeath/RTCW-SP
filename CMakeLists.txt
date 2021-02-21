@@ -4,3 +4,4 @@ project(wolf)
 
 add_subdirectory(src/botlib)
 add_subdirectory(src/cgame)
+add_subdirectory(src/game)
