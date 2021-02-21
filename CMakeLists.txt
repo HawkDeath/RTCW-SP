@@ -9,3 +9,4 @@ add_subdirectory(src/game)
 # rednerer
 
 add_subdirectory(src/splines)
+add_subdirectory(src/ui)
