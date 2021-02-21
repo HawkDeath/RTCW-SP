@@ -5,6 +5,45 @@ if(WIN32)
     add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS) # -DBUILD_FREETYPE)
 endif()
 
+set(JPEG_SOURCES
+    ../jpeg-6/jcapimin.c
+    ../jpeg-6/jccoefct.c
+    ../jpeg-6/jccolor.c
+    ../jpeg-6/jcdctmgr.c
+    ../jpeg-6/jchuff.c
+    ../jpeg-6/jcinit.c
+    ../jpeg-6/jcmainct.c
+    ../jpeg-6/jcmarker.c
+    ../jpeg-6/jcmaster.c
+    ../jpeg-6/jcomapi.c
+    ../jpeg-6/jcparam.c
+    ../jpeg-6/jcphuff.c
+    ../jpeg-6/jcprepct.c
+    ../jpeg-6/jcsample.c
+    ../jpeg-6/jctrans.c
+    ../jpeg-6/jdapimin.c
+    ../jpeg-6/jdapistd.c
+    ../jpeg-6/jdatadst.c
+    ../jpeg-6/jdatasrc.c
+    ../jpeg-6/jdcoefct.c
+    ../jpeg-6/jdcolor.c
+    ../jpeg-6/jddctmgr.c
+    ../jpeg-6/jdhuff.c
+    ../jpeg-6/jdinput.c
+    ../jpeg-6/jdmainct.c
+    ../jpeg-6/jdmarker.c
+    ../jpeg-6/jdmaster.c
+    ../jpeg-6/jdpostct.c
+    ../jpeg-6/jdsample.c
+    ../jpeg-6/jdtrans.c
+    ../jpeg-6/jerror.c
+    ../jpeg-6/jfdctflt.c
+    ../jpeg-6/jidctflt.c
+    ../jpeg-6/jmemmgr.c
+    ../jpeg-6/jmemnobs.c
+    ../jpeg-6/jutils.c
+    )
+
 set(RENDERER_GL_HEADERS
     anorms256.h
     ../qcommon/cm_public.h
@@ -22,8 +61,8 @@ set(RENDERER_GL_HEADERS
     ../win32/win_local.h
     )
 
-
 set(RENDERER_GL_SOURCES
+    ${JPEG_SOURCES}
     tr_animation.c
     tr_backend.c
     tr_bsp.c

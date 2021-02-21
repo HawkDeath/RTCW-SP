@@ -37,7 +37,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // clang-format off
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
-#include "../renderer/tr_public.h"
+#include "../renderer_gl/tr_public.h"
 #include "../ui/ui_public.h"
 #include "keys.h"
 #include "snd_public.h"

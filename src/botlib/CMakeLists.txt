@@ -62,6 +62,7 @@ set(BOTLIB_SOURCES
     be_aas_routetable.c
     be_aas_sample.c
     be_ai_char.c
+    be_ai_chat.c
     be_ai_gen.c
     be_ai_goal.c
     be_ai_move.c

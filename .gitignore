@@ -31,6 +31,8 @@ src/renderer/Release/
 src/splines/Release/
 src/ui/Release/
 
+# build output
+output/
 
 # Visual Studio output
 src/.vs/
