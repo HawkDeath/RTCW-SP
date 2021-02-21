@@ -2,4 +2,7 @@
 
 ## TODO:
 
-- [ ] support for x64
+- [ ] linux support
+
+### Renderer TODO
+- [ ] Vulkan API support
