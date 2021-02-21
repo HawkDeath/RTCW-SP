@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(botlib C)
 
-add_definitions(-DBOTLIB)
+if(WIN32)
+    add_definitions(-DBOTLIB -D_CRT_SECURE_NO_WARNINGS)
+else()
+    add_definitions(-DBOTLIB)
+endif()
 
 set(BOTLIB_HEADERS
     aasfile.h
