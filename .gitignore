@@ -33,6 +33,7 @@ src/ui/Release/
 
 # build output
 output/
+build/
 
 # Visual Studio output
 src/.vs/
@@ -43,6 +44,7 @@ src/*/*.vcxproj.user
 
 # Visual Studio Code
 .vscode/
+.vs/
 
 # QT Creator
 CMakeLists.txt.user
