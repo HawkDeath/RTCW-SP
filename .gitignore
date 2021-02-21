@@ -41,3 +41,6 @@ src/*/*.vcxproj.user
 
 # Visual Studio Code
 .vscode/
+
+# QT Creator
+CMakeLists.txt.user
