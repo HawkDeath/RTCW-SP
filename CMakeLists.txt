@@ -5,7 +5,7 @@ add_subdirectory(src/botlib)
 add_subdirectory(src/cgame)
 add_subdirectory(src/game)
 
-# rednerer
+add_subdirectory(src/renderer_gl)
 
 add_subdirectory(src/splines)
 add_subdirectory(src/ui)

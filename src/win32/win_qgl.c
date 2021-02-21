@@ -45,7 +45,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 // clang-format off
 #include <float.h>
-#include "../renderer/tr_local.h"
+#include "../renderer_gl/tr_local.h"
 #include "glw_win.h"
 // clang-format on
 

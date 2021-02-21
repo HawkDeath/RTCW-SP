@@ -50,7 +50,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 // clang-format off
 #include <assert.h>
-#include "../renderer/tr_local.h"
+#include "../renderer_gl/tr_local.h"
 #include "../qcommon/qcommon.h"
 #include "resource.h"
 #include "glw_win.h"
