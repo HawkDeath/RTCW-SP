@@ -47,7 +47,6 @@ set(BOTLIB_HEADERS
     ../game/surfaceflags.h
     )
 
-
 set(BOTLIB_SOURCES
     be_aas_bspq3.c
     be_aas_cluster.c
@@ -78,6 +77,5 @@ set(BOTLIB_SOURCES
     l_script.c
     l_struct.c
     )
-
 
 add_library(botlib STATIC ${BOTLIB_SOURCES} ${BOTLIB_HEADERS})

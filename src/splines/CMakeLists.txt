@@ -16,6 +16,7 @@ set(SPLINES_HEADERS
     util_list.h
     util_str.h
     )
+
 set(SPLINES_SOURCES
     math_angles.cpp
     math_matrix.cpp

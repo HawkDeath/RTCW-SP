@@ -16,6 +16,7 @@ set(UI_HEADERS
     ui_public.h
     ui_shared.h
     )
+
 set(UI_SOURCES
     #../game/bg_lib.c
     ../game/bg_misc.c

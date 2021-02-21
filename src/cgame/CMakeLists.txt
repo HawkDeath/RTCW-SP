@@ -7,8 +7,6 @@ else()
     add_definitions(-DCGAMEDLL)
 endif()
 
-
-
 set(CGAME_HEADERS
     ../game/bg_local.h
     ../game/bg_public.h
@@ -57,19 +55,4 @@ set(CGAME_SOURCES
     #../game/bg_lib.c
     )
 
-
 add_library(cgamex86 SHARED cgame.def ${CGAME_SOURCES} ${CGAME_HEADERS})
-if(WIN32)
-target_link_libraries(cgamex86 PRIVATE odbc32 odbccp32 kernel32
-    user32
-    gdi32
-    winspool
-    comdlg32
-    advapi32
-    shell32
-    ole32
-    oleaut32
-    uuid
-    )
-
-endif()
