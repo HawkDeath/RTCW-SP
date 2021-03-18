@@ -41,6 +41,7 @@ src/Backup/
 src/UpgradeLog.htm
 src/*.vcxproj.user
 src/*/*.vcxproj.user
+CMakeSettings.json
 
 # Visual Studio Code
 .vscode/
