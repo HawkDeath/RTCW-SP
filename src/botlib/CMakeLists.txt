@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(botlib C)
 
 if(WIN32)
-    add_definitions(-DBOTLIB -D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-DWIN32 -DBOTLIB -D_LIB -D_CRT_SECURE_NO_WARNINGS)
 else()
     add_definitions(-DBOTLIB)
 endif()

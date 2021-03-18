@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(wolf)
 
+add_definitions(-D_M_IX86)
+
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/output")
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/output/bin")
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/output/lib")
