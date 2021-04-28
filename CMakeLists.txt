@@ -33,8 +33,11 @@ endif(WOLFSP_USE_RENDERER_VULKAN)
 
 add_subdirectory(src/splines)
 add_subdirectory(src/ui)
-
-add_subdirectory(src/win32)
+if (WIN32)
+    add_subdirectory(src/win32)
+else()
+    add_subdirectory(src/unix)
+endif()
 
 if(WOLFSP_USE_RENDERER_VULKAN)
     add_dependencies(WolfSP botlib Renderer_VK Splines)
