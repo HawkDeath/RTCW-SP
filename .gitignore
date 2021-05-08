@@ -34,6 +34,7 @@ src/ui/Release/
 # build output
 output/
 build/
+out/
 
 # Visual Studio output
 src/.vs/
@@ -49,3 +50,6 @@ CMakeSettings.json
 
 # QT Creator
 CMakeLists.txt.user
+
+# game resource
+Main/
