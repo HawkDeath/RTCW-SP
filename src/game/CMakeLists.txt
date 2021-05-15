@@ -4,7 +4,7 @@ project(game C)
 if(WIN32)
     add_definitions(-DWIN32 -D_WINDOWS -DGAMEDLL -D_CRT_SECURE_NO_WARNINGS)
 else()
-    add_definitions(-DGAMEDLL)
+    add_definitions(-DGAMEDLL -D__linux__ -D__LCC__)
 endif()
 
 set(CGAME_HEADERS

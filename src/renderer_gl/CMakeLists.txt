@@ -4,6 +4,8 @@ project(renderer_gl C)
 add_definitions(-DWOLFSP_RENDERER_VULKAN=0)
 if(WIN32)
     add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS) # -DBUILD_FREETYPE)
+else()
+    add_definitions(-D_XF86DGA_SERVER_)
 endif()
 
 set(JPEG_SOURCES
@@ -62,6 +64,18 @@ set(RENDERER_GL_HEADERS
     ../win32/win_local.h
     )
 
+if (WIN32)
+set(RENDERER_GL_PLATFORM
+    ../win32/win_gamma.c
+    ../win32/win_glimp.c
+    ../win32/win_qgl.c
+    )
+else()
+set(RENDERER_GL_PLATFORM
+    ../unix/linux_glimp.c
+    ../unix/linux_qgl.c
+    )
+endif()
 set(RENDERER_GL_SOURCES
     ${JPEG_SOURCES}
     tr_animation.c
@@ -88,9 +102,8 @@ set(RENDERER_GL_SOURCES
     tr_sky.c
     tr_surface.c
     tr_world.c
-    ../win32/win_gamma.c
-    ../win32/win_glimp.c
-    ../win32/win_qgl.c
+    ${RENDERER_GL_PLATFORM}
     )
 
 add_library(Renderer_GL STATIC ref_trin.def ${RENDERER_GL_SOURCES} ${RENDERER_GL_HEADERS})
+set_target_properties(Renderer_GL PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
