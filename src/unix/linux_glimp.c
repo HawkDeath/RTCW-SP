@@ -53,6 +53,8 @@ If you have questions concerning this license or the applicable additional terms
 #include <pthread.h>
 #include <semaphore.h>
 
+#include <X11/extensions/xf86dga1const.h>
+
 // bk001204
 #include <dlfcn.h>
 
@@ -62,7 +64,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "../renderer/tr_local.h"
+#include "../renderer_gl/tr_local.h"
 #include "../client/client.h"
 #include "linux_local.h" // bk001130
 
