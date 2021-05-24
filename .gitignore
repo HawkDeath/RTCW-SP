@@ -36,6 +36,9 @@ output/
 build/
 out/
 
+# deps
+3party/
+
 # Visual Studio output
 src/.vs/
 src/Backup/
