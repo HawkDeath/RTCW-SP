@@ -113,6 +113,7 @@ idVec3 idSplineList::zero(0, 0, 0);
 
 void glLabeledPoint(idVec3 &color, idVec3 &point, float size,
                     const char *label) {
+  #ifdef VK
   qglColor3fv(color);
   qglPointSize(size);
   qglBegin(GL_POINTS);
@@ -124,6 +125,7 @@ void glLabeledPoint(idVec3 &color, idVec3 &point, float size,
   v.z += 1;
   qglRasterPos3fv(v);
   qglCallLists(strlen(label), GL_UNSIGNED_BYTE, label);
+#endif
 }
 
 void glBox(idVec3 &color, idVec3 &point, float size) {
@@ -135,6 +137,7 @@ void glBox(idVec3 &color, idVec3 &point, float size) {
   maxs[0] += size;
   maxs[1] -= size;
   maxs[2] += size;
+#ifdef VK
   qglColor3fv(color);
   qglBegin(GL_LINE_LOOP);
   qglVertex3f(mins[0], mins[1], mins[2]);
@@ -159,6 +162,7 @@ void glBox(idVec3 &color, idVec3 &point, float size) {
   qglVertex3f(maxs[0], maxs[1], maxs[2]);
   qglVertex3f(maxs[0], maxs[1], mins[2]);
   qglEnd();
+#endif
 }
 
 void splineTest() {
@@ -267,7 +271,7 @@ void idSplineList::draw(bool editMode) {
   if (dirty) {
     buildSpline();
   }
-
+#ifdef VK
   qglColor3fv(controlColor);
   qglPointSize(5);
 
@@ -308,6 +312,7 @@ void idSplineList::draw(bool editMode) {
       glBox(yellow, *splinePoints[activeSegment], 8);
     }
   }
+#endif
 }
 
 float idSplineList::totalDistance() {
