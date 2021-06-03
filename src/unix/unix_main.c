@@ -58,7 +58,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
-#include "../renderer/tr_public.h"
+#include "../renderer_gl/tr_local.h"
 
 #include "linux_local.h" // bk001204
 
@@ -650,7 +650,7 @@ void *Sys_LoadDll( const char *name,
 
 	// bk001206 - let's have some paranoia
 	assert( name );
-
+#define __i386__
 #if defined __i386__
 	snprintf( fname, sizeof( fname ), "%si386.so", name );
 #elif defined __powerpc__   //rcg010207 - PPC support.

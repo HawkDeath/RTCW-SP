@@ -56,3 +56,5 @@ set(CGAME_SOURCES
     )
 
 add_library(cgamex86 SHARED cgame.def ${CGAME_SOURCES} ${CGAME_HEADERS})
+set_target_properties(cgamex86 PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+

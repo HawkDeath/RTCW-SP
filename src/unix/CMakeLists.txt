@@ -3,5 +3,66 @@ project(linux C)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
-add_executable(WolfSP linux_snd.c)
+set(WOLFSP_UNIX_HEADERS
+    linux_local.h
+    qasm.h
+
+    )
+
+set(WOLFSP_UNIX_SOURCES
+    ../client/cl_cgame.c
+    ../client/cl_cin.c
+    ../client/cl_console.c
+    ../client/cl_input.c
+    ../client/cl_keys.c
+    ../client/cl_main.c
+    ../client/cl_net_chan.c
+    ../client/cl_parse.c
+    ../client/cl_scrn.c
+    ../client/cl_ui.c
+    ../qcommon/cm_load.c
+    ../qcommon/cm_patch.c
+    ../qcommon/cm_polylib.c
+    ../qcommon/cm_test.c
+    ../qcommon/cm_trace.c
+    ../qcommon/cmd.c
+    ../qcommon/common.c
+    ../qcommon/cvar.c
+    ../qcommon/files.c
+    ../qcommon/huffman.c
+    ../qcommon/md4.c
+    ../qcommon/msg.c
+    ../qcommon/net_chan.c
+    ../game/q_math.c
+    ../game/q_shared.c
+    ../client/snd_adpcm.c
+    ../client/snd_dma.c
+    ../client/snd_mem.c
+    ../client/snd_mix.c
+    ../client/snd_wavelet.c
+    ../server/sv_bot.c
+    ../server/sv_ccmds.c
+    ../server/sv_client.c
+    ../server/sv_game.c
+    ../server/sv_init.c
+    ../server/sv_main.c
+    ../server/sv_net_chan.c
+    ../server/sv_snapshot.c
+    ../server/sv_world.c
+    ../qcommon/unzip.c
+    ../qcommon/vm.c
+    ../qcommon/vm_interpreted.c
+    ../qcommon/vm_x86.c
+    linux_common.c
+    linux_joystick.c
+    ftol.nasm
+    snd_mixa.s
+    sys_dosa.s
+    unix_main.c
+
+    linux_snd.c)
+
+add_executable(WolfSP quake3.xpm ${WOLFSP_UNIX_SOURCES} ${WOLFSP_UNIX_HEADERS})
 target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL)
+set_target_properties(WolfSP PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+
