@@ -80,3 +80,5 @@ set(BOTLIB_SOURCES
     )
 
 add_library(botlib STATIC ${BOTLIB_SOURCES} ${BOTLIB_HEADERS})
+set_target_properties(botlib PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+

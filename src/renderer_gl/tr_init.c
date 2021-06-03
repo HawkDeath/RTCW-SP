@@ -213,12 +213,14 @@ int max_polys;
 cvar_t *r_maxpolyverts;
 int max_polyverts;
 
+#ifdef WIN32
 void(APIENTRY *qglMultiTexCoord2fARB)(GLenum texture, GLfloat s, GLfloat t);
 void(APIENTRY *qglActiveTextureARB)(GLenum texture);
 void(APIENTRY *qglClientActiveTextureARB)(GLenum texture);
 
 void(APIENTRY *qglLockArraysEXT)(GLint, GLint);
 void(APIENTRY *qglUnlockArraysEXT)(void);
+#endif
 
 //----(SA)	added
 void(APIENTRY *qglPNTrianglesiATI)(GLenum pname, GLint param);
