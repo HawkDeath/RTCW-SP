@@ -106,4 +106,4 @@ set(RENDERER_GL_SOURCES
     )
 
 add_library(Renderer_GL STATIC ref_trin.def ${RENDERER_GL_SOURCES} ${RENDERER_GL_HEADERS})
-set_target_properties(Renderer_GL PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+set_target_properties(Renderer_GL PROPERTIES COMPILE_FLAGS " " LINK_FLAGS " ")

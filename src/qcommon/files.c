@@ -2480,8 +2480,9 @@ Ignore case and seprator char distinctions
 */
 int FS_PathCmp(const char *s1, const char *s2) {
   int c1, c2;
-
+if (s1 == NULL || s2 == NULL) return -1;
   do {
+    printf("%c %c", (char)c1, (char)c2);
     c1 = *s1++;
     c2 = *s2++;
 

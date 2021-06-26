@@ -28,5 +28,5 @@ set(SPLINES_SOURCES
     util_str.cpp)
 
 add_library(Splines STATIC ${SPLINES_SOURCES} ${SPLINES_HEADERS})
-set_target_properties(Splines PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+set_target_properties(Splines PROPERTIES COMPILE_FLAGS " " LINK_FLAGS " ")
 

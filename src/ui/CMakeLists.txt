@@ -32,5 +32,5 @@ set(UI_SOURCES
     )
 
 add_library(uix86 SHARED ui.def ${UI_SOURCES} ${UI_HEADERS})
-set_target_properties(uix86 PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+set_target_properties(uix86 PROPERTIES COMPILE_FLAGS " " LINK_FLAGS " ")
 
