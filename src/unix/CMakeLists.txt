@@ -40,7 +40,6 @@ set(WOLFSP_UNIX_SOURCES
     ../game/q_shared.c
     ../client/snd_adpcm.c
     ../client/snd_dma.c
-    snd_mixa.s
     ../client/snd_mem.c
     ../client/snd_mix.c
     ../client/snd_wavelet.c
@@ -60,7 +59,7 @@ set(WOLFSP_UNIX_SOURCES
     linux_common.c
     linux_joystick.c
     ftol.nasm
-
+    snapvector.nasm
     sys_dosa.s
     unix_main.c
     unix_shared.c
@@ -68,6 +67,6 @@ set(WOLFSP_UNIX_SOURCES
     linux_snd.c)
 
 add_executable(WolfSP quake3.xpm ${WOLFSP_UNIX_SOURCES} ${WOLFSP_UNIX_HEADERS})
-target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL dl X11)
+target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL dl X11 Xxf86dga)
 set_target_properties(WolfSP PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 

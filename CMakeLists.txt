@@ -20,6 +20,7 @@ else()
     add_definitions(-DBOTLIB -D_LIB -D_CRT_SECURE_NO_WARNINGS -D_M_IX86)
 endif()
 
+
 add_subdirectory(src/botlib)
 add_subdirectory(src/cgame)
 add_subdirectory(src/game)
