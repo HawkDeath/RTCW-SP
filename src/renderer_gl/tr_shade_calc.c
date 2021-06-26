@@ -1108,15 +1108,15 @@ void RB_CalcRotateTexCoords(float degsPerSecond, float *st) {
   RB_CalcTransformTexCoords(&tmi, st);
 }
 
-#if id386 && !((defined __linux__ || defined __FreeBSD__) &&                   \
-               (defined __i386__)) // rb010123
+// #if id386 && !((defined __linux__ || defined __FreeBSD__) &&                   \
+//                (defined __i386__)) // rb010123
 
-long myftol(float f) {
-  static int tmp;
-  __asm fld f __asm fistp tmp __asm mov eax, tmp
-}
+// long myftol(float f) {
+//   static int tmp;
+//   __asm fld f __asm fistp tmp __asm mov eax, tmp
+// }
 
-#endif
+// #endif
 
 /*
 ** RB_CalcSpecularAlpha

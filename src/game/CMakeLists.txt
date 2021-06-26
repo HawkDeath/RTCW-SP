@@ -96,5 +96,5 @@ set(CGAME_SOURCES
     )
 
 add_library(qagamex86 SHARED game.def ${CGAME_SOURCES} ${CGAME_HEADERS})
-set_target_properties(qagamex86 PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+set_target_properties(qagamex86 PROPERTIES COMPILE_FLAGS " " LINK_FLAGS " ")
 

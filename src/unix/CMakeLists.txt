@@ -55,7 +55,7 @@ set(WOLFSP_UNIX_SOURCES
     ../qcommon/unzip.c
     ../qcommon/vm.c
     ../qcommon/vm_interpreted.c
-    ../qcommon/vm_x86.c
+    vm_x86.c
     linux_common.c
     linux_joystick.c
     ftol.nasm
@@ -67,6 +67,6 @@ set(WOLFSP_UNIX_SOURCES
     linux_snd.c)
 
 add_executable(WolfSP quake3.xpm ${WOLFSP_UNIX_SOURCES} ${WOLFSP_UNIX_HEADERS})
-target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL dl X11 Xxf86dga)
-set_target_properties(WolfSP PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL dl Xxf86vm X11 Xxf86dga)
+set_target_properties(WolfSP PROPERTIES COMPILE_FLAGS " " LINK_FLAGS " ")
 
