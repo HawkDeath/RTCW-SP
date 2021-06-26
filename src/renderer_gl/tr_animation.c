@@ -431,21 +431,35 @@ void R_AddAnimSurfaces(trRefEntity_t *ent) {
   }
 }
 
+#ifdef WIN32
 __inline void LocalMatrixTransformVector(vec3_t in, vec3_t mat[3], vec3_t out) {
+#else
+void LocalMatrixTransformVector(vec3_t in, vec3_t mat[3], vec3_t out) {
+#endif
   out[0] = in[0] * mat[0][0] + in[1] * mat[0][1] + in[2] * mat[0][2];
   out[1] = in[0] * mat[1][0] + in[1] * mat[1][1] + in[2] * mat[1][2];
   out[2] = in[0] * mat[2][0] + in[1] * mat[2][1] + in[2] * mat[2][2];
 }
 
+#ifdef WIN32
 __inline void LocalMatrixTransformVectorTranslate(vec3_t in, vec3_t mat[3],
                                                   vec3_t tr, vec3_t out) {
+#else
+void LocalMatrixTransformVectorTranslate(vec3_t in, vec3_t mat[3],
+                                         vec3_t tr, vec3_t out) {
+#endif
   out[0] = in[0] * mat[0][0] + in[1] * mat[0][1] + in[2] * mat[0][2] + tr[0];
   out[1] = in[0] * mat[1][0] + in[1] * mat[1][1] + in[2] * mat[1][2] + tr[1];
   out[2] = in[0] * mat[2][0] + in[1] * mat[2][1] + in[2] * mat[2][2] + tr[2];
 }
 
+#ifdef WIN32
 __inline void LocalScaledMatrixTransformVector(vec3_t in, float s,
                                                vec3_t mat[3], vec3_t out) {
+#else
+void LocalScaledMatrixTransformVector(vec3_t in, float s,
+                                      vec3_t mat[3], vec3_t out) {
+#endif
   out[0] = (1.0f - s) * in[0] +
            s * (in[0] * mat[0][0] + in[1] * mat[0][1] + in[2] * mat[0][2]);
   out[1] = (1.0f - s) * in[1] +
@@ -454,9 +468,15 @@ __inline void LocalScaledMatrixTransformVector(vec3_t in, float s,
            s * (in[0] * mat[2][0] + in[1] * mat[2][1] + in[2] * mat[2][2]);
 }
 
+#ifdef WIN32
 __inline void LocalScaledMatrixTransformVectorTranslate(vec3_t in, float s,
                                                         vec3_t mat[3],
                                                         vec3_t tr, vec3_t out) {
+#else
+void LocalScaledMatrixTransformVectorTranslate(vec3_t in, float s,
+                                                        vec3_t mat[3],
+                                                        vec3_t tr, vec3_t out) {
+#endif
   out[0] = (1.0f - s) * in[0] + s * (in[0] * mat[0][0] + in[1] * mat[0][1] +
                                      in[2] * mat[0][2] + tr[0]);
   out[1] = (1.0f - s) * in[1] + s * (in[0] * mat[1][0] + in[1] * mat[1][1] +
@@ -465,10 +485,17 @@ __inline void LocalScaledMatrixTransformVectorTranslate(vec3_t in, float s,
                                      in[2] * mat[2][2] + tr[2]);
 }
 
+#ifdef WIN32
 __inline void LocalScaledMatrixTransformVectorFullTranslate(vec3_t in, float s,
                                                             vec3_t mat[3],
                                                             vec3_t tr,
                                                             vec3_t out) {
+#else
+void LocalScaledMatrixTransformVectorFullTranslate(vec3_t in, float s,
+                                                   vec3_t mat[3],
+                                                   vec3_t tr,
+                                                   vec3_t out) {
+#endif
   out[0] = (1.0f - s) * in[0] +
            s * (in[0] * mat[0][0] + in[1] * mat[0][1] + in[2] * mat[0][2]) +
            tr[0];
@@ -480,8 +507,13 @@ __inline void LocalScaledMatrixTransformVectorFullTranslate(vec3_t in, float s,
            tr[2];
 }
 
+#ifdef WIN32
 __inline void LocalAddScaledMatrixTransformVectorFullTranslate(
     vec3_t in, float s, vec3_t mat[3], vec3_t tr, vec3_t out) {
+#else
+void LocalAddScaledMatrixTransformVectorFullTranslate(
+    vec3_t in, float s, vec3_t mat[3], vec3_t tr, vec3_t out) {
+#endif
   out[0] +=
       s * (in[0] * mat[0][0] + in[1] * mat[0][1] + in[2] * mat[0][2]) + tr[0];
   out[1] +=
@@ -490,10 +522,17 @@ __inline void LocalAddScaledMatrixTransformVectorFullTranslate(
       s * (in[0] * mat[2][0] + in[1] * mat[2][1] + in[2] * mat[2][2]) + tr[2];
 }
 
+#ifdef WIN32
 __inline void LocalAddScaledMatrixTransformVectorTranslate(vec3_t in, float s,
                                                            vec3_t mat[3],
                                                            vec3_t tr,
                                                            vec3_t out) {
+#else
+void LocalAddScaledMatrixTransformVectorTranslate(vec3_t in, float s,
+                                                           vec3_t mat[3],
+                                                           vec3_t tr,
+                                                           vec3_t out) {
+#endif
   out[0] +=
       s * (in[0] * mat[0][0] + in[1] * mat[0][1] + in[2] * mat[0][2] + tr[0]);
   out[1] +=
@@ -502,8 +541,13 @@ __inline void LocalAddScaledMatrixTransformVectorTranslate(vec3_t in, float s,
       s * (in[0] * mat[2][0] + in[1] * mat[2][1] + in[2] * mat[2][2] + tr[2]);
 }
 
+#ifdef WIN32
 __inline void LocalAddScaledMatrixTransformVector(vec3_t in, float s,
                                                   vec3_t mat[3], vec3_t out) {
+#else
+void LocalAddScaledMatrixTransformVector(vec3_t in, float s,
+                                         vec3_t mat[3], vec3_t out) {
+#endif
   out[0] += s * (in[0] * mat[0][0] + in[1] * mat[0][1] + in[2] * mat[0][2]);
   out[1] += s * (in[0] * mat[1][0] + in[1] * mat[1][1] + in[2] * mat[1][2]);
   out[2] += s * (in[0] * mat[2][0] + in[1] * mat[2][1] + in[2] * mat[2][2]);
@@ -515,7 +559,11 @@ static float sp, sy;
 // static float    cr; // TTimo: unused
 static float cp, cy;
 
+#ifdef WIN32
 __inline void LocalAngleVector(vec3_t angles, vec3_t forward) {
+#else
+void LocalAngleVector(vec3_t angles, vec3_t forward) {
+#endif
   LAVangle = angles[YAW] * (M_PI * 2 / 360);
   sy = sin(LAVangle);
   cy = cos(LAVangle);
@@ -527,8 +575,11 @@ __inline void LocalAngleVector(vec3_t angles, vec3_t forward) {
   forward[1] = cp * sy;
   forward[2] = -sp;
 }
-
+#ifdef WIN32
 __inline void LocalVectorMA(vec3_t org, float dist, vec3_t vec, vec3_t out) {
+#else
+void LocalVectorMA(vec3_t org, float dist, vec3_t vec, vec3_t out) {
+#endif
   out[0] = org[0] + dist * vec[0];
   out[1] = org[1] + dist * vec[1];
   out[2] = org[2] + dist * vec[2];
@@ -541,7 +592,11 @@ __inline void LocalVectorMA(vec3_t org, float dist, vec3_t vec, vec3_t out) {
     *(pf++) = SHORT2ANGLE(*(sh++));                                            \
   }
 
+#ifdef WIN32
 __inline void SLerp_Normal(vec3_t from, vec3_t to, float tt, vec3_t out) {
+#else
+void SLerp_Normal(vec3_t from, vec3_t to, float tt, vec3_t out) {
+#endif
   float ft = 1.0 - tt;
 
   out[0] = from[0] * ft + to[0] * tt;
@@ -559,8 +614,13 @@ __inline void SLerp_Normal(vec3_t from, vec3_t to, float tt, vec3_t out) {
 ===============================================================================
 */
 
+#ifdef WIN32
 __inline void Matrix4Multiply(const vec4_t a[4], const vec4_t b[4],
                               vec4_t dst[4]) {
+#else
+void Matrix4Multiply(const vec4_t a[4], const vec4_t b[4],
+                              vec4_t dst[4]) {
+#endif
   dst[0][0] = a[0][0] * b[0][0] + a[0][1] * b[1][0] + a[0][2] * b[2][0] +
               a[0][3] * b[3][0];
   dst[0][1] = a[0][0] * b[0][1] + a[0][1] * b[1][1] + a[0][2] * b[2][1] +
@@ -600,9 +660,15 @@ __inline void Matrix4Multiply(const vec4_t a[4], const vec4_t b[4],
 
 // TTimo: const vec_t ** would require explicit casts for ANSI C conformance
 // see unix/const-arg.c in Wolf MP source
+#ifdef WIN32
 __inline void Matrix4MultiplyInto3x3AndTranslation(/*const*/ vec4_t a[4],
                                                    /*const*/ vec4_t b[4],
                                                    vec3_t dst[3], vec3_t t) {
+#else
+void Matrix4MultiplyInto3x3AndTranslation(/*const*/ vec4_t a[4],
+                                                   /*const*/ vec4_t b[4],
+                                                   vec3_t dst[3], vec3_t t) {
+#endif
   dst[0][0] = a[0][0] * b[0][0] + a[0][1] * b[1][0] + a[0][2] * b[2][0] +
               a[0][3] * b[3][0];
   dst[0][1] = a[0][0] * b[0][1] + a[0][1] * b[1][1] + a[0][2] * b[2][1] +
@@ -631,7 +697,11 @@ __inline void Matrix4MultiplyInto3x3AndTranslation(/*const*/ vec4_t a[4],
          a[2][3] * b[3][3];
 }
 
+#ifdef WIN32
 __inline void Matrix4Transpose(const vec4_t matrix[4], vec4_t transpose[4]) {
+#else
+void Matrix4Transpose(const vec4_t matrix[4], vec4_t transpose[4]) {
+#endif
   int i, j;
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) {
@@ -640,7 +710,11 @@ __inline void Matrix4Transpose(const vec4_t matrix[4], vec4_t transpose[4]) {
   }
 }
 
+#ifdef WIN32
 __inline void Matrix4FromAxis(const vec3_t axis[3], vec4_t dst[4]) {
+#else
+void Matrix4FromAxis(const vec3_t axis[3], vec4_t dst[4]) {
+#endif
   int i, j;
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {
@@ -652,8 +726,13 @@ __inline void Matrix4FromAxis(const vec3_t axis[3], vec4_t dst[4]) {
   dst[3][3] = 1;
 }
 
+#ifdef WIN32
 __inline void Matrix4FromScaledAxis(const vec3_t axis[3], const float scale,
                                     vec4_t dst[4]) {
+#else
+void Matrix4FromScaledAxis(const vec3_t axis[3], const float scale,
+                                    vec4_t dst[4]) {
+#endif
   int i, j;
 
   for (i = 0; i < 3; i++) {
@@ -669,7 +748,11 @@ __inline void Matrix4FromScaledAxis(const vec3_t axis[3], const float scale,
   dst[3][3] = 1;
 }
 
+#ifdef WIN32
 __inline void Matrix4FromTranslation(const vec3_t t, vec4_t dst[4]) {
+#else
+void Matrix4FromTranslation(const vec3_t t, vec4_t dst[4]) {
+#endif
   int i, j;
 
   for (i = 0; i < 3; i++) {
@@ -689,8 +772,14 @@ __inline void Matrix4FromTranslation(const vec3_t t, vec4_t dst[4]) {
 // can put an axis rotation followed by a translation directly into one matrix
 // TTimo: const vec_t ** would require explicit casts for ANSI C conformance
 // see unix/const-arg.c in Wolf MP source
+#ifdef WIN32
 __inline void Matrix4FromAxisPlusTranslation(/*const*/ vec3_t axis[3],
                                              const vec3_t t, vec4_t dst[4]) {
+#else
+void Matrix4FromAxisPlusTranslation(/*const*/ vec3_t axis[3],
+                                             const vec3_t t, vec4_t dst[4]) {
+
+#endif
   int i, j;
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {
@@ -705,10 +794,17 @@ __inline void Matrix4FromAxisPlusTranslation(/*const*/ vec3_t axis[3],
 // can put a scaled axis rotation followed by a translation directly into one
 // matrix TTimo: const vec_t ** would require explicit casts for ANSI C
 // conformance see unix/const-arg.c in Wolf MP source
+#ifdef WIN32
 __inline void Matrix4FromScaledAxisPlusTranslation(/*const*/ vec3_t axis[3],
                                                    const float scale,
                                                    const vec3_t t,
                                                    vec4_t dst[4]) {
+#else
+void Matrix4FromScaledAxisPlusTranslation(/*const*/ vec3_t axis[3],
+                                                   const float scale,
+                                                   const vec3_t t,
+                                                   vec4_t dst[4]) {
+#endif
   int i, j;
 
   for (i = 0; i < 3; i++) {
@@ -724,7 +820,11 @@ __inline void Matrix4FromScaledAxisPlusTranslation(/*const*/ vec3_t axis[3],
   dst[3][3] = 1;
 }
 
+#ifdef WIN32
 __inline void Matrix4FromScale(const float scale, vec4_t dst[4]) {
+#else
+void Matrix4FromScale(const float scale, vec4_t dst[4]) {
+#endif
   int i, j;
 
   for (i = 0; i < 4; i++) {
@@ -739,8 +839,13 @@ __inline void Matrix4FromScale(const float scale, vec4_t dst[4]) {
   dst[3][3] = 1;
 }
 
+#ifdef WIN32
 __inline void Matrix4TransformVector(const vec4_t m[4], const vec3_t src,
                                      vec3_t dst) {
+#else
+void Matrix4TransformVector(const vec4_t m[4], const vec3_t src,
+                                     vec3_t dst) {
+#endif
   dst[0] = m[0][0] * src[0] + m[0][1] * src[1] + m[0][2] * src[2] + m[0][3];
   dst[1] = m[1][0] * src[0] + m[1][1] * src[1] + m[1][2] * src[2] + m[1][3];
   dst[2] = m[2][0] * src[0] + m[2][1] * src[1] + m[2][2] * src[2] + m[2][3];
@@ -754,7 +859,11 @@ __inline void Matrix4TransformVector(const vec4_t m[4], const vec3_t src,
 ===============================================================================
 */
 
+#ifdef WIN32
 __inline void Matrix3Transpose(const vec3_t matrix[3], vec3_t transpose[3]) {
+#else
+void Matrix3Transpose(const vec3_t matrix[3], vec3_t transpose[3]) {
+#endif
   int i, j;
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {

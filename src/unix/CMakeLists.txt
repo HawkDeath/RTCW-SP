@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
-project(linux C)
+project(linux CXX C)
+
+add_definitions(-D__LCC__)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 set(WOLFSP_UNIX_HEADERS
+    ../qcommon/qcommon.h
     linux_local.h
     qasm.h
 
@@ -37,6 +40,7 @@ set(WOLFSP_UNIX_SOURCES
     ../game/q_shared.c
     ../client/snd_adpcm.c
     ../client/snd_dma.c
+    snd_mixa.s
     ../client/snd_mem.c
     ../client/snd_mix.c
     ../client/snd_wavelet.c
@@ -56,13 +60,14 @@ set(WOLFSP_UNIX_SOURCES
     linux_common.c
     linux_joystick.c
     ftol.nasm
-    snd_mixa.s
+
     sys_dosa.s
     unix_main.c
-
+    unix_shared.c
+    unix_net.c
     linux_snd.c)
 
 add_executable(WolfSP quake3.xpm ${WOLFSP_UNIX_SOURCES} ${WOLFSP_UNIX_HEADERS})
-target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL)
+target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL dl X11)
 set_target_properties(WolfSP PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 

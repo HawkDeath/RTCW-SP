@@ -131,7 +131,11 @@ void AAS_RoutingInfo(void) {
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
+#ifdef WIN32
 __inline int AAS_ClusterAreaNum(int cluster, int areanum) {
+#else
+int AAS_ClusterAreaNum(int cluster, int areanum) {
+#endif
   int side, areacluster;
 
   areacluster = (*aasworld).areasettings[areanum].cluster;
@@ -201,7 +205,11 @@ int AAS_TravelFlagForType(int traveltype) {
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
+#ifdef WIN32
 __inline float AAS_RoutingTime(void) {
+#else
+float AAS_RoutingTime(void) {
+#endif
   return AAS_Time();
 } // end of the function AAS_RoutingTime
 //===========================================================================
