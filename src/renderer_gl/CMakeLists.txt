@@ -71,6 +71,7 @@ set(RENDERER_GL_PLATFORM
     )
 else()
 set(RENDERER_GL_PLATFORM
+    ../unix/matha.s
     ../unix/linux_glimp.c
     ../unix/linux_qgl.c
     )

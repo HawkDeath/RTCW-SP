@@ -63,7 +63,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "linux_local.h" // bk001204
 
 // Structure containing functions exported from refresh DLL
-refexport_t re;
+//refexport_t re;
 
 unsigned sys_frame_time;
 
@@ -433,7 +433,7 @@ void Sys_ConsoleInputInit() {
 				  characters  EOF,  EOL,  EOL2, ERASE, KILL, REPRINT,
 				  STATUS, and WERASE, and buffers by lines.
 		 ISIG: when any of the characters  INTR,  QUIT,  SUSP,  or
-				  DSUSP are received, generate the corresponding sig­
+				  DSUSP are received, generate the corresponding sigï¿½
 				  nal
 		*/
 		tc.c_lflag &= ~( ECHO | ICANON );

@@ -646,8 +646,8 @@ int BoxOnPlaneSide2 (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 
 ==================
 */
-#define __LCC__
-#if !(defined __linux__ && defined __i386__ && !defined C_ONLY)
+ #define __LCC__
+//#if !(defined __linux__ && defined __i386__ && !defined C_ONLY) // TODO: fix this, check windows
 #if defined __LCC__ || defined C_ONLY || !id386
 
 int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, struct cplane_s *p) {
@@ -965,7 +965,7 @@ initialized:
 #pragma warning(default : 4035)
 
 #endif
-#endif
+//#endif
 
 /*
 =================
