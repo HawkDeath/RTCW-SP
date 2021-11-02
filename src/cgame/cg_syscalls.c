@@ -395,9 +395,16 @@ void trap_R_RemapShader(const char *oldShader, const char *newShader,
   syscall(CG_R_REMAP_SHADER, oldShader, newShader, timeOffset);
 }
 
+#ifdef WOLF_VULKAN
+// TODO: add CG_GETVKCONFIG
+void trap_GetVkconfig(vkconfig_t* vkconfig) {
+  syscall(CG_GETVKCONFIG, vkconfig);
+}
+#else
 void trap_GetGlconfig(glconfig_t *glconfig) {
   syscall(CG_GETGLCONFIG, glconfig);
 }
+#endif
 
 void trap_GetGameState(gameState_t *gamestate) {
   syscall(CG_GETGAMESTATE, gamestate);

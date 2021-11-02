@@ -1560,7 +1560,11 @@ extern soundScript_t soundScripts[MAX_SOUND_SCRIPTS];
 // all clients to begin playing instantly
 typedef struct {
   gameState_t gameState; // gamestate from server
-  glconfig_t glconfig;   // rendering configuration
+#ifdef WOLF_VULKAN
+  vkconfig_t vkconfig;   // rendering configuration for vulkan api
+#else
+  glconfig_t glconfig;   // rendering configuration for opengl api
+#endif
   float screenXScale;    // derived from glconfig
   float screenYScale;
   float screenXBias;
@@ -2507,7 +2511,11 @@ void trap_R_SetFog(int fogvar, int var1, int var2, float r, float g, float b,
 // The glconfig_t will not change during the life of a cgame.
 // If it needs to change, the entire cgame will be restarted, because
 // all the qhandle_t are then invalid.
+#ifdef WOLF_VULKAN
+void trap_GetGlconfig(vkconfig_t* vkconfig);
+#else
 void trap_GetGlconfig(glconfig_t *glconfig);
+#endif
 
 // the gamestate should be grabbed at startup, and whenever a
 // configstring changes

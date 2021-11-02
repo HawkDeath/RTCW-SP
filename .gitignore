@@ -35,6 +35,9 @@ src/ui/Release/
 output/
 build/
 out/
+cmake-build-debug/
+cmake-build-release/
+cmake-build-relwithdebinfo/
 
 # deps
 3party/
@@ -46,6 +49,9 @@ src/UpgradeLog.htm
 src/*.vcxproj.user
 src/*/*.vcxproj.user
 CMakeSettings.json
+
+# Clion
+.idea/
 
 # Visual Studio Code
 .vscode/

@@ -1045,10 +1045,15 @@ typedef struct {
 
 extern backEndState_t backEnd;
 extern trGlobals_t tr;
+#ifdef WOLF_VULKAN
+// TODO: vkstate_t ???
+extern vkconfig_t vkConfig;
+#else
 extern glconfig_t
     glConfig; // outside of TR since it shouldn't be cleared during ref re-init
 extern glstate_t
     glState; // outside of TR since it shouldn't be cleared during ref re-init
+#endif
 
 //
 // cvars
@@ -1309,7 +1314,11 @@ void RE_UploadCinematic(int w, int h, int cols, int rows, const byte *data,
                         int client, qboolean dirty);
 
 void RE_BeginFrame(stereoFrame_t stereoFrame);
-void RE_BeginRegistration(glconfig_t *glconfig);
+#ifdef WOLF_VULKAN
+void RE_BeginRegistration(vkconfig_t* vkconfig);
+#else
+void RE_BeginRegistration(glconfig_t* glconfig);
+#endif
 void RE_LoadWorldMap(const char *mapname);
 void RE_SetWorldVisData(const byte *vis);
 qhandle_t RE_RegisterModel(const char *name);

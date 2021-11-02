@@ -1,4 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+
 include(ExternalProject)
+include(GNUInstallDirs)
 
 # Vulkan 1.2.170
 set(VULKAN_HPP_REPO Vulkan-Headers)
@@ -8,7 +11,7 @@ ExternalProject_Add(
     PREFIX ${VULKAN_HPP_REPO}
     GIT_REPOSITORY "https://github.com/KhronosGroup/Vulkan-Headers.git"
     GIT_TAG "v1.2.170"
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_INCLUDEDIR}/${VULKAN_HPP_REPO} -DVULKAN_HPP_INSTALL=ON
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_INCLUDEDIR}/${VULKAN_HPP_REPO} 
     BUILD_COMMAND  ${CMAKE_COMMAND} --build <BINARY_DIR> --target all
 )
 

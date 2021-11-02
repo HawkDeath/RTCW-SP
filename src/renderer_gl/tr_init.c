@@ -42,8 +42,14 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // void RE_A3D_RenderGeometry (void *pVoidA3D, void *pVoidGeom, void *pVoidMat,
 // void *pVoidGeomStatus); #endif
 
+#ifdef WOLF_VULKAN
+// TODO: vkstate_t ?????
+vkconfig_t vkConfig;
+#else
 glconfig_t glConfig;
 glstate_t glState;
+#endif
+
 
 static void GfxInfo_f(void);
 
