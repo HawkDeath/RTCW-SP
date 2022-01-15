@@ -113,7 +113,7 @@ idVec3 idSplineList::zero(0, 0, 0);
 
 void glLabeledPoint(idVec3 &color, idVec3 &point, float size,
                     const char *label) {
-  #ifndef WOLF_VULKAN
+  #ifdef VK
   qglColor3fv(color);
   qglPointSize(size);
   qglBegin(GL_POINTS);
@@ -137,7 +137,7 @@ void glBox(idVec3 &color, idVec3 &point, float size) {
   maxs[0] += size;
   maxs[1] -= size;
   maxs[2] += size;
-#ifndef WOLF_VULKAN
+#ifdef VK
   qglColor3fv(color);
   qglBegin(GL_LINE_LOOP);
   qglVertex3f(mins[0], mins[1], mins[2]);
@@ -271,7 +271,7 @@ void idSplineList::draw(bool editMode) {
   if (dirty) {
     buildSpline();
   }
-#ifndef WOLF_VULKAN
+#ifdef VK
   qglColor3fv(controlColor);
   qglPointSize(5);
 

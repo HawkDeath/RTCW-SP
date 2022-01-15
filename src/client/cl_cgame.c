@@ -65,11 +65,7 @@ CL_GetGlconfig
 
 ====================
 */
-#ifdef WOLF_VULKAN
-void CL_GetVkconfig(vkconfig_t* vkconfig) { *vkconfig = cls.vkconfig; }
-#else
 void CL_GetGlconfig(glconfig_t *glconfig) { *glconfig = cls.glconfig; }
-#endif 
 
 /*
 ====================

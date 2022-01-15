@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
-project(splines CXX)
+project(splines C)
+
+if(WIN32)
+    add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS)
+endif()
 
 set(SPLINES_HEADERS
     math_angles.h

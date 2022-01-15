@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(game C)
 
-add_definitions(-DGAMEDLL)
+if(WIN32)
+    add_definitions(-DWIN32 -D_WINDOWS -DGAMEDLL -D_CRT_SECURE_NO_WARNINGS)
+else()
+    add_definitions(-DGAMEDLL)
+endif()
 
 set(CGAME_HEADERS
     ai_cast.h

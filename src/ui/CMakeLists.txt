@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(ui C)
 
+if(WIN32)
+    add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 set(UI_HEADERS
     ../game/bg_public.h
     keycodes.h

@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(renderer_gl C)
 
+if(WIN32)
+    add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS) # -DBUILD_FREETYPE)
+endif()
+
 set(JPEG_SOURCES
     ../jpeg-6/jcapimin.c
     ../jpeg-6/jccoefct.c

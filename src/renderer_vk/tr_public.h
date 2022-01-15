@@ -58,11 +58,7 @@ typedef struct {
   // and returns the current gl configuration, including screen width
   // and height, which can be used by the client to intelligently
   // size display elements
-#ifdef WOLF_VULKAN
-  void (*BeginRegistration)(vkconfig_t* config);
-#else
   void (*BeginRegistration)(glconfig_t *config);
-#endif
   qhandle_t (*RegisterModel)(const char *name);
   qhandle_t (*RegisterSkin)(const char *name);
   qhandle_t (*RegisterShader)(const char *name);

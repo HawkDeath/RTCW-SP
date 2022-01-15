@@ -542,7 +542,7 @@ public:
   }
 
   virtual void draw(bool editMode) {
-#ifndef WOLF_VULKAN
+#ifdef VK
     glLabeledPoint(blue, startPos, (editMode) ? 5 : 3, "Start interpolated");
     glLabeledPoint(blue, endPos, (editMode) ? 5 : 3, "End interpolated");
     qglBegin(GL_LINES);

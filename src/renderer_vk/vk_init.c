@@ -7,12 +7,9 @@
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
+#define LOG(...) MessageBoxA(NULL, __VA_ARGS__, "", MB_OK);
 
-
-#define LOG(...) { ri.Printf(PRINT_ALL, "%s", __VA_ARGS__); MessageBoxA(NULL, __VA_ARGS__, "", MB_OK);  }
-
-vkconfig_t vkConfig;
-static refimport_t ri;
+glconfig_t glConfig; // dummy
 
 void AddCoronaToScene(const vec3_t org, float r, float g, float b,
   float scale, int id, int flags) {
@@ -33,25 +30,25 @@ void Shutdown(qboolean destroyWindow) {
   LOG(__PRETTY_FUNCTION__)
 }
 
-void BeginRegistration(vkconfig_t* config) { LOG(__PRETTY_FUNCTION__) }
+void BeginRegistration(glconfig_t* config) { LOG(__PRETTY_FUNCTION__) }
 
 qhandle_t RegisterModel(const char* name) {
   LOG(__PRETTY_FUNCTION__)
-    return 0;
+  return 0;
 }
 qhandle_t RegisterSkin(const char* name) {
   LOG(__PRETTY_FUNCTION__)
-    return 0;
+  return 0;
 }
 
 qhandle_t RegisterShader(const char* name) {
   LOG(__PRETTY_FUNCTION__)
-    return 0;
+  return 0;
 }
 
 qhandle_t RegisterShaderNoMip(const char* name) {
   LOG(__PRETTY_FUNCTION__)
-    return 0;
+  return 0;
 }
 
 void LoadWorld(const char* name) {
@@ -61,13 +58,13 @@ void LoadWorld(const char* name) {
 qboolean GetSkinModel(qhandle_t skinid, const char* type,
   char* name) {
   LOG(__PRETTY_FUNCTION__)
-    return qtrue;
+  return qtrue;
 }
 
 qhandle_t GetShaderFromModel(qhandle_t modelid, int surfnum,
   int withlightmap) {
   LOG(__PRETTY_FUNCTION__)
-    return 0;
+  return 0;
 }
 
 void SetWorldVisData(const byte* vis) {
@@ -76,7 +73,7 @@ void SetWorldVisData(const byte* vis) {
 
 void EndRegistration(void) {
   LOG(__PRETTY_FUNCTION__)
-}
+}  
 
 void ClearScene(void) { LOG(__PRETTY_FUNCTION__) }
 
@@ -85,7 +82,7 @@ void AddRefEntityToScene(const refEntity_t* re) { LOG(__PRETTY_FUNCTION__) }
 int LightForPoint(vec3_t point, vec3_t ambientLight, vec3_t directedLight,
   vec3_t lightDir) {
   LOG(__PRETTY_FUNCTION__)
-    return 0;
+  return 0;
 }
 
 void AddPolyToScene(qhandle_t hShader, int numVerts,
@@ -133,13 +130,13 @@ int MarkFragments(int numPoints, const vec3_t* points,
   vec3_t pointBuffer, int maxFragments,
   markFragment_t* fragmentBuffer) {
   LOG(__PRETTY_FUNCTION__)
-    return 0;
+  return 0;
 }
 
 int LerpTag(orientation_t* tag, const refEntity_t* refent,
   const char* tagName, int startIndex) {
   LOG(__PRETTY_FUNCTION__)
-    return 0;
+  return 0;
 }
 void ModelBounds(qhandle_t model, vec3_t mins, vec3_t maxs) { LOG(__PRETTY_FUNCTION__) }
 
@@ -154,7 +151,7 @@ qboolean GetEntityToken(char* buffer, int size) { LOG(__PRETTY_FUNCTION__) retur
 
 refexport_t* GetRefAPI(int apiVersion, refimport_t* rimp) {
   static refexport_t re;
-  ri = *rimp;
+  //    ri = *rimp;
   VkInstance instance;
   volkInitialize();
   memset(&re, 0, sizeof(re));

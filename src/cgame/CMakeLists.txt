@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(cgame C)
 
-add_definitions(-DCGAMEDLL)
+if(WIN32)
+    add_definitions(-DWIN32 -D_WINDOWS -DCGAMEDLL -D_CRT_SECURE_NO_WARNINGS)
+else()
+    add_definitions(-DCGAMEDLL)
+endif()
 
 set(CGAME_HEADERS
     ../game/bg_local.h

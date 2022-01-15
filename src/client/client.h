@@ -328,11 +328,7 @@ typedef struct {
   netadr_t authorizeServer;
 
   // rendering info
-#ifdef WOLF_VULKAN
-  vkconfig_t vkconfig;
-#else
   glconfig_t glconfig;
-#endif
   qhandle_t charSetShader;
   qhandle_t whiteShader;
   qhandle_t consoleShader;

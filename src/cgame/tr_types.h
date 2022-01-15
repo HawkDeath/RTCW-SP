@@ -296,11 +296,6 @@ typedef enum {
   GLHW_PERMEDIA2  // where you don't have src*dst
 } glHardwareType_t;
 
-#ifdef WOLF_VULKAN
-typedef struct {
-
-} vkconfig_t;
-#else
 typedef struct {
   char renderer_string[MAX_STRING_CHARS];
   char vendor_string[MAX_STRING_CHARS];
@@ -351,7 +346,6 @@ typedef struct {
 
   qboolean textureFilterAnisotropicAvailable; // DAJ
 } glconfig_t;
-#endif
 
 #if !defined _WIN32
 
