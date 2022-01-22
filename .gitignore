@@ -51,6 +51,9 @@ CMakeSettings.json
 .vscode/
 .vs/
 
+# Clion
+.idea/
+
 # QT Creator
 CMakeLists.txt.user
 
