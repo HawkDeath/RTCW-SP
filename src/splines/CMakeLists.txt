@@ -12,10 +12,20 @@ set(SPLINES_HEADERS
     math_vector.h
     ../game/q_shared.h
     q_splineshared.h
-    splines.h
     util_list.h
     util_str.h
     )
+    
+if (WOLFSP_RENDERER_VULKAN)
+    set(SPLINES_SOURCES_DEPS_TMP
+        vk_splines.cpp
+        vk_splines.h)
+else()
+  set(SPLINES_SOURCES_DEPS_TMP
+          splines.cpp
+          splines.h)
+endif()
+
 
 set(SPLINES_SOURCES
     math_angles.cpp
@@ -24,7 +34,8 @@ set(SPLINES_SOURCES
     math_vector.cpp
     q_parse.cpp
     q_shared.cpp
-    splines.cpp
-    util_str.cpp)
+    util_str.cpp
+    ${SPLINES_SOURCES_DEPS_TMP})
+
 
 add_library(Splines STATIC ${SPLINES_SOURCES} ${SPLINES_HEADERS})

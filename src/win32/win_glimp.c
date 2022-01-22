@@ -50,7 +50,11 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 // clang-format off
 #include <assert.h>
+#ifdef WOLFSP_RENDERER_VULKAN
+#include "../renderer_vk/vk_local.h"
+#else
 #include "../renderer_gl/tr_local.h"
+#endif
 #include "../qcommon/qcommon.h"
 #include "resource.h"
 #include "glw_win.h"

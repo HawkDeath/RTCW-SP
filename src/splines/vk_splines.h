@@ -37,11 +37,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #define __SPLINES_H
 // clang-format off
 extern "C" {
-#ifdef Q3RADIANT
-  #include "../qgl.h"
-#else
-  #include "../renderer_gl/qgl.h"
-#endif
+
 }
 #include "util_list.h"
 #include "util_str.h"
@@ -542,12 +538,12 @@ public:
   }
 
   virtual void draw(bool editMode) {
-    glLabeledPoint(blue, startPos, (editMode) ? 5 : 3, "Start interpolated");
-    glLabeledPoint(blue, endPos, (editMode) ? 5 : 3, "End interpolated");
-    qglBegin(GL_LINES);
-    qglVertex3fv(startPos);
-    qglVertex3fv(endPos);
-    qglEnd();
+    //glLabeledPoint(blue, startPos, (editMode) ? 5 : 3, "Start interpolated");
+    //glLabeledPoint(blue, endPos, (editMode) ? 5 : 3, "End interpolated");
+    //qglBegin(GL_LINES);
+    //qglVertex3fv(startPos);
+    //qglVertex3fv(endPos);
+    //qglEnd();
   }
 
   virtual void start(long t) {
