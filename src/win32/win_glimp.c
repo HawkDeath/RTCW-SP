@@ -894,6 +894,8 @@ static void GLW_InitExtensions(void) {
   //----(SA)	moved these up
   glConfig.textureCompression = TC_NONE;
   glConfig.textureEnvAddAvailable = qfalse;
+#ifndef WOLFSP_RENDERER_VULKAN
+
   qglMultiTexCoord2fARB = NULL;
   qglActiveTextureARB = NULL;
   qglClientActiveTextureARB = NULL;
@@ -903,6 +905,7 @@ static void GLW_InitExtensions(void) {
   qwglSetDeviceGammaRamp3DFX = NULL;
   qglPNTrianglesiATI = NULL;
   qglPNTrianglesfATI = NULL;
+#endif
   glConfig.anisotropicAvailable = qfalse;
   glConfig.NVFogAvailable = qfalse;
   glConfig.NVFogMode = 0;
@@ -957,6 +960,7 @@ static void GLW_InitExtensions(void) {
   } else {
     ri.Printf(PRINT_ALL, "...GL_EXT_texture_env_add not found\n");
   }
+#ifndef WOLFSP_RENDERER_VULKAN
 
   // WGL_EXT_swap_control
   qwglSwapIntervalEXT =
@@ -1100,7 +1104,7 @@ static void GLW_InitExtensions(void) {
     ri.Printf(PRINT_ALL, "...GL_NV_fog_distance not found\n");
     ri.Cvar_Set("r_ext_NV_fog_dist", "0");
   }
-
+#endif
   //----(SA)	end
 
   // support?
@@ -1223,27 +1227,33 @@ void GLimp_EndFrame(void) {
   //
   if (r_swapInterval->modified) {
     r_swapInterval->modified = qfalse;
+#ifndef WOLFSP_RENDERER_VULKAN
 
     if (!glConfig.stereoEnabled) { // why?
       if (qwglSwapIntervalEXT) {
         qwglSwapIntervalEXT(r_swapInterval->integer);
       }
     }
+#endif
   }
 
   // don't flip if drawing to front buffer
   if (Q_stricmp(r_drawBuffer->string, "GL_FRONT") != 0) {
     if (glConfig.driverType > GLDRV_ICD) {
+#ifndef WOLFSP_RENDERER_VULKAN
+
       if (!qwglSwapBuffers(glw_state.hDC)) {
         ri.Error(ERR_FATAL, "GLimp_EndFrame() - SwapBuffers() failed!\n");
       }
+#endif
     } else {
       SwapBuffers(glw_state.hDC);
     }
   }
-
+#ifndef WOLFSP_RENDERER_VULKAN
   // check logging
   QGL_EnableLogging(r_logFile->integer);
+#endif
 }
 
 extern qboolean GlideIsValid(void);
@@ -1348,6 +1358,7 @@ void GLimp_Init(void) {
   r_allowSoftwareGL = ri.Cvar_Get("r_allowSoftwareGL", "0", CVAR_LATCH);
   r_maskMinidriver = ri.Cvar_Get("r_maskMinidriver", "0", CVAR_LATCH);
 
+#ifndef WOLFSP_RENDERER_VULKAN
   // load appropriate DLL and initialize subsystem
   GLW_StartOpenGL();
 
@@ -1366,7 +1377,7 @@ void GLimp_Init(void) {
   //
   Q_strncpyz(buf, glConfig.renderer_string, sizeof(buf));
   Q_strlwr(buf);
-
+#endif
   //
   // NOTE: if changing cvars, do it within this block.  This allows them
   // to be overridden when testing driver fixes, etc. but only sets
@@ -1439,17 +1450,19 @@ void GLimp_Shutdown(void) {
   //	const char *strings[] = { "soft", "hard" };
   const char *success[] = {"failed", "success"};
   int retVal;
+#ifndef WOLFSP_RENDERER_VULKAN
 
   // FIXME: Brian, we need better fallbacks from partially initialized failures
   if (!qwglMakeCurrent) {
     return;
   }
-
+#endif
   ri.Printf(PRINT_ALL, "Shutting down OpenGL subsystem\n");
 
   // restore gamma.  We do this first because 3Dfx's extension needs a valid OGL
   // subsystem
   WG_RestoreGamma();
+#ifndef WOLFSP_RENDERER_VULKAN
 
   // set current context to NULL
   if (qwglMakeCurrent) {
@@ -1458,14 +1471,18 @@ void GLimp_Shutdown(void) {
     ri.Printf(PRINT_ALL, "...wglMakeCurrent( NULL, NULL ): %s\n",
               success[retVal]);
   }
-
+#endif
   // delete HGLRC
+#ifndef WOLFSP_RENDERER_VULKAN
   if (glw_state.hGLRC) {
+
+
     retVal = qwglDeleteContext(glw_state.hGLRC) != 0;
+
     ri.Printf(PRINT_ALL, "...deleting GL context: %s\n", success[retVal]);
     glw_state.hGLRC = NULL;
   }
-
+#endif
   // release DC
   if (glw_state.hDC) {
     retVal = ReleaseDC(g_wv.hWnd, glw_state.hDC) != 0;
@@ -1496,8 +1513,9 @@ void GLimp_Shutdown(void) {
   }
 
   // shutdown QGL subsystem
+#ifndef WOLFSP_RENDERER_VULKAN
   QGL_Shutdown();
-
+#endif
   memset(&glConfig, 0, sizeof(glConfig));
   memset(&glState, 0, sizeof(glState));
 }
@@ -1527,9 +1545,11 @@ void (*glimpRenderThread)(void);
 
 void GLimp_RenderThreadWrapper(void) {
   glimpRenderThread();
+#ifndef WOLFSP_RENDERER_VULKAN
 
   // unbind the context before we die
   qwglMakeCurrent(glw_state.hDC, NULL);
+#endif
 }
 
 /*
@@ -1568,22 +1588,24 @@ static int wglErrors;
 
 void *GLimp_RendererSleep(void) {
   void *data;
+#ifndef WOLFSP_RENDERER_VULKAN
 
   if (!qwglMakeCurrent(glw_state.hDC, NULL)) {
     wglErrors++;
   }
-
+#endif
   ResetEvent(renderActiveEvent);
 
   // after this, the front end can exit GLimp_FrontEndSleep
   SetEvent(renderCompletedEvent);
 
   WaitForSingleObject(renderCommandsEvent, INFINITE);
+#ifndef WOLFSP_RENDERER_VULKAN
 
   if (!qwglMakeCurrent(glw_state.hDC, glw_state.hGLRC)) {
     wglErrors++;
   }
-
+#endif
   ResetEvent(renderCompletedEvent);
   ResetEvent(renderCommandsEvent);
 
@@ -1597,19 +1619,22 @@ void *GLimp_RendererSleep(void) {
 
 void GLimp_FrontEndSleep(void) {
   WaitForSingleObject(renderCompletedEvent, INFINITE);
+#ifndef WOLFSP_RENDERER_VULKAN
 
   if (!qwglMakeCurrent(glw_state.hDC, glw_state.hGLRC)) {
     wglErrors++;
   }
+#endif
 }
 
 void GLimp_WakeRenderer(void *data) {
   smpData = data;
+#ifndef WOLFSP_RENDERER_VULKAN
 
   if (!qwglMakeCurrent(glw_state.hDC, NULL)) {
     wglErrors++;
   }
-
+#endif
   // after this, the renderer can continue through GLimp_RendererSleep
   SetEvent(renderCommandsEvent);
 

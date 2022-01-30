@@ -40,6 +40,10 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __GLW_WIN_H__
 #define __GLW_WIN_H__
 
+#ifdef WOLFSP_RENDERER_VULKAN
+#include <Windows.h>
+#endif
+
 typedef struct {
   WNDPROC wndproc;
 

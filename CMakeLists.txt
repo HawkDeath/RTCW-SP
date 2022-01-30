@@ -32,6 +32,7 @@ add_subdirectory(src/cgame)
 add_subdirectory(src/game)
 
 if(WOLFSP_RENDERER_VULKAN)
+    add_definitions(-DWOLFSP_RENDERER_VULKAN)
     add_subdirectory(src/renderer_vk)
 else()
     add_subdirectory(src/renderer_gl)
@@ -43,6 +44,7 @@ add_subdirectory(src/ui)
 add_subdirectory(src/win32)
 
 if(WOLFSP_RENDERER_VULKAN)
+   
     add_dependencies(Renderer_VK volk)
     add_dependencies(WolfSP botlib Renderer_VK Splines)
 else()
