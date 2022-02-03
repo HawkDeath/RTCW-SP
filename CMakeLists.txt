@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
 project(wolf)
 
+add_definitions(-D_M_IX86)
+set (CMAKE_C_FLAGS "-m32")
+set (CMAKE_CXX_FLAGS "-m32")
+
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/output")
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/output/bin")
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/output/lib")

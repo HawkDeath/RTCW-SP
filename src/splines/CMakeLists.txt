@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
 project(splines C)
 
+set(CMAKE_C_FLAGS "-m32")
+set(CMAKE_CXX_FLAGS "-m32")
+
 if(WIN32)
     add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS)
 endif()
