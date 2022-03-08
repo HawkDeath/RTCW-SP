@@ -1,12 +1,9 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16...3.21)
 project(renderer_vk C CXX)
 
 if(WIN32)
     add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS)
 endif()
-
-add_definitions(-DVK_NO_PROTOTYPES)
-
 
 set(JPEG_SOURCES
     ../jpeg-6/jcapimin.c
@@ -100,4 +97,4 @@ set(RENDERER_VK_SOURCES
     ../win32/win_glimp.c)
 
 add_library(Renderer_VK STATIC ref_trin.def ${RENDERER_VK_SOURCES} ${RENDERER_VK_HEADERS})
-target_link_libraries(Renderer_VK INTERFACE volk)
+target_link_libraries(Renderer_VK INTERFACE ${Vulkan_LIBRARY})
