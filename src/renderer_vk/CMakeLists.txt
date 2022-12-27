@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.16...3.21)
+cmake_minimum_required(VERSION 3.21)
 project(renderer_vk C CXX)
+
 
 if(WIN32)
     add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS)
 endif()
+
+#include_directories(${Vulkan_INCLUDE_DIRS})
 
 set(JPEG_SOURCES
     ../jpeg-6/jcapimin.c
@@ -92,9 +95,7 @@ set(RENDERER_VK_SOURCES
     vk_shadows.c
     vk_sky.c
     vk_surface.c
-    vk_world.c
-    ../win32/win_gamma.c
-    ../win32/win_glimp.c)
+    vk_world.c)
 
 add_library(Renderer_VK STATIC ref_trin.def ${RENDERER_VK_SOURCES} ${RENDERER_VK_HEADERS})
-target_link_libraries(Renderer_VK INTERFACE ${Vulkan_LIBRARY})
+target_link_libraries(Renderer_VK PRIVATE Vulkan::Vulkan) # TODO: remove external dependencies for Vulkan headers

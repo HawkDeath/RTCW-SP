@@ -53,6 +53,9 @@ CMakeSettings.json
 
 # Clion
 .idea/
+cmake-build-debug/
+cmake-build-relase/
+cmake-build-relwithdebinfo/
 
 # QT Creator
 CMakeLists.txt.user

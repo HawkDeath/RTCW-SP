@@ -42,6 +42,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "../qcommon/qcommon.h"
 #include "vk_public.h"
 
+#include <vulkan/vulkan.h>
+
 // clang-format on
 typedef int GLuint;
 typedef int GLint;
@@ -115,6 +117,50 @@ typedef struct image_s {
 
   struct image_s *next;
 } image_t;
+
+typedef struct {
+  // for information about window size, never is set on NULL
+  glconfig_t* mainConfig;
+  // Device related
+  VkInstance instance;
+  VkDevice device;
+  VkPhysicalDevice physicalDevice;
+  VkPhysicalDeviceProperties gpuProperties;
+  VkSurfaceKHR surface;
+
+  qboolean validationLayersEnabled;
+  VkDebugUtilsMessengerEXT debugMessenger; // not NULL if validationLayersEnabled is true
+
+  VkCommandPool commandPool;
+  VkCommandBuffer* commandBuffers;
+  VkQueue presentQueue;
+  VkQueue graphicsQueue;
+
+  // swapchain related
+  VkSwapchainKHR swapchain;
+  VkSwapchainKHR* oldSwapChain;
+  VkFormat swapchainImageFormat;
+  VkFormat swapchainDepthFormat;
+  
+  VkFramebuffer* swapchainFramebuffers; // probably will changed to 2 elements array
+  VkRenderPass renderPass;
+
+  VkImage *depthImage;
+  VkDeviceMemory* depthImageMemorys;
+  VkImageView* depthImageViews;
+
+  VkImage* swapchainImage;
+  VkDeviceMemory* swapchainDeviceMemorys;
+  VkImageView* swapchainImageViews;
+
+  VkSemaphore* imageAvailableSemaphores;
+  VkSemaphore* renderFinishedSemaphores;
+  VkFence* inFlightFences;
+  VkFence* ImagesInFlight;
+
+  size_t currentFrame;
+
+} vkVulkanContext;
 
 //===============================================================================
 
@@ -1187,8 +1233,6 @@ extern cvar_t *r_lodCurveError;
 extern cvar_t *r_smp;
 extern cvar_t *r_showSmp;
 extern cvar_t *r_skipBackEnd;
-
-extern cvar_t *r_ignoreGLErrors;
 
 extern cvar_t *r_overBrightBits;
 extern cvar_t *r_mapOverBrightBits;

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(renderer_gl C)
 
+add_definitions(-DWOLFSP_RENDERER_VULKAN=0)
 if(WIN32)
     add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS) # -DBUILD_FREETYPE)
 endif()

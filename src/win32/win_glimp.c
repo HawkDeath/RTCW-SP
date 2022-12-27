@@ -50,7 +50,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 // clang-format off
 #include <assert.h>
-#ifdef WOLFSP_RENDERER_VULKAN
+#ifndef WOLFSP_RENDERER_VULKAN
 #include "../renderer_vk/vk_local.h"
 #else
 #include "../renderer_gl/tr_local.h"
@@ -1358,7 +1358,6 @@ void GLimp_Init(void) {
   r_allowSoftwareGL = ri.Cvar_Get("r_allowSoftwareGL", "0", CVAR_LATCH);
   r_maskMinidriver = ri.Cvar_Get("r_maskMinidriver", "0", CVAR_LATCH);
 
-#ifndef WOLFSP_RENDERER_VULKAN
   // load appropriate DLL and initialize subsystem
   GLW_StartOpenGL();
 
@@ -1377,7 +1376,6 @@ void GLimp_Init(void) {
   //
   Q_strncpyz(buf, glConfig.renderer_string, sizeof(buf));
   Q_strlwr(buf);
-#endif
   //
   // NOTE: if changing cvars, do it within this block.  This allows them
   // to be overridden when testing driver fixes, etc. but only sets

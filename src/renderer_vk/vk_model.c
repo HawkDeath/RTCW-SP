@@ -36,6 +36,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // tr_models.c -- model loading and caching
 
 #include "vk_local.h"
+#include "anorms256.h"
 
 #include <Windows.h> // temporary
 
@@ -306,12 +307,9 @@ fail:
   mod->type = MOD_BAD;
   return 0;
 }
-
 //-------------------------------------------------------------------------------
 // Ridah, mesh compression
-float r_anormals[NUMMDCVERTEXNORMALS][3] = {
-#include "anorms256.h"
-};
+
 
 /*
 =============

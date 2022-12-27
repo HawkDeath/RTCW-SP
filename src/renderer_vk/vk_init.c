@@ -1,38 +1,3 @@
-/*
-===========================================================================
-
-Return to Castle Wolfenstein single player GPL Source Code
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
-
-This file is part of the Return to Castle Wolfenstein single player GPL Source
-Code (RTCW SP Source Code).
-
-RTCW SP Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-RTCW SP Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with RTCW SP Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, the RTCW SP Source Code is also subject to certain additional
-terms. You should have received a copy of these additional terms immediately
-following the terms and conditions of the GNU General Public License which
-accompanied the RTCW SP Source Code.  If not, please request a copy in writing
-from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
-120, Rockville, Maryland 20850 USA.
-
-===========================================================================
-*/
-
 // tr_init.c -- functions that are not called every frame
 
 #include "vk_local.h"
@@ -120,7 +85,6 @@ cvar_t *r_ati_truform_pointmode;  // linear/cubic
 
 cvar_t *r_ati_fsaa_samples; // DAJ valids are 1, 2, 4
 
-cvar_t *r_ignoreGLErrors;
 cvar_t *r_logFile;
 
 cvar_t *r_stencilbits;
@@ -213,51 +177,6 @@ int max_polys;
 cvar_t *r_maxpolyverts;
 int max_polyverts;
 
-/*
-The tessellation level and normal generation mode are specified with:
-
-        void qglPNTriangles{if}ATI(enum pname, T param)
-
-        If <pname> is:
-                GL_PN_TRIANGLES_NORMAL_MODE_ATI -
-                        <param> must be one of the symbolic constants:
-                                - GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI or
-                                - GL_PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI
-                        which will select linear or quadratic normal
-interpolation respectively. GL_PN_TRIANGLES_POINT_MODE_ATI - <param> must be one
-of the symbolic  constants:
-                                - GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI or
-                                - GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI
-                        which will select linear or cubic interpolation
-respectively. GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI - <param> should be a value
-specifying the number of evaluation points on each edge.  This value must be
-                        greater than 0 and less than or equal to the value given
-by GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI.
-
-        An INVALID_VALUE error will be generated if the value for <param> is
-less than zero or greater than the max value.
-
-Associated 'gets':
-Get Value                               Get Command Type     Minimum Value
-Attribute
----------                               ----------- ----     ------------
----------
-PN_TRIANGLES_ATI						IsEnabled   B
-False                                       PN Triangles/enable
-PN_TRIANGLES_NORMAL_MODE_ATI			GetIntegerv Z2
-PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI		PN Triangles
-PN_TRIANGLES_POINT_MODE_ATI				GetIntegerv Z2
-PN_TRIANGLES_POINT_MODE_CUBIC_ATI			PN Triangles
-PN_TRIANGLES_TESSELATION_LEVEL_ATI		GetIntegerv Z+
-1 PN Triangles
-MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI	GetIntegerv Z+		1
--
-
-
-
-
-*/
-//----(SA)	end
 
 static void AssertCvarRange(cvar_t *cv, float minVal, float maxVal,
                             qboolean shouldBeIntegral) {
@@ -281,14 +200,11 @@ static void AssertCvarRange(cvar_t *cv, float minVal, float maxVal,
 }
 
 /*
-** InitOpenGL
+** InitVulkan
 **
-** This function is responsible for initializing a valid OpenGL subsystem.  This
-** is done by calling GLimp_Init (which gives us a working OGL subsystem) then
-** setting variables, checking GL constants, and reporting the gfx system config
-** to the user.
+** This function is responsible for initializing a valid Vulkan subsystem.
 */
-static void InitOpenGL(void) {
+static void InitVulkan(void) {
   char renderer_buffer[1024];
 
   //
@@ -306,7 +222,7 @@ static void InitOpenGL(void) {
   if (glConfig.vidWidth == 0) {
     GLint temp;
 
-    GLimp_Init();
+//    GLimp_Init();
 
     strcpy(renderer_buffer, glConfig.renderer_string);
     Q_strlwr(renderer_buffer);
@@ -396,19 +312,6 @@ static void R_ModeList_f(void) {
   ri.Printf(PRINT_ALL, "\n");
 }
 
-/*
-==============================================================================
-
-                                                SCREEN SHOTS
-
-==============================================================================
-*/
-
-/*
-==================
-R_TakeScreenshot
-==================
-*/
 void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
   byte *buffer;
   int i, c, temp;
@@ -545,6 +448,8 @@ void R_LevelShot(void) {
   buffer[12] = 128;
   buffer[14] = 128;
   buffer[16] = 24; // pixel size
+
+  // TODO: give a acces to frame buffer
 
  /* qglReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGB,
                 GL_UNSIGNED_BYTE, source);*/
@@ -706,9 +611,6 @@ void R_ScreenShotJPEG_f(void) {
 
 //============================================================================
 
-/*
-** GL_SetDefaultState
-*/
 void GL_SetDefaultState(void) {
   //qglClearDepth(1.0f);
 
@@ -756,11 +658,7 @@ void GL_SetDefaultState(void) {
   //----(SA)	end
 }
 
-/*
-================
-GfxInfo_f
-================
-*/
+
 void GfxInfo_f(void) {
   //cvar_t *sys_cpustring = ri.Cvar_Get("sys_cpustring", "", 0);
   //const char *enablestrings[] = {"disabled", "enabled"};
@@ -871,11 +769,7 @@ void GfxInfo_f(void) {
 // RF
 extern void R_CropImages_f(void);
 
-/*
-===============
-R_Register
-===============
-*/
+
 void R_Register(void) {
   //
   // latched and archived variables
@@ -1014,7 +908,6 @@ void R_Register(void) {
   //----(SA)	added
   r_zfar = ri.Cvar_Get("r_zfar", "0", CVAR_CHEAT);
   //----(SA)	end
-  r_ignoreGLErrors = ri.Cvar_Get("r_ignoreGLErrors", "1", CVAR_ARCHIVE);
   r_fastsky = ri.Cvar_Get("r_fastsky", "0", CVAR_ARCHIVE);
   r_inGameVideo = ri.Cvar_Get("r_inGameVideo", "1", CVAR_ARCHIVE);
   r_drawSun = ri.Cvar_Get("r_drawSun", "1", CVAR_ARCHIVE);
@@ -1144,11 +1037,6 @@ void R_Register(void) {
   // done.
 }
 
-/*
-===============
-R_Init
-===============
-*/
 void R_Init(void) {
   int err;
   int i;
@@ -1224,7 +1112,7 @@ void R_Init(void) {
   }
   R_ToggleSmpFrame();
 
-  InitOpenGL();
+  InitVulkan();
 
   R_InitImages();
 
@@ -1328,12 +1216,6 @@ void RE_EndRegistration(void) {
   }
 }
 
-/*
-@@@@@@@@@@@@@@@@@@@@@
-GetRefAPI
-
-@@@@@@@@@@@@@@@@@@@@@
-*/
 refexport_t *GetRefAPI(int apiVersion, refimport_t *rimp) {
   static refexport_t re;
 
@@ -1392,10 +1274,6 @@ refexport_t *GetRefAPI(int apiVersion, refimport_t *rimp) {
   re.RegisterFont = RE_RegisterFont;
   re.RemapShader = R_RemapShader;
   re.GetEntityToken = R_GetEntityToken;
-
-#ifdef BLAH // MrE __USEA3D
-  re.A3D_RenderGeometry = RE_A3D_RenderGeometry;
-#endif
 
   // RF
   re.ZombieFXAddNewHit = NULL;// RB_ZombieFXAddNewHit;
