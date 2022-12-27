@@ -1,17 +1,10 @@
-cmake_minimum_required(VERSION 3.16...3.21)
+cmake_minimum_required(VERSION 3.21)
 project(win32 C)
 
 if(WIN32)
-    add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS) # -DBUILD_FREETYPE)
+    add_definitions(-DWIN32 -D_WINDOWS -D_CRT_SECURE_NO_WARNINGS)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /INCREMENTAL:NO" )
 endif()
-
-
-if(WOLFSP_USE_RENDERER_VULKAN)
-add_definitions(-DWOLFSP_RENDERER_VULKAN=1)
-else()
-add_definitions(-DWOLFSP_RENDERER_VULKAN=0)
-endif(WOLFSP_USE_RENDERER_VULKAN)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
@@ -108,7 +101,6 @@ set_property(TARGET WolfSP PROPERTY WIN32_EXECUTABLE TRUE)
 if(WOLFSP_USE_RENDERER_VULKAN)
 target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_VK
     winmm wsock32 kernel32 user32 gdi32 winspool comdlg32 advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32)
-
 else()
 target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL
     winmm wsock32 kernel32 user32 gdi32 winspool comdlg32 advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32)

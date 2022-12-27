@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.21)
 project(renderer_gl C)
 
 add_definitions(-DWOLFSP_RENDERER_VULKAN=0)
