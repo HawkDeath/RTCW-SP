@@ -38,11 +38,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 // clang-format off
 #include <assert.h>
-#ifndef WOLFSP_RENDERER_VULKAN
-#include "../renderer_vk/vk_local.h"
-#else
 #include "../renderer_gl/tr_local.h"
-#endif
 #include "../qcommon/qcommon.h"
 #include "glw_win.h"
 #include "win_local.h"
@@ -60,7 +56,6 @@ void WG_CheckHardwareGamma(void) {
   HDC hDC;
 
   glConfig.deviceSupportsGamma = qfalse;
-#ifndef WOLFSP_RENDERER_VULKAN
 
   if (qwglSetDeviceGammaRamp3DFX) {
     glConfig.deviceSupportsGamma = qtrue;
@@ -72,7 +67,7 @@ void WG_CheckHardwareGamma(void) {
 
     return;
   }
-#endif
+
   // non-3Dfx standalone drivers don't support gamma changes, period
   if (glConfig.driverType == GLDRV_STANDALONE) {
     return;
@@ -199,13 +194,10 @@ void GLimp_SetGamma(unsigned char red[256], unsigned char green[256],
       }
     }
   }
-#ifndef WOLFSP_RENDERER_VULKAN
 
   if (qwglSetDeviceGammaRamp3DFX) {
     qwglSetDeviceGammaRamp3DFX(glw_state.hDC, table);
-  } else
-#endif
-  {
+  } else {
     ret = SetDeviceGammaRamp(glw_state.hDC, table);
     if (!ret) {
       Com_Printf("SetDeviceGammaRamp failed.\n");
@@ -218,13 +210,9 @@ void GLimp_SetGamma(unsigned char red[256], unsigned char green[256],
 */
 void WG_RestoreGamma(void) {
   if (glConfig.deviceSupportsGamma) {
-#ifndef WOLFSP_RENDERER_VULKAN
-
     if (qwglSetDeviceGammaRamp3DFX) {
       qwglSetDeviceGammaRamp3DFX(glw_state.hDC, s_oldHardwareGamma);
-    } else
-#endif
-    {
+    } else {
       HDC hDC;
 
       hDC = GetDC(GetDesktopWindow());
