@@ -16,7 +16,7 @@ set(SPLINES_HEADERS
     util_str.h
     )
     
-if (WOLFSP_RENDERER_VULKAN)
+if (WOLFSP_USE_RENDERER_VULKAN)
     set(SPLINES_SOURCES_DEPS_TMP
         vk_splines.cpp
         vk_splines.h)
@@ -24,7 +24,7 @@ else()
   set(SPLINES_SOURCES_DEPS_TMP
           splines.cpp
           splines.h)
-endif()
+endif(WOLFSP_USE_RENDERER_VULKAN)
 
 
 set(SPLINES_SOURCES

@@ -510,11 +510,11 @@ void IN_Frame(void) {
     // temporarily deactivate if not in the game and
     // running on the desktop
     // voodoo always counts as full screen
-    if (Cvar_VariableValue("r_fullscreen") == 0 &&
-        strcmp(Cvar_VariableString("r_glDriver"), _3DFX_DRIVER_NAME)) {
-      IN_DeactivateMouse();
-      return;
-    }
+    //if (Cvar_VariableValue("r_fullscreen") == 0 &&
+    //    strcmp(Cvar_VariableString("r_glDriver"), _3DFX_DRIVER_NAME)) {
+    //  IN_DeactivateMouse();
+    //  return;
+    //}
   }
 
   if (!in_appactive) {

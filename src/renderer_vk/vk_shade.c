@@ -72,7 +72,7 @@ R_DrawStripElements
 */
 static int c_vertexes; // for seeing how long our average strips are
 static int c_begins;
-static void R_DrawStripElements(int numIndexes, const glIndex_t *indexes,
+static void R_DrawStripElements(int numIndexes, const unsigned int *indexes,
                                 void(APIENTRY *element)(GLint)) {
   int i;
   int last[3] = {-1, -1, -1};
@@ -167,7 +167,7 @@ instead of using the single glDrawElements call that may be inefficient
 without compiled vertex arrays.
 ==================
 */
-static void R_DrawElements(int numIndexes, const glIndex_t *indexes) {
+static void R_DrawElements(int numIndexes, const unsigned int *indexes) {
   int primitives;
 
   primitives = r_primitives->integer;
@@ -227,9 +227,9 @@ static void R_BindAnimatedImage(textureBundle_t *bundle) {
 
   if (bundle->numImageAnimations <= 1) {
     if (bundle->isLightmap && (backEnd.refdef.rdflags & RDF_SNOOPERVIEW)) {
-      GL_Bind(tr.whiteImage);
+    //  GL_Bind(tr.whiteImage);
     } else {
-      GL_Bind(bundle->image[0]);
+   //   GL_Bind(bundle->image[0]);
     }
     return;
   }
@@ -246,9 +246,9 @@ static void R_BindAnimatedImage(textureBundle_t *bundle) {
   index %= bundle->numImageAnimations;
 
   if (bundle->isLightmap && (backEnd.refdef.rdflags & RDF_SNOOPERVIEW)) {
-    GL_Bind(tr.whiteImage);
+  //  GL_Bind(tr.whiteImage);
   } else {
-    GL_Bind(bundle->image[index]);
+ //   GL_Bind(bundle->image[index]);
   }
 }
 
@@ -260,10 +260,10 @@ Draws triangle outlines for debugging
 ================
 */
 static void DrawTris(shaderCommands_t *input) {
-  GL_Bind(tr.whiteImage);
+  //GL_Bind(tr.whiteImage);
  // qglColor3f(1, 1, 1);
 
-  GL_State(GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE);
+  //GL_State(GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE);
 
   if (r_showtris->integer == 1) {
  //   qglDepthRange(0, 0);
@@ -299,13 +299,13 @@ static void DrawNormals(shaderCommands_t *input) {
   int i;
   vec3_t temp;
 
-  GL_Bind(tr.whiteImage);
+  //GL_Bind(tr.whiteImage);
 //  qglColor3f(1, 1, 1);
 
   if (r_shownormals->integer == 1) {
 //    qglDepthRange(0, 0); // never occluded
   }
-  GL_State(GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE);
+  //GL_State(GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE);
 
  // qglBegin(GL_LINES);
   for (i = 0; i < input->numVertexes; i++) {
@@ -372,7 +372,7 @@ static void DrawMultitextured(shaderCommands_t *input, int stage) {
   }
   // done.
 
-  GL_State(pStage->stateBits);
+  //GL_State(pStage->stateBits);
 
   // this is an ugly hack to work around a GeForce driver
   // bug with multitexture and clip planes
@@ -383,22 +383,22 @@ static void DrawMultitextured(shaderCommands_t *input, int stage) {
   //
   // base
   //
-  GL_SelectTexture(0);
+  //GL_SelectTexture(0);
  // qglTexCoordPointer(2, GL_FLOAT, 0, input->svars.texcoords[0]);
   R_BindAnimatedImage(&pStage->bundle[0]);
 
   //
   // lightmap/secondary pass
   //
-  GL_SelectTexture(1);
+  //GL_SelectTexture(1);
 //  qglEnable(GL_TEXTURE_2D);
 //  qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-  if (r_lightmap->integer) {
-    GL_TexEnv(/*GL_REPLACE*/0);
-  } else {
-    GL_TexEnv(tess.shader->multitextureEnv);
-  }
+  //if (r_lightmap->integer) {
+  //  GL_TexEnv(/*GL_REPLACE*/0);
+  //} else {
+  //  GL_TexEnv(tess.shader->multitextureEnv);
+  //}
 
  // qglTexCoordPointer(2, GL_FLOAT, 0, input->svars.texcoords[1]);
 
@@ -413,7 +413,7 @@ static void DrawMultitextured(shaderCommands_t *input, int stage) {
   // TODO
   // qglDisable(GL_TEXTURE_2D);
 
-  GL_SelectTexture(0);
+  //GL_SelectTexture(0);
 }
 
 /*
@@ -568,7 +568,7 @@ static void ProjectDlightTexture(void) {
         for (i = 0; i < dls->numUnfoggedPasses; i++) {
           shaderStage_t *stage = dls->stages[i];
           R_BindAnimatedImage(&dls->stages[i]->bundle[0]);
-          GL_State(stage->stateBits | GLS_DEPTHFUNC_EQUAL);
+          //GL_State(stage->stateBits | GLS_DEPTHFUNC_EQUAL);
           R_DrawElements(numIndexes, hitIndexes);
           backEnd.pc.c_totalIndexes += numIndexes;
           backEnd.pc.c_dlightIndexes += numIndexes;
@@ -579,11 +579,11 @@ static void ProjectDlightTexture(void) {
 
         //				if (!dl->overdraw || !qglActiveTextureARB)
         //{
-        GL_Bind(tr.dlightImage);
-        // include GLS_DEPTHFUNC_EQUAL so alpha tested surfaces don't add light
-        // where they aren't rendered
-        GL_State(GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ONE |
-                 GLS_DEPTHFUNC_EQUAL);
+        //GL_Bind(tr.dlightImage);
+        //// include GLS_DEPTHFUNC_EQUAL so alpha tested surfaces don't add light
+        //// where they aren't rendered
+        //GL_State(GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ONE |
+        //         GLS_DEPTHFUNC_EQUAL);
         R_DrawElements(numIndexes, hitIndexes);
         backEnd.pc.c_totalIndexes += numIndexes;
         backEnd.pc.c_dlightIndexes += numIndexes;
@@ -631,14 +631,14 @@ static void RB_FogPass(void) {
 
   RB_CalcFogTexCoords((float *)tess.svars.texcoords[0]);
 
-  GL_Bind(tr.fogImage);
+  //GL_Bind(tr.fogImage);
 
-  if (tess.shader->fogPass == FP_EQUAL) {
-    GL_State(GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA |
-             GLS_DEPTHFUNC_EQUAL);
-  } else {
-    GL_State(GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA);
-  }
+  //if (tess.shader->fogPass == FP_EQUAL) {
+  //  GL_State(GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA |
+  //           GLS_DEPTHFUNC_EQUAL);
+  //} else {
+  //  GL_State(GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA);
+  //}
 
   R_DrawElements(tess.numIndexes, tess.indexes);
 }
@@ -1081,9 +1081,9 @@ static void RB_IterateStagesGeneric(shaderCommands_t *input) {
       //
       if (pStage->bundle[0].vertexLightmap &&
           ((r_vertexLight->integer && !r_uiFullScreen->integer) ||
-           glConfig.hardwareType == GLHW_PERMEDIA2) &&
+           renderConfig.hardwareType == GLHW_PERMEDIA2) &&
           r_lightmap->integer) {
-        GL_Bind(tr.whiteImage);
+        //GL_Bind(tr.whiteImage);
       } else {
         R_BindAnimatedImage(&pStage->bundle[0]);
       }
@@ -1104,7 +1104,7 @@ static void RB_IterateStagesGeneric(shaderCommands_t *input) {
       if (fadeStart) {
         fadeEnd = backEnd.currentEntity->e.fadeEndTime;
         if (fadeStart > tr.refdef.time) { // has not started to fade yet
-          GL_State(pStage->stateBits);
+          //GL_State(pStage->stateBits);
         } else {
           int i;
           unsigned int tempState;
@@ -1124,8 +1124,8 @@ static void RB_IterateStagesGeneric(shaderCommands_t *input) {
           // set the blend to src_alpha, dst_one_minus_src_alpha
           tempState |=
               (GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA);
-          GL_State(tempState);
-          GL_Cull(CT_FRONT_SIDED);
+          //GL_State(tempState);
+          //GL_Cull(CT_FRONT_SIDED);
           // modulate the alpha component of each vertex in the render list
           for (i = 0; i < tess.numVertexes; i++) {
             tess.svars.colors[i][0] *= alphaval;
@@ -1135,7 +1135,7 @@ static void RB_IterateStagesGeneric(shaderCommands_t *input) {
           }
         }
       } else {
-        GL_State(pStage->stateBits);
+        //GL_State(pStage->stateBits);
       }
       //----(SA)	end
 
@@ -1169,8 +1169,8 @@ void RB_StageIteratorGeneric(void) {
   if (r_logFile->integer) {
     // don't just call LogComment, or we will get
     // a call to va() every frame!
-    GLimp_LogComment(
-        va("--- RB_StageIteratorGeneric( %s ) ---\n", tess.shader->name));
+  //  GLimp_LogComment(
+  //      va("--- RB_StageIteratorGeneric( %s ) ---\n", tess.shader->name));
   }
 
   // set GL fog
@@ -1309,9 +1309,9 @@ void RB_StageIteratorVertexLitTexture(void) {
   if (r_logFile->integer) {
     // don't just call LogComment, or we will get
     // a call to va() every frame!
-    GLimp_LogComment(
-        va("--- RB_StageIteratorVertexLitTexturedUnfogged( %s ) ---\n",
-           tess.shader->name));
+    //GLimp_LogComment(
+    //    va("--- RB_StageIteratorVertexLitTexturedUnfogged( %s ) ---\n",
+    //       tess.shader->name));
   }
 
   // set GL fog
@@ -1401,9 +1401,9 @@ void RB_StageIteratorLightmappedMultitexture(void) {
   if (r_logFile->integer) {
     // don't just call LogComment, or we will get
     // a call to va() every frame!
-    GLimp_LogComment(
-        va("--- RB_StageIteratorLightmappedMultitexture( %s ) ---\n",
-           tess.shader->name));
+    //GLimp_LogComment(
+    //    va("--- RB_StageIteratorLightmappedMultitexture( %s ) ---\n",
+    //       tess.shader->name));
   }
 
   // set GL fog
@@ -1441,7 +1441,7 @@ void RB_StageIteratorLightmappedMultitexture(void) {
   //
   // select base stage
   //
-  GL_SelectTexture(0);
+ // GL_SelectTexture(0);
 
 //  qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
   R_BindAnimatedImage(&tess.xstages[0]->bundle[0]);
@@ -1450,18 +1450,18 @@ void RB_StageIteratorLightmappedMultitexture(void) {
   //
   // configure second stage
   //
-  GL_SelectTexture(1);
+ // GL_SelectTexture(1);
 //  qglEnable(GL_TEXTURE_2D);
   if (r_lightmap->integer) {
-    GL_TexEnv(/*GL_REPLACE*/0);
+  //  GL_TexEnv(/*GL_REPLACE*/0);
   } else {
-    GL_TexEnv(/*GL_MODULATE*/2);
+ //   GL_TexEnv(/*GL_MODULATE*/2);
   }
 
   //----(SA)	modified for snooper
   if (tess.xstages[0]->bundle[1].isLightmap &&
       (backEnd.refdef.rdflags & RDF_SNOOPERVIEW)) {
-    GL_Bind(tr.whiteImage);
+  //  GL_Bind(tr.whiteImage);
   } else {
     R_BindAnimatedImage(&tess.xstages[0]->bundle[1]);
   }
@@ -1485,11 +1485,7 @@ void RB_StageIteratorLightmappedMultitexture(void) {
  /* qglDisable(GL_TEXTURE_2D);
   qglDisableClientState(GL_TEXTURE_COORD_ARRAY);*/
 
-  GL_SelectTexture(0);
-#ifdef REPLACE_MODE
-  GL_TexEnv(GL_MODULATE);
-  qglShadeModel(GL_SMOOTH);
-#endif
+//  GL_SelectTexture(0);
 
   //
   // now do any dynamic lighting needed
@@ -1598,5 +1594,5 @@ void RB_EndSurface(void) {
   // clear shader so we can tell we don't have any unclosed surfaces
   tess.numIndexes = 0;
 
-  GLimp_LogComment("----------\n");
+  // GLimp_LogComment("----------\n");
 }

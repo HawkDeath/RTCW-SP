@@ -259,14 +259,14 @@ static void CG_CalcVrect(void) {
   }
   //----(SA)	end
 
-  cg.refdef.width = cgs.glconfig.vidWidth * xsize / 100;
+  cg.refdef.width = cgs.renderConfig.vidWidth * xsize / 100;
   cg.refdef.width &= ~1;
 
-  cg.refdef.height = cgs.glconfig.vidHeight * ysize / 100;
+  cg.refdef.height = cgs.renderConfig.vidHeight * ysize / 100;
   cg.refdef.height &= ~1;
 
-  cg.refdef.x = (cgs.glconfig.vidWidth - cg.refdef.width) / 2;
-  cg.refdef.y = (cgs.glconfig.vidHeight - cg.refdef.height) / 2;
+  cg.refdef.x = (cgs.renderConfig.vidWidth - cg.refdef.width) / 2;
+  cg.refdef.y = (cgs.renderConfig.vidHeight - cg.refdef.height) / 2;
 }
 
 //==============================================================================
@@ -989,7 +989,7 @@ static void CG_DamageBlendBlob(void) {
   float redFlash;
 
   // ragePro systems can't fade blends, so don't obscure the screen
-  if (cgs.glconfig.hardwareType == GLHW_RAGEPRO) {
+  if (cgs.renderConfig.hardwareType == GLHW_RAGEPRO) {
     return;
   }
 

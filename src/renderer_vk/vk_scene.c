@@ -61,13 +61,15 @@ R_ToggleSmpFrame
 ====================
 */
 void R_ToggleSmpFrame(void) {
-  if (r_smp->integer) {
-    // use the other buffers next frame, because another CPU
-    // may still be rendering into the current ones
-    tr.smpFrame ^= 1;
-  } else {
-    tr.smpFrame = 0;
-  }
+  // I will use only one backend 
+  // if (r_smp->integer) {
+  //   // use the other buffers next frame, because another CPU
+  //   // may still be rendering into the current ones
+  //   tr.smpFrame ^= 1;
+  // } else {
+  //  
+  // }
+  tr.smpFrame = 0;
 
   backEndData[tr.smpFrame]->commands.used = 0;
 
@@ -167,7 +169,7 @@ void RE_AddPolyToScene(qhandle_t hShader, int numVerts,
 
   memcpy(poly->verts, verts, numVerts * sizeof(*verts));
   // Ridah
-  if (glConfig.hardwareType == GLHW_RAGEPRO) {
+  if (renderConfig.hardwareType == GLHW_RAGEPRO) {
     poly->verts->modulate[0] = 255;
     poly->verts->modulate[1] = 255;
     poly->verts->modulate[2] = 255;
@@ -245,7 +247,7 @@ void RE_AddPolysToScene(qhandle_t hShader, int numVerts,
 
     memcpy(poly->verts, &verts[numVerts * j], numVerts * sizeof(*verts));
     // Ridah
-    if (glConfig.hardwareType == GLHW_RAGEPRO) {
+    if (renderConfig.hardwareType == GLHW_RAGEPRO) {
       poly->verts->modulate[0] = 255;
       poly->verts->modulate[1] = 255;
       poly->verts->modulate[2] = 255;
@@ -336,8 +338,8 @@ void RE_AddLightToScene(const vec3_t org, float intensity, float r, float g,
     return;
   }
   // these cards don't have the correct blend mode
-  if (glConfig.hardwareType == GLHW_RIVA128 ||
-      glConfig.hardwareType == GLHW_PERMEDIA2) {
+  if (renderConfig.hardwareType == GLHW_RIVA128 ||
+      renderConfig.hardwareType == GLHW_PERMEDIA2) {
     return;
   }
   // RF, allow us to force some dlights under all circumstances
@@ -422,7 +424,7 @@ void RE_RenderScene(const refdef_t *fd) {
   if (!tr.registered) {
     return;
   }
-  GLimp_LogComment("====== RE_RenderScene =====\n");
+  // GLimp_LogComment("====== RE_RenderScene =====\n");
 
   if (r_norefresh->integer) {
     return;
@@ -505,7 +507,7 @@ void RE_RenderScene(const refdef_t *fd) {
   if (/*r_dynamiclight->integer == 0 ||*/ // RF, disabled so we can force things
                                           // like lightning dlights
           r_vertexLight->integer == 1 ||
-      glConfig.hardwareType == GLHW_PERMEDIA2) {
+      renderConfig.hardwareType == GLHW_PERMEDIA2) {
     tr.refdef.num_dlights = 0;
   }
 
@@ -525,7 +527,7 @@ void RE_RenderScene(const refdef_t *fd) {
   //
   memset(&parms, 0, sizeof(parms));
   parms.viewportX = tr.refdef.x;
-  parms.viewportY = glConfig.vidHeight - (tr.refdef.y + tr.refdef.height);
+  parms.viewportY = renderConfig.vidHeight - (tr.refdef.y + tr.refdef.height);
   parms.viewportWidth = tr.refdef.width;
   parms.viewportHeight = tr.refdef.height;
   parms.isPortal = qfalse;

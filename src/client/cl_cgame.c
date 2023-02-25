@@ -65,7 +65,8 @@ CL_GetGlconfig
 
 ====================
 */
-void CL_GetGlconfig(glconfig_t *glconfig) { *glconfig = cls.glconfig; }
+// void CL_GetGlconfig(glconfig_t *glconfig) { *glconfig = cls.glconfig; }
+void CL_GetRenderconfig(renderconfig_t *glconfig) { *glconfig = cls.renderConfig; }
 
 /*
 ====================
@@ -674,8 +675,11 @@ int CL_CgameSystemCalls(int *args) {
     return 0;
   case CG_R_LERPTAG:
     return re.LerpTag(VMA(1), VMA(2), VMA(3), args[4]);
-  case CG_GETGLCONFIG:
-    CL_GetGlconfig(VMA(1));
+  //case CG_GETGLCONFIG:
+  //  CL_GetGlconfig(VMA(1));
+  //  return 0;
+  case CG_GETRENDERCONFIG:
+    CL_GetRenderconfig(VMA(1));
     return 0;
   case CG_GETGAMESTATE:
     CL_GetGameState(VMA(1));

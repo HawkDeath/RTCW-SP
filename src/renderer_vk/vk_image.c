@@ -175,7 +175,7 @@ static long generateHashValue(const char *fname) {
 GL_TextureMode
 ===============
 */
-void GL_TextureMode(const char *string) {
+void GL_TextureMode(const char *string) { // TO REMOVE
   int i;
   image_t *glt;
 
@@ -185,12 +185,6 @@ void GL_TextureMode(const char *string) {
     }
   }
 
-  // hack to prevent trilinear from being set on voodoo,
-  // because their driver freaks...
-  if (i == 5 && glConfig.hardwareType == GLHW_3DFX_2D3D) {
-    ri.Printf(PRINT_ALL, "Refusing to set trilinear on a voodoo.\n");
-    i = 3;
-  }
 
   if (i == 6) {
     ri.Printf(PRINT_ALL, "bad filter name\n");
@@ -249,8 +243,8 @@ void R_ImageList_f(void) {
     image = tr.images[i];
 
     texels += image->uploadWidth * image->uploadHeight;
-    ri.Printf(PRINT_ALL, "%4i: %4i %4i  %s   %d   ", i, image->uploadWidth,
-              image->uploadHeight, yesno[image->mipmap], image->TMU);
+    //ri.Printf(PRINT_ALL, "%4i: %4i %4i  %s   %d   ", i, image->uploadWidth,
+    //          image->uploadHeight, yesno[image->mipmap], image->TMU);
     switch (image->internalFormat) {
     case 1:
       ri.Printf(PRINT_ALL, "I    ");
@@ -369,7 +363,7 @@ lighting range
 void R_LightScaleTexture(unsigned *in, int inwidth, int inheight,
                          qboolean only_gamma) {
   if (only_gamma) {
-    if (!glConfig.deviceSupportsGamma) {
+    if (!renderConfig.deviceSupportsGamma) {
       int i, c;
       byte *p;
 
@@ -390,7 +384,7 @@ void R_LightScaleTexture(unsigned *in, int inwidth, int inheight,
 
     c = inwidth * inheight;
 
-    if (glConfig.deviceSupportsGamma) {
+    if (renderConfig.deviceSupportsGamma) {
       for (i = 0; i < c; i++, p += 4) {
         p[0] = s_intensitytable[p[0]];
         p[1] = s_intensitytable[p[1]];
@@ -623,7 +617,7 @@ static void Upload32(unsigned *data, int width, int height, qboolean mipmap,
   unsigned *resampledBuffer = NULL;
   int i, c;
   byte *scan;
-  GLenum internalFormat = 0; // GL_RGB;
+  int internalFormat = 0; // GL_RGB;
   float rMax = 0, gMax = 0, bMax = 0;
   static int rmse_saved = 0;
   float rmse;
@@ -701,8 +695,8 @@ static void Upload32(unsigned *data, int width, int height, qboolean mipmap,
   // scale both axis down equally so we don't have to
   // deal with a half mip resampling
   //
-  while (scaled_width > glConfig.maxTextureSize ||
-         scaled_height > glConfig.maxTextureSize) {
+  while (scaled_width > renderConfig.maxTextureSize ||
+         scaled_height > renderConfig.maxTextureSize) {
     scaled_width >>= 1;
     scaled_height >>= 1;
   }
@@ -777,10 +771,10 @@ static void Upload32(unsigned *data, int width, int height, qboolean mipmap,
     }
     // select proper internal format
     if (samples == 3) {
-      if (!noCompress && glConfig.textureCompression == TC_EXT_COMP_S3TC) {
+      if (!noCompress && renderConfig.textureCompression == TC_EXT_COMP_S3TC) {
         // TODO: which format is best for which textures?
        // internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-      } else if (!noCompress && glConfig.textureCompression == TC_S3TC) {
+      } else if (!noCompress && renderConfig.textureCompression == TC_S3TC) {
      //   internalFormat = GL_RGB4_S3TC;
       } else if (r_texturebits->integer == 16) {
      //   internalFormat = GL_RGB5;
@@ -790,7 +784,7 @@ static void Upload32(unsigned *data, int width, int height, qboolean mipmap,
         internalFormat = 3;
       }
     } else if (samples == 4) {
-      if (!noCompress && glConfig.textureCompression == TC_EXT_COMP_S3TC) {
+      if (!noCompress && renderConfig.textureCompression == TC_EXT_COMP_S3TC) {
         // TODO: which format is best for which textures?
       //  internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
       } else if (r_texturebits->integer == 16) {
@@ -930,7 +924,7 @@ image_t *R_CreateImageExt(const char *name, const byte *pic, int width,
   // Ridah
   image = tr.images[tr.numImages] = R_CacheImageAlloc(sizeof(image_t));
 
-  image->texnum = 1024 + tr.numImages;
+ // image->texnum = 1024 + tr.numImages;
 
   // Ridah
   if (r_cacheShaders->integer) {
@@ -953,9 +947,11 @@ image_t *R_CreateImageExt(const char *name, const byte *pic, int width,
  /* if (qglActiveTextureARB && isLightmap) {
     image->TMU = 1;
   } else {*/
-    image->TMU = 0;
+//    image->TMU = 0;
   //}
 
+ 
+  // TODO: create Vulkan image here
   //if (qglActiveTextureARB) {
   //  GL_SelectTexture(image->TMU);
   //}
@@ -973,9 +969,9 @@ image_t *R_CreateImageExt(const char *name, const byte *pic, int width,
 
   qglBindTexture(GL_TEXTURE_2D, 0);*/
 
-  if (image->TMU == 1) {
-    GL_SelectTexture(0);
-  }
+  //if (image->TMU == 1) {
+  //  GL_SelectTexture(0);
+  //}
 
   hash = generateHashValue(name);
   image->next = hashTable[hash];
@@ -2343,17 +2339,17 @@ void R_SetColorMappings(void) {
 
   // setup the overbright lighting
   tr.overbrightBits = r_overBrightBits->integer;
-  if (!glConfig.deviceSupportsGamma) {
+  if (!vkConfig.deviceSupportsGamma) {
     tr.overbrightBits = 0; // need hardware gamma for overbright
   }
 
   // never overbright in windowed mode
-  if (!glConfig.isFullscreen) {
+  if (!vkConfig.isFullscreen) {
     tr.overbrightBits = 0;
   }
 
   // allow 2 overbright bits in 24 bit, but only 1 in 16 bit
-  if (glConfig.colorBits > 16) {
+  if (vkConfig.colorBits > 16) {
     if (tr.overbrightBits > 2) {
       tr.overbrightBits = 2;
     }
@@ -2405,10 +2401,6 @@ void R_SetColorMappings(void) {
       j = 255;
     }
     s_intensitytable[i] = j;
-  }
-
-  if (glConfig.deviceSupportsGamma) {
-    GLimp_SetGamma(s_gammatable, s_gammatable, s_gammatable);
   }
 }
 
@@ -3531,7 +3523,7 @@ R_PurgeImage
 */
 void R_PurgeImage(image_t *image) {
 
-  texnumImages[image->texnum - 1024] = NULL;
+//  texnumImages[image->texnum - 1024] = NULL;
 
  // qglDeleteTextures(1, &image->texnum);
 
@@ -3704,7 +3696,7 @@ void R_FindFreeTexnum(image_t *inImage) {
     } else {
       last_i = 0;
     }
-    inImage->texnum = 1024 + i;
+   // inImage->texnum = 1024 + i;
     texnumImages[i] = inImage;
   } else {
     ri.Error(ERR_DROP, "R_FindFreeTexnum: MAX_DRAWIMAGES hit\n");

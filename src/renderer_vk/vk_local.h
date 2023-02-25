@@ -45,11 +45,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include <vulkan/vulkan.h>
 
 // clang-format on
-typedef int GLuint;
-typedef int GLint;
-typedef int GLenum;
-#define GL_INDEX_TYPE GL_UNSIGNED_INT
-typedef unsigned int glIndex_t;
+
 
 // fast float to int conversion
 #if id386 && !((defined __linux__ || defined __FreeBSD__) &&                   \
@@ -58,6 +54,8 @@ long myftol(float f);
 #else
 #define myftol(x) ((int)(x))
 #endif
+
+#define VULKAN_DRIVER_NAME "vulkan-1"
 
 // everything that is needed by the backend needs
 // to be double buffered to allow it to run in
@@ -95,17 +93,18 @@ typedef struct {
   float modelMatrix[16];
 } orientationr_t;
 
+
+// TODO: image
 typedef struct image_s {
   char imgName[MAX_QPATH];       // game path, including extension
   int width, height;             // source image
   int uploadWidth, uploadHeight; // after power of two and picmip but not
                                  // including clamp to MAX_TEXTURE_SIZE
-  GLuint texnum;                 // gl texture binding
+  VkImage image;
 
   int frameUsed; // for texture usage in frame statistics
 
   int internalFormat;
-  int TMU; // only needed for voodoo2
 
   qboolean mipmap;
   qboolean allowPicmip;
@@ -118,9 +117,9 @@ typedef struct image_s {
   struct image_s *next;
 } image_t;
 
+
+// TODO: vkContext - initialization of vulkan instance
 typedef struct {
-  // for information about window size, never is set on NULL
-  glconfig_t* mainConfig;
   // Device related
   VkInstance instance;
   VkDevice device;
@@ -160,7 +159,15 @@ typedef struct {
 
   size_t currentFrame;
 
-} vkVulkanContext;
+  uint32_t vidWidth;
+  uint32_t vidHeight;
+  qboolean deviceSupportsGamma;
+  qboolean isFullscreen;
+  uint32_t colorBits;
+  int smpActive; // TMP_SOL is usele here; TODO: remove
+
+} vkContext;
+
 
 //===============================================================================
 
@@ -368,7 +375,7 @@ typedef struct {
 
   byte constantColor[4]; // for CGEN_CONST and AGEN_CONST
 
-  unsigned stateBits; // GLS_xxxx mask
+  unsigned stateBits; // GLS_xxxx mask // TODO: shaderStage_t - probably to remove (opengl stuff)
 
   acff_t adjustColorsForFog;
 
@@ -397,7 +404,7 @@ typedef enum {
 
 typedef struct {
   float cloudHeight;
-  image_t *outerbox[6], *innerbox[6];
+  image_t *outerbox[6], *innerbox[6]; // TODO: maybe here shoulde be dedicated skybox object, not arrays of textures
 } skyParms_t;
 
 typedef struct {
@@ -434,7 +441,7 @@ typedef struct shader_s {
 
   float portalRange; // distance to fog out at
 
-  int multitextureEnv; // 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
+  int multitextureEnv; // 0, GL_MODULATE, GL_ADD (FIXME: put in stage) // TODO: shader_s - probably typical OpenGL Stuff
 
   cullType_t cullType;    // CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
   qboolean polygonOffset; // set for decals and other items that must be offset
@@ -487,6 +494,7 @@ typedef struct corona_s {
              // fading
 } corona_t;
 
+// TODO: info input for shader about light
 typedef struct dlight_s {
   vec3_t origin;
   vec3_t color; // range from 0.0 to 1.0, should be color normalized
@@ -905,6 +913,8 @@ removed	: used to be clipped flag
 #define QSORT_ENTITYNUM_SHIFT 11
 #define QSORT_FOGNUM_SHIFT 2
 
+
+// TODO: remove begin
 // GR - tessellation flag in bit 8
 #define QSORT_ATI_TESS_SHIFT 8
 // GR - TruForm flags
@@ -912,7 +922,7 @@ removed	: used to be clipped flag
 #define ATI_TESS_NONE 0
 
 extern int gl_filter_min, gl_filter_max;
-
+// TODO: remove end
 /*
 ** performanceCounters_t
 */
@@ -932,6 +942,7 @@ typedef struct {
 #define FUNCTABLE_SIZE2 10
 #define FUNCTABLE_MASK (FUNCTABLE_SIZE - 1)
 
+// TODO: check and/or delete
 // the renderer front end should never modify glstate_t
 typedef struct {
   int currenttextures[2];
@@ -1093,8 +1104,9 @@ typedef struct {
 
 extern backEndState_t backEnd;
 extern trGlobals_t tr;
-extern glconfig_t
-    glConfig; // outside of TR since it shouldn't be cleared during ref re-init
+extern renderconfig_t renderConfig;
+extern vkContext
+    vkConfig; // outside of TR since it shouldn't be cleared during ref re-init
 extern glstate_t
     glState; // outside of TR since it shouldn't be cleared during ref re-init
 
@@ -1355,7 +1367,7 @@ void RE_UploadCinematic(int w, int h, int cols, int rows, const byte *data,
                         int client, qboolean dirty);
 
 void RE_BeginFrame(stereoFrame_t stereoFrame);
-void RE_BeginRegistration(glconfig_t *glconfig);
+void RE_BeginRegistration(renderconfig_t *renderContext);
 void RE_LoadWorldMap(const char *mapname);
 void RE_SetWorldVisData(const byte *vis);
 qhandle_t RE_RegisterModel(const char *name);
@@ -1461,7 +1473,7 @@ typedef struct stageVars {
 } stageVars_t;
 
 typedef struct shaderCommands_s {
-  glIndex_t indexes[SHADER_MAX_INDEXES];
+  uint32_t indexes[SHADER_MAX_INDEXES];
   vec4_t xyz[SHADER_MAX_VERTEXES];
   vec4_t normal[SHADER_MAX_VERTEXES];
   vec2_t texCoords[SHADER_MAX_VERTEXES][2];
@@ -1812,9 +1824,6 @@ extern volatile qboolean renderThreadActive;
 
 void *R_GetCommandBuffer(int bytes);
 void RB_ExecuteRenderCommands(const void *data);
-
-void R_InitCommandBuffers(void);
-void R_ShutdownCommandBuffers(void);
 
 void R_SyncRenderThread(void);
 

@@ -46,79 +46,54 @@ static float s_flipMatrix[16] = {
 /*
 ** GL_Bind
 */
-void GL_Bind(image_t *image) {
-  int texnum;
+//void GL_Bind(image_t *image) {
+//  int texnum;
+//
+//  if (!image) {
+//    ri.Printf(PRINT_WARNING, "GL_Bind: NULL image\n");
+//    texnum = tr.defaultImage->texnum;
+//  } else {
+//    texnum = image->texnum;
+//  }
+//
+//  if (r_nobind->integer && tr.dlightImage) { // performance evaluation option
+//    texnum = tr.dlightImage->texnum;
+//  }
+//
+//  if (glState.currenttextures[glState.currenttmu] != texnum) {
+//    image->frameUsed = tr.frameCount;
+//    glState.currenttextures[glState.currenttmu] = texnum;
+// //   qglBindTexture(GL_TEXTURE_2D, texnum);
+//  }
+//}
 
-  if (!image) {
-    ri.Printf(PRINT_WARNING, "GL_Bind: NULL image\n");
-    texnum = tr.defaultImage->texnum;
-  } else {
-    texnum = image->texnum;
-  }
-
-  if (r_nobind->integer && tr.dlightImage) { // performance evaluation option
-    texnum = tr.dlightImage->texnum;
-  }
-
-  if (glState.currenttextures[glState.currenttmu] != texnum) {
-    image->frameUsed = tr.frameCount;
-    glState.currenttextures[glState.currenttmu] = texnum;
- //   qglBindTexture(GL_TEXTURE_2D, texnum);
-  }
-}
-
-/*
-** GL_SelectTexture
-*/
-void GL_SelectTexture(int unit) {
-  if (glState.currenttmu == unit) {
-    return;
-  }
-
-  if (unit == 0) {
-   // qglActiveTextureARB(GL_TEXTURE0_ARB);
-    GLimp_LogComment("glActiveTextureARB( GL_TEXTURE0_ARB )\n");
-  //  qglClientActiveTextureARB(GL_TEXTURE0_ARB);
-    GLimp_LogComment("glClientActiveTextureARB( GL_TEXTURE0_ARB )\n");
-  } else if (unit == 1) {
-  //  qglActiveTextureARB(GL_TEXTURE1_ARB);
-    GLimp_LogComment("glActiveTextureARB( GL_TEXTURE1_ARB )\n");
- //   qglClientActiveTextureARB(GL_TEXTURE1_ARB);
-    GLimp_LogComment("glClientActiveTextureARB( GL_TEXTURE1_ARB )\n");
-  } else {
-    ri.Error(ERR_DROP, "GL_SelectTexture: unit = %i", unit);
-  }
-
-  glState.currenttmu = unit;
-}
-
-/*
-** GL_BindMultitexture
-*/
-void GL_BindMultitexture(image_t *image0, GLuint env0, image_t *image1,
-                         GLuint env1) {
-  int texnum0, texnum1;
-
-  texnum0 = image0->texnum;
-  texnum1 = image1->texnum;
-
-  if (r_nobind->integer && tr.dlightImage) { // performance evaluation option
-    texnum0 = texnum1 = tr.dlightImage->texnum;
-  }
-
-  if (glState.currenttextures[1] != texnum1) {
-    GL_SelectTexture(1);
-    image1->frameUsed = tr.frameCount;
-    glState.currenttextures[1] = texnum1;
-  //  qglBindTexture(GL_TEXTURE_2D, texnum1);
-  }
-  if (glState.currenttextures[0] != texnum0) {
-    GL_SelectTexture(0);
-    image0->frameUsed = tr.frameCount;
-    glState.currenttextures[0] = texnum0;
-  //  qglBindTexture(GL_TEXTURE_2D, texnum0);
-  }
-}
+///* TODO: delete this
+//** GL_BindMultitexture
+//*/
+//void GL_BindMultitexture(image_t *image0, GLuint env0, image_t *image1,
+//                         GLuint env1) {
+//  int texnum0, texnum1;
+//
+//  texnum0 = image0->texnum;
+//  texnum1 = image1->texnum;
+//
+//  if (r_nobind->integer && tr.dlightImage) { // performance evaluation option
+//    texnum0 = texnum1 = tr.dlightImage->texnum;
+//  }
+//
+//  if (glState.currenttextures[1] != texnum1) {
+//    GL_SelectTexture(1);
+//    image1->frameUsed = tr.frameCount;
+//    glState.currenttextures[1] = texnum1;
+//  //  qglBindTexture(GL_TEXTURE_2D, texnum1);
+//  }
+//  if (glState.currenttextures[0] != texnum0) {
+//    GL_SelectTexture(0);
+//    image0->frameUsed = tr.frameCount;
+//    glState.currenttextures[0] = texnum0;
+//  //  qglBindTexture(GL_TEXTURE_2D, texnum0);
+//  }
+//}
 
 /*
 ** GL_Cull
@@ -208,7 +183,7 @@ void GL_State(unsigned long stateBits) {
   // check blend bits
   //
   if (diff & (GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS)) {
-    GLenum srcFactor, dstFactor;
+    int srcFactor, dstFactor;
 
     if (stateBits & (GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS)) {
       switch (stateBits & GLS_SRCBLEND_BITS) {
@@ -926,7 +901,7 @@ void RE_StretchRaw(int x, int y, int w, int h, int cols, int rows,
              rows);
   }
 
-  GL_Bind(tr.scratchImage[client]);
+ // GL_Bind(tr.scratchImage[client]);
 
   // if the scratchImage isn't in the format we want, specify it as a new
   // texture
@@ -976,7 +951,7 @@ void RE_StretchRaw(int x, int y, int w, int h, int cols, int rows,
 void RE_UploadCinematic(int w, int h, int cols, int rows, const byte *data,
                         int client, qboolean dirty) {
 
-  GL_Bind(tr.scratchImage[client]);
+ // GL_Bind(tr.scratchImage[client]);
 
   // if the scratchImage isn't in the format we want, specify it as a new
   // texture
@@ -1253,8 +1228,8 @@ void RB_ShowImages(void) {
   for (i = 0; i < tr.numImages; i++) {
     image = tr.images[i];
 
-    w = glConfig.vidWidth / 40;
-    h = glConfig.vidHeight / 30;
+    w = vkConfig.vidWidth / 40;
+    h = vkConfig.vidHeight / 30;
 
     x = i % 40 * w;
     y = i / 30 * h;
@@ -1312,12 +1287,12 @@ const void *RB_SwapBuffers(const void *data) {
     long sum = 0;
     unsigned char *stencilReadback;
 
-    stencilReadback =
-        ri.Hunk_AllocateTempMemory(glConfig.vidWidth * glConfig.vidHeight);
+    stencilReadback = ri.Hunk_AllocateTempMemory(renderConfig.vidWidth *
+                                                 renderConfig.vidHeight);
    /* qglReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_STENCIL_INDEX,
                   GL_UNSIGNED_BYTE, stencilReadback);*/
 
-    for (i = 0; i < glConfig.vidWidth * glConfig.vidHeight; i++) {
+    for (i = 0; i < renderConfig.vidWidth * renderConfig.vidHeight; i++) {
       sum += stencilReadback[i];
     }
 
@@ -1329,7 +1304,7 @@ const void *RB_SwapBuffers(const void *data) {
   //  qglFinish();
   }
 
-  GLimp_LogComment("***************** RB_SwapBuffers *****************\n\n\n");
+  // GLimp_LogComment("***************** RB_SwapBuffers *****************\n\n\n");
 
 //  GLimp_EndFrame();
 
@@ -1399,7 +1374,7 @@ void RB_RenderThread(void) {
   // wait for either a rendering command or a quit command
   while (1) {
     // sleep until we have work to do
-    data = GLimp_RendererSleep();
+    data = NULL; // GLimp_RendererSleep();
 
     if (!data) {
       return; // all done, renderer is shutting down

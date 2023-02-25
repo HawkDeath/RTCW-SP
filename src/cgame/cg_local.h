@@ -1560,7 +1560,7 @@ extern soundScript_t soundScripts[MAX_SOUND_SCRIPTS];
 // all clients to begin playing instantly
 typedef struct {
   gameState_t gameState; // gamestate from server
-  glconfig_t glconfig;   // rendering configuration
+  renderconfig_t renderConfig;   // rendering configuration
   float screenXScale;    // derived from glconfig
   float screenYScale;
   float screenXBias;
@@ -2507,7 +2507,10 @@ void trap_R_SetFog(int fogvar, int var1, int var2, float r, float g, float b,
 // The glconfig_t will not change during the life of a cgame.
 // If it needs to change, the entire cgame will be restarted, because
 // all the qhandle_t are then invalid.
-void trap_GetGlconfig(glconfig_t *glconfig);
+// void trap_GetGlconfig(glconfig_t *glconfig);
+
+void trap_GetRenderconfig(renderconfig_t *renderconfig);
+
 
 // the gamestate should be grabbed at startup, and whenever a
 // configstring changes

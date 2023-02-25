@@ -1232,7 +1232,7 @@ static qboolean SurfIsOffscreen(const drawSurf_t *drawSurf,
   unsigned int pointOr = 0;
   unsigned int pointAnd = (unsigned int)~0;
 
-  if (glConfig.smpActive) { // FIXME!  we can't do RB_BeginSurface/RB_EndSurface
+  if (vkConfig.smpActive) { // FIXME!  we can't do RB_BeginSurface/RB_EndSurface
                             // stuff with smp!
     return qfalse;
   }
@@ -1875,7 +1875,7 @@ void R_DebugGraphics(void) {
   // the render thread can't make callbacks to the main thread
   R_SyncRenderThread();
 
-  GL_Bind(tr.whiteImage);
+  //GL_Bind(tr.whiteImage);
   GL_Cull(CT_FRONT_SIDED);
   ri.CM_DrawDebugSurface(R_DebugPolygon);
 }

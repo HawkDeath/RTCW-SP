@@ -258,8 +258,12 @@ void trap_GetClientState(uiClientState_t *state) {
   syscall(UI_GETCLIENTSTATE, state);
 }
 
-void trap_GetGlconfig(glconfig_t *glconfig) {
-  syscall(UI_GETGLCONFIG, glconfig);
+//void trap_GetGlconfig(glconfig_t *glconfig) {
+//  syscall(UI_GETGLCONFIG, glconfig);
+//}
+
+void trap_GetRenderconfig(renderconfig_t *renderconfig) {
+  syscall(UI_GETRENDERCONFIG, renderconfig);
 }
 
 int trap_GetConfigString(int index, char *buff, int buffsize) {

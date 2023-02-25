@@ -2,15 +2,16 @@
 
 #include "vk_local.h"
 
-//#ifdef __USEA3D
+// #ifdef __USEA3D
 //// Defined in snd_a3dg_refcommon.c
 // void RE_A3D_RenderGeometry (void *pVoidA3D, void *pVoidGeom, void *pVoidMat,
 // void *pVoidGeomStatus); #endif
 
-glconfig_t glConfig;
+renderconfig_t renderConfig;
+vkContext vkConfig;
 glstate_t glState;
 
-static void GfxInfo_f(void);
+static void VkInfo_f(void);
 
 cvar_t *r_flareSize;
 cvar_t *r_flareFade;
@@ -95,7 +96,7 @@ cvar_t *r_primitives;
 cvar_t *r_texturebits;
 
 cvar_t *r_drawBuffer;
-cvar_t *r_glDriver;
+cvar_t *r_vkDriver;
 cvar_t *r_glIgnoreWicked3D;
 cvar_t *r_lightmap;
 cvar_t *r_vertexLight;
@@ -177,7 +178,6 @@ int max_polys;
 cvar_t *r_maxpolyverts;
 int max_polyverts;
 
-
 static void AssertCvarRange(cvar_t *cv, float minVal, float maxVal,
                             qboolean shouldBeIntegral) {
   if (shouldBeIntegral) {
@@ -204,7 +204,8 @@ static void AssertCvarRange(cvar_t *cv, float minVal, float maxVal,
 **
 ** This function is responsible for initializing a valid Vulkan subsystem.
 */
-static void InitVulkan(void) {
+static void InitVulkan(void)
+{
   char renderer_buffer[1024];
 
   //
@@ -212,39 +213,16 @@ static void InitVulkan(void) {
   //
   // GLimp_Init directly or indirectly references the following cvars:
   //		- r_fullscreen
-  //		- r_glDriver
+  //		- r_vkDriver
   //		- r_mode
   //		- r_(color|depth|stencil)bits
   //		- r_ignorehwgamma
   //		- r_gamma
   //
 
-  if (glConfig.vidWidth == 0) {
-    GLint temp;
-
-//    GLimp_Init();
-
-    strcpy(renderer_buffer, glConfig.renderer_string);
-    Q_strlwr(renderer_buffer);
-
-    // OpenGL driver constants
-  //  qglGetIntegerv(GL_MAX_TEXTURE_SIZE, &temp);
-    glConfig.maxTextureSize = 1024;// temp;
-
-    // stubbed or broken drivers may have reported 0...
-    if (glConfig.maxTextureSize <= 0) {
-      glConfig.maxTextureSize = 0;
-    }
-  }
-
-  // init command buffers and SMP
-  R_InitCommandBuffers();
 
   // print info
-  GfxInfo_f();
-
-  // set default state
-  GL_SetDefaultState();
+  VkInfo_f();
 }
 
 /*
@@ -256,7 +234,7 @@ typedef struct vidmode_s {
   float pixelAspect; // pixel width / height
 } vidmode_t;
 
-vidmode_t r_vidModes[] = {
+vidmode_t r_vidModes[] = { // TODO: find solution for add support for modern resolutions
     {"Mode  0: 320x240", 320, 240, 1},
     {"Mode  1: 400x300", 400, 300, 1},
     {"Mode  2: 512x384", 512, 384, 1},
@@ -317,7 +295,7 @@ void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
   int i, c, temp;
 
   buffer = ri.Hunk_AllocateTempMemory(
-      glConfig.vidWidth * glConfig.vidHeight * 3 + 18);
+      vkConfig.vidWidth * vkConfig.vidHeight * 3 + 18);
 
   memset(buffer, 0, 18);
   buffer[2] = 2; // uncompressed type
@@ -327,7 +305,7 @@ void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
   buffer[15] = height >> 8;
   buffer[16] = 24; // pixel size
 
- // qglReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer + 18);
+  // qglReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer + 18);
 
   // swap rgb to bgr
   c = 18 + width * height * 3;
@@ -338,8 +316,8 @@ void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
   }
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && glConfig.deviceSupportsGamma) {
-    R_GammaCorrect(buffer + 18, glConfig.vidWidth * glConfig.vidHeight * 3);
+  if ((tr.overbrightBits > 0) && vkConfig.deviceSupportsGamma) {
+    R_GammaCorrect(buffer + 18, vkConfig.vidWidth * vkConfig.vidHeight * 3);
   }
 
   ri.FS_WriteFile(fileName, buffer, c);
@@ -356,17 +334,17 @@ void R_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName) {
   byte *buffer;
 
   buffer =
-      ri.Hunk_AllocateTempMemory(glConfig.vidWidth * glConfig.vidHeight * 4);
+      ri.Hunk_AllocateTempMemory(vkConfig.vidWidth * vkConfig.vidHeight * 4);
 
- // qglReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+  // qglReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && glConfig.deviceSupportsGamma) {
-    R_GammaCorrect(buffer, glConfig.vidWidth * glConfig.vidHeight * 4);
+  if ((tr.overbrightBits > 0) && vkConfig.deviceSupportsGamma) {
+    R_GammaCorrect(buffer, vkConfig.vidWidth * vkConfig.vidHeight * 4);
   }
 
   ri.FS_WriteFile(fileName, buffer, 1); // create path
-  SaveJPG(fileName, 95, glConfig.vidWidth, glConfig.vidHeight, buffer);
+  SaveJPG(fileName, 95, vkConfig.vidWidth, vkConfig.vidHeight, buffer);
 
   ri.Hunk_FreeTempMemory(buffer);
 }
@@ -400,7 +378,8 @@ void R_ScreenshotFilename(int lastNumber, char *fileName) {
 R_ScreenshotFilenameJPEG
 ==============
 */
-void R_ScreenshotFilenameJPEG(int lastNumber, char *fileName) {
+void R_ScreenshotFilenameJPEG(int lastNumber, char *fileName)
+{
   int a, b, c, d;
 
   if (lastNumber < 0 || lastNumber > 9999) {
@@ -427,7 +406,8 @@ levelshots are specialized 128*128 thumbnails for
 the menu system, sampled down from full screen distorted images
 ====================
 */
-void R_LevelShot(void) {
+void R_LevelShot(void)
+{
   char checkname[MAX_OSPATH];
   byte *buffer;
   byte *source;
@@ -440,7 +420,7 @@ void R_LevelShot(void) {
   sprintf(checkname, "levelshots/%s.tga", tr.world->baseName);
 
   source =
-      ri.Hunk_AllocateTempMemory(glConfig.vidWidth * glConfig.vidHeight * 3);
+      ri.Hunk_AllocateTempMemory(vkConfig.vidWidth * vkConfig.vidHeight * 3);
 
   buffer = ri.Hunk_AllocateTempMemory(128 * 128 * 3 + 18);
   memset(buffer, 0, 18);
@@ -450,19 +430,18 @@ void R_LevelShot(void) {
   buffer[16] = 24; // pixel size
 
   // TODO: give a acces to frame buffer
-
- /* qglReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGB,
-                GL_UNSIGNED_BYTE, source);*/
+  /* qglReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGB,
+                 GL_UNSIGNED_BYTE, source);*/
 
   // resample from source
-  xScale = glConfig.vidWidth / 512.0f;
-  yScale = glConfig.vidHeight / 384.0f;
+  xScale = vkConfig.vidWidth / 512.0f;
+  yScale = vkConfig.vidHeight / 384.0f;
   for (y = 0; y < 128; y++) {
     for (x = 0; x < 128; x++) {
       r = g = b = 0;
       for (yy = 0; yy < 3; yy++) {
         for (xx = 0; xx < 4; xx++) {
-          src = source + 3 * (glConfig.vidWidth * (int)((y * 3 + yy) * yScale) +
+          src = source + 3 * (vkConfig.vidWidth * (int)((y * 3 + yy) * yScale) +
                               (int)((x * 4 + xx) * xScale));
           r += src[0];
           g += src[1];
@@ -477,7 +456,7 @@ void R_LevelShot(void) {
   }
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && glConfig.deviceSupportsGamma) {
+  if ((tr.overbrightBits > 0) && vkConfig.deviceSupportsGamma) {
     R_GammaCorrect(buffer + 18, 128 * 128 * 3);
   }
 
@@ -548,7 +527,8 @@ void R_ScreenShot_f(void) {
     lastNumber++;
   }
 
-  R_TakeScreenshot(0, 0, glConfig.vidWidth, glConfig.vidHeight, checkname);
+  R_TakeScreenshot(0, 0, renderConfig.vidWidth, renderConfig.vidHeight,
+                   checkname);
 
   if (!silent) {
     ri.Printf(PRINT_ALL, "Wrote %s\n", checkname);
@@ -602,180 +582,29 @@ void R_ScreenShotJPEG_f(void) {
     lastNumber++;
   }
 
-  R_TakeScreenshotJPEG(0, 0, glConfig.vidWidth, glConfig.vidHeight, checkname);
+  R_TakeScreenshotJPEG(0, 0, vkConfig.vidWidth, vkConfig.vidHeight, checkname);
 
   if (!silent) {
     ri.Printf(PRINT_ALL, "Wrote %s\n", checkname);
   }
 }
 
-//============================================================================
 
-void GL_SetDefaultState(void) {
-  //qglClearDepth(1.0f);
+void VkInfo_f(void)
+{
 
-  //qglCullFace(GL_FRONT);
-
-  //qglColor4f(1, 1, 1, 1);
-
-  //// initialize downstream texture unit if we're running
-  //// in a multitexture environment
-  //if (qglActiveTextureARB) {
-  //  GL_SelectTexture(1);
-  //  GL_TextureMode(r_textureMode->string);
-  //  GL_TexEnv(GL_MODULATE);
-  //  qglDisable(GL_TEXTURE_2D);
-  //  GL_SelectTexture(0);
-  //}
-
-  //qglEnable(GL_TEXTURE_2D);
-  //GL_TextureMode(r_textureMode->string);
-  //GL_TexEnv(GL_MODULATE);
-
-  //qglShadeModel(GL_SMOOTH);
-  //qglDepthFunc(GL_LEQUAL);
-
-  //// the vertex array is always enabled, but the color and texture
-  //// arrays are enabled and disabled around the compiled vertex array call
-  //qglEnableClientState(GL_VERTEX_ARRAY);
-
-  //
-  // make sure our GL state vector is set correctly
-  //
-  glState.glStateBits = GLS_DEPTHTEST_DISABLE | GLS_DEPTHMASK_TRUE;
-
-  //qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  //qglDepthMask(GL_TRUE);
-  //qglDisable(GL_DEPTH_TEST);
-  //qglEnable(GL_SCISSOR_TEST);
-  //qglDisable(GL_CULL_FACE);
-  //qglDisable(GL_BLEND);
-
-  //----(SA)	added.
-  // ATI pn_triangles
-
-
-  //----(SA)	end
-}
-
-
-void GfxInfo_f(void) {
-  //cvar_t *sys_cpustring = ri.Cvar_Get("sys_cpustring", "", 0);
-  //const char *enablestrings[] = {"disabled", "enabled"};
-  //const char *fsstrings[] = {"windowed", "fullscreen"};
-
-  //ri.Printf(PRINT_ALL, "\nGL_VENDOR: %s\n", glConfig.vendor_string);
-  //ri.Printf(PRINT_ALL, "GL_RENDERER: %s\n", glConfig.renderer_string);
-  //ri.Printf(PRINT_ALL, "GL_VERSION: %s\n", glConfig.version_string);
-  //ri.Printf(PRINT_ALL, "GL_EXTENSIONS: %s\n", glConfig.extensions_string);
-  //ri.Printf(PRINT_ALL, "GL_MAX_TEXTURE_SIZE: %d\n", glConfig.maxTextureSize);
-  //ri.Printf(PRINT_ALL, "GL_MAX_ACTIVE_TEXTURES_ARB: %d\n",
-  //          glConfig.maxActiveTextures);
-  //ri.Printf(PRINT_ALL,
-  //          "\nPIXELFORMAT: color(%d-bits) Z(%d-bit) stencil(%d-bits)\n",
-  //          glConfig.colorBits, glConfig.depthBits, glConfig.stencilBits);
-  //ri.Printf(PRINT_ALL, "MODE: %d, %d x %d %s hz:", r_mode->integer,
-  //          glConfig.vidWidth, glConfig.vidHeight,
-  //          fsstrings[r_fullscreen->integer == 1]);
-  //if (glConfig.displayFrequency) {
-  //  ri.Printf(PRINT_ALL, "%d\n", glConfig.displayFrequency);
-  //} else {
-  //  ri.Printf(PRINT_ALL, "N/A\n");
-  //}
-  //if (glConfig.deviceSupportsGamma) {
-  //  ri.Printf(PRINT_ALL, "GAMMA: hardware w/ %d overbright bits\n",
-  //            tr.overbrightBits);
-  //} else {
-  //  ri.Printf(PRINT_ALL, "GAMMA: software w/ %d overbright bits\n",
-  //            tr.overbrightBits);
-  //}
-  //ri.Printf(PRINT_ALL, "CPU: %s\n", sys_cpustring->string);
-
-  //// rendering primitives
-  //{
-  //  int primitives;
-
-  //  // default is to use triangles if compiled vertex arrays are present
-  //  ri.Printf(PRINT_ALL, "rendering primitives: ");
-  //  primitives = r_primitives->integer;
-  //  if (primitives == 0) {
-  //    if (qglLockArraysEXT) {
-  //      primitives = 2;
-  //    } else {
-  //      primitives = 1;
-  //    }
-  //  }
-  //  if (primitives == -1) {
-  //    ri.Printf(PRINT_ALL, "none\n");
-  //  } else if (primitives == 2) {
-  //    ri.Printf(PRINT_ALL, "single glDrawElements\n");
-  //  } else if (primitives == 1) {
-  //    ri.Printf(PRINT_ALL, "multiple glArrayElement\n");
-  //  } else if (primitives == 3) {
-  //    ri.Printf(PRINT_ALL,
-  //              "multiple glColor4ubv + glTexCoord2fv + glVertex3fv\n");
-  //  }
-  //}
-
-  //ri.Printf(PRINT_ALL, "texturemode: %s\n", r_textureMode->string);
-  //ri.Printf(PRINT_ALL, "picmip: %d\n", r_picmip->integer);
-  //ri.Printf(PRINT_ALL, "picmip2: %d\n", r_picmip2->integer);
-  //ri.Printf(PRINT_ALL, "texture bits: %d\n", r_texturebits->integer);
-  //ri.Printf(PRINT_ALL, "multitexture: %s\n",
-  //          enablestrings[qglActiveTextureARB != 0]);
-  //ri.Printf(PRINT_ALL, "compiled vertex arrays: %s\n",
-  //          enablestrings[qglLockArraysEXT != 0]);
-  //ri.Printf(PRINT_ALL, "texenv add: %s\n",
-  //          enablestrings[glConfig.textureEnvAddAvailable != 0]);
-  //ri.Printf(PRINT_ALL, "compressed textures: %s\n",
-  //          enablestrings[glConfig.textureCompression != TC_NONE]);
-
-  //ri.Printf(PRINT_ALL, "ATI truform: %s\n",
-  //          enablestrings[qglPNTrianglesiATI != 0]);
-  //if (qglPNTrianglesiATI) {
-  //  // DAJ bogus at this point		ri.Printf( PRINT_ALL,
-  //  // "MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI: %d\n", glConfig.ATIMaxTruformTess
-  //  // );
-  //  ri.Printf(PRINT_ALL, "Truform Tess: %d\n", r_ati_truform_tess->integer);
-  //  ri.Printf(PRINT_ALL, "Truform Point Mode: %s\n",
-  //            r_ati_truform_pointmode->string);
-  //  ri.Printf(PRINT_ALL, "Truform Normal Mode: %s\n",
-  //            r_ati_truform_normalmode->string);
-  //}
-
-  //ri.Printf(PRINT_ALL, "NV distance fog: %s\n",
-  //          enablestrings[glConfig.NVFogAvailable != 0]);
-  //if (glConfig.NVFogAvailable) {
-  //  ri.Printf(PRINT_ALL, "Fog Mode: %s\n", r_nv_fogdist_mode->string);
-  //}
-
-  //if (r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2) {
-  //  ri.Printf(PRINT_ALL, "HACK: using vertex lightmap approximation\n");
-  //}
-  //if (glConfig.hardwareType == GLHW_RAGEPRO) {
-  //  ri.Printf(PRINT_ALL, "HACK: ragePro approximations\n");
-  //}
-  //if (glConfig.hardwareType == GLHW_RIVA128) {
-  //  ri.Printf(PRINT_ALL, "HACK: riva128 approximations\n");
-  //}
-  //if (glConfig.smpActive) {
-  //  ri.Printf(PRINT_ALL, "Using dual processor acceleration\n");
-  //}
-  //if (r_finish->integer) {
-  //  ri.Printf(PRINT_ALL, "Forcing glFinish\n");
-  //}
 }
 
 // RF
 extern void R_CropImages_f(void);
 
-
-void R_Register(void) {
+void R_Register(void)
+{
   //
   // latched and archived variables
   //
-  r_glDriver =
-      ri.Cvar_Get("r_glDriver", OPENGL_DRIVER_NAME, CVAR_ARCHIVE | CVAR_LATCH);
+  r_vkDriver =
+      ri.Cvar_Get("r_vkDriver", VULKAN_DRIVER_NAME, CVAR_ARCHIVE | CVAR_LATCH);
   r_allowExtensions =
       ri.Cvar_Get("r_allowExtensions", "1", CVAR_ARCHIVE | CVAR_LATCH);
   r_ext_compressed_textures =
@@ -848,8 +677,8 @@ void R_Register(void) {
   {
     //	extern long gSystemVersion;
     //	if(gSystemVersion >= 0x1000)
-    //		r_stencilbits = ri.Cvar_Get( "r_stencilbits", "8", CVAR_ARCHIVE |
-    //CVAR_LATCH ); 	else
+    //		r_stencilbits = ri.Cvar_Get( "r_stencilbits", "8", CVAR_ARCHIVE
+    //| CVAR_LATCH ); 	else
     r_stencilbits =
         ri.Cvar_Get("r_stencilbits", "0", CVAR_ARCHIVE | CVAR_LATCH);
   }
@@ -956,11 +785,10 @@ void R_Register(void) {
   // show_bug.cgi?id=440
   // NOTE TTimo: r_cache is disabled by default in SP
   ri.Cvar_Set("r_cache", "0");
-  r_cache =
-      ri.Cvar_Get("r_cache", "1",
-                  CVAR_LATCH); // leaving it as this for backwards compability.
-                               // but it caches models and shaders also
-                               // (SA) disabling cacheshaders
+  r_cache = ri.Cvar_Get("r_cache", "1",
+                        CVAR_LATCH); // leaving it as this for backwards
+                                     // compability. but it caches models and
+                                     // shaders also (SA) disabling cacheshaders
   ri.Cvar_Set("r_cacheShaders", "0");
   r_cacheShaders = ri.Cvar_Get("r_cacheShaders", "0", CVAR_LATCH);
   //----(SA)	end
@@ -1013,7 +841,6 @@ void R_Register(void) {
   r_lockpvs = ri.Cvar_Get("r_lockpvs", "0", CVAR_CHEAT);
   r_noportals = ri.Cvar_Get("r_noportals", "0", CVAR_CHEAT);
   r_shadows = ri.Cvar_Get("cg_shadows", "1", 0);
-  r_shadows = ri.Cvar_Get("cg_shadows", "1", 0);
   r_portalsky = ri.Cvar_Get("cg_skybox", "1", 0);
 
   r_maxpolys = ri.Cvar_Get("r_maxpolys", va("%d", MAX_POLYS), 0);
@@ -1029,7 +856,7 @@ void R_Register(void) {
   ri.Cmd_AddCommand("modelist", R_ModeList_f);
   ri.Cmd_AddCommand("screenshot", R_ScreenShot_f);
   ri.Cmd_AddCommand("screenshotJPEG", R_ScreenShotJPEG_f);
-  ri.Cmd_AddCommand("gfxinfo", GfxInfo_f);
+  ri.Cmd_AddCommand("vkinfo", VkInfo_f);
   ri.Cmd_AddCommand("taginfo", R_TagInfo_f);
 
   // Ridah
@@ -1094,22 +921,14 @@ void R_Init(void) {
     max_polyverts = MAX_POLYVERTS;
   }
 
-  //	backEndData[0] = ri.Hunk_Alloc( sizeof( *backEndData[0] ), h_low );
   backEndData[0] =
       ri.Hunk_Alloc(sizeof(*backEndData[0]) + sizeof(srfPoly_t) * max_polys +
                         sizeof(polyVert_t) * max_polyverts,
                     h_low);
 
-  if (r_smp->integer) {
-    //		backEndData[1] = ri.Hunk_Alloc( sizeof( *backEndData[1] ), h_low
-    //);
-    backEndData[1] =
-        ri.Hunk_Alloc(sizeof(*backEndData[1]) + sizeof(srfPoly_t) * max_polys +
-                          sizeof(polyVert_t) * max_polyverts,
-                      h_low);
-  } else {
-    backEndData[1] = NULL;
-  }
+
+  backEndData[1] = NULL; // second backend is not needed for now
+
   R_ToggleSmpFrame();
 
   InitVulkan();
@@ -1123,13 +942,6 @@ void R_Init(void) {
   R_ModelInit();
 
   R_InitFreeType();
-
-  RB_ZombieFXInit();
-
-  //err = qglGetError();
-  //if (err != GL_NO_ERROR) {
-  //  ri.Printf(PRINT_ALL, "glGetError() = 0x%x\n", err);
-  //}
 
   ri.Printf(PRINT_ALL, "----- finished R_Init -----\n");
 }
@@ -1191,7 +1003,7 @@ void RE_Shutdown(qboolean destroyWindow) {
 
   // shut down platform specific OpenGL stuff
   if (destroyWindow) {
-    GLimp_Shutdown();
+    //  GLimp_Shutdown();
 
     // Ridah, release the virtual memory
     R_Hunk_End();
@@ -1276,7 +1088,7 @@ refexport_t *GetRefAPI(int apiVersion, refimport_t *rimp) {
   re.GetEntityToken = R_GetEntityToken;
 
   // RF
-  re.ZombieFXAddNewHit = NULL;// RB_ZombieFXAddNewHit;
+  re.ZombieFXAddNewHit = NULL; // RB_ZombieFXAddNewHit;
 
   return &re;
 }

@@ -277,13 +277,20 @@ typedef enum { STEREO_CENTER, STEREO_LEFT, STEREO_RIGHT } stereoFrame_t;
 typedef enum { TC_NONE, TC_S3TC, TC_EXT_COMP_S3TC } textureCompression_t;
 
 typedef enum {
+  /// <summary>
+  /// ////////////////// Legacy drivers
+  /// </summary>
   GLDRV_ICD,        // driver is integrated with window system
                     // WARNING: there are tests that check for
                     // > GLDRV_ICD for minidriverness, so this
                     // should always be the lowest value in this
                     // enum set
   GLDRV_STANDALONE, // driver is a non-3Dfx standalone driver
-  GLDRV_VOODOO      // driver is a 3Dfx standalone driver
+  GLDRV_VOODOO,      // driver is a 3Dfx standalone driver
+  //////////////////////// Modern drivers
+  GLDRV_NVIDIA,
+  GLDRV_AMD,
+  GLDRV_INTEL
 } glDriverType_t;
 
 typedef enum {
@@ -296,39 +303,8 @@ typedef enum {
   GLHW_PERMEDIA2  // where you don't have src*dst
 } glHardwareType_t;
 
-typedef struct {
-  char renderer_string[MAX_STRING_CHARS];
-  char vendor_string[MAX_STRING_CHARS];
-  char version_string[MAX_STRING_CHARS];
-  char
-      extensions_string[4 * MAX_STRING_CHARS]; // this is actually too short for
-                                               // many current cards/drivers  //
-                                               // (SA) doubled from 2x to 4x
-                                               // MAX_STRING_CHARS
-
-  int maxTextureSize;    // queried from GL
-  int maxActiveTextures; // multitexture ability
-
-  int colorBits, depthBits, stencilBits;
-
-  glDriverType_t driverType;
-  glHardwareType_t hardwareType;
-
-  qboolean deviceSupportsGamma;
-  textureCompression_t textureCompression;
-  qboolean textureEnvAddAvailable;
-  qboolean anisotropicAvailable; //----(SA)	added
-  float maxAnisotropy;           //----(SA)	added
-
-  // vendor-specific support
-  // NVidia
-  qboolean NVFogAvailable; //----(SA)	added
-  int NVFogMode;           //----(SA)	added
-  // ATI
-  int ATIMaxTruformTess; // for truform support
-  int ATINormalMode;     // for truform support
-  int ATIPointMode;      // for truform support
-
+typedef struct
+{
   int vidWidth, vidHeight;
   // aspect is the screen's physical width / height, which may be different
   // than scrWidth / scrHeight if the pixels are non-square
@@ -336,29 +312,19 @@ typedef struct {
   float windowAspect;
 
   int displayFrequency;
+  glHardwareType_t hardwareType;
+  textureCompression_t textureCompression;
 
+  int maxTextureSize;
+  int stencilBits;
+  int colorBits;
   // synonymous with "does rendering consume the entire screen?", therefore
   // a Voodoo or Voodoo2 will have this set to TRUE, as will a Win32 ICD that
   // used CDS.
   qboolean isFullscreen;
   qboolean stereoEnabled;
   qboolean smpActive; // dual processor
-
-  qboolean textureFilterAnisotropicAvailable; // DAJ
-} glconfig_t;
-
-#if !defined _WIN32
-
-#define _3DFX_DRIVER_NAME "libMesaVoodooGL.so.3.1"
-#define OPENGL_DRIVER_NAME "libGL.so.1"
-
-#else
-
-#define _3DFX_DRIVER_NAME "3dfxvgl"
-#define OPENGL_DRIVER_NAME "opengl32"
-#define WICKED3D_V5_DRIVER_NAME "gl/openglv5.dll"
-#define WICKED3D_V3_DRIVER_NAME "gl/openglv3.dll"
-
-#endif // !defined _WIN32
+  qboolean deviceSupportsGamma;
+} renderconfig_t;
 
 #endif // __TR_TYPES_H

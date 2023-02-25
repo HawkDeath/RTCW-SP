@@ -2538,54 +2538,55 @@ static void UI_DrawGLInfo(rectDef_t *rect, int font, float scale, vec4_t color,
   const char *lines[64];
   int y, numLines, i;
 
-  Text_Paint(rect->x + 2, rect->y, font, scale, color,
-             va("VENDOR: %s", uiInfo.uiDC.glconfig.vendor_string), 0, 30,
-             textStyle);
-  Text_Paint(rect->x + 2, rect->y + 15, font, scale, color,
-             va("VERSION: %s: %s", uiInfo.uiDC.glconfig.version_string,
-                uiInfo.uiDC.glconfig.renderer_string),
-             0, 30, textStyle);
-  Text_Paint(rect->x + 2, rect->y + 30, font, scale, color,
-             va("PIXELFORMAT: color(%d-bits) Z(%d-bits) stencil(%d-bits)",
-                uiInfo.uiDC.glconfig.colorBits, uiInfo.uiDC.glconfig.depthBits,
-                uiInfo.uiDC.glconfig.stencilBits),
-             0, 30, textStyle);
+  //Text_Paint(rect->x + 2, rect->y, font, scale, color,
+  //           va("VENDOR: %s", uiInfo.uiDC.renderConfig.vendor_string), 0, 30,
+  //           textStyle);
+  //Text_Paint(rect->x + 2, rect->y + 15, font, scale, color,
+  //           va("VERSION: %s: %s", uiInfo.uiDC.glconfig.version_string,
+  //              uiInfo.uiDC.glconfig.renderer_string),
+  //           0, 30, textStyle);
+  //Text_Paint(rect->x + 2, rect->y + 30, font, scale, color,
+  //           va("PIXELFORMAT: color(%d-bits) Z(%d-bits) stencil(%d-bits)",
+  //              uiInfo.uiDC.renderConfig.colorBits,
+  //              uiInfo.uiDC.renderConfig.depthBits,
+  //              uiInfo.uiDC.renderConfig.stencilBits),
+  //           0, 30, textStyle);
 
-  // build null terminated extension strings
-  Q_strncpyz(buff, uiInfo.uiDC.glconfig.extensions_string, 4096);
-  eptr = buff;
-  y = rect->y + 45;
-  numLines = 0;
-  while (y < rect->y + rect->h && *eptr) {
-    while (*eptr && *eptr == ' ')
-      *eptr++ = '\0';
+  //// build null terminated extension strings
+  //Q_strncpyz(buff, uiInfo.uiDC.glconfig.extensions_string, 4096);
+  //eptr = buff;
+  //y = rect->y + 45;
+  //numLines = 0;
+  //while (y < rect->y + rect->h && *eptr) {
+  //  while (*eptr && *eptr == ' ')
+  //    *eptr++ = '\0';
 
-    // track start of valid string
-    if (*eptr && *eptr != ' ') {
-      lines[numLines++] = eptr;
-    }
+  //  // track start of valid string
+  //  if (*eptr && *eptr != ' ') {
+  //    lines[numLines++] = eptr;
+  //  }
 
-    while (*eptr && *eptr != ' ')
-      eptr++;
-  }
+  //  while (*eptr && *eptr != ' ')
+  //    eptr++;
+  //}
 
-  i = 0;
-  while (i < numLines) {
-    Text_Paint(rect->x + 2, y, font, scale, color, lines[i++], 0, 36,
-               textStyle);
-    if (i < numLines) {
-      Text_Paint(rect->x + rect->w / 3.0f, y, font, scale, color, lines[i++], 0,
-                 36, textStyle);
-    }
-    if (i < numLines) {
-      Text_Paint(rect->x + (2.0f * (rect->w / 3.0f)), y, font, scale, color,
-                 lines[i++], 0, 36, textStyle);
-    }
-    y += 10;
-    if (y > rect->y + rect->h - 11) {
-      break;
-    }
-  }
+  //i = 0;
+  //while (i < numLines) {
+  //  Text_Paint(rect->x + 2, y, font, scale, color, lines[i++], 0, 36,
+  //             textStyle);
+  //  if (i < numLines) {
+  //    Text_Paint(rect->x + rect->w / 3.0f, y, font, scale, color, lines[i++], 0,
+  //               36, textStyle);
+  //  }
+  //  if (i < numLines) {
+  //    Text_Paint(rect->x + (2.0f * (rect->w / 3.0f)), y, font, scale, color,
+  //               lines[i++], 0, 36, textStyle);
+  //  }
+  //  y += 10;
+  //  if (y > rect->y + rect->h - 11) {
+  //    break;
+  //  }
+  //}
 
   //	i = 0;
   //	while (i < numLines) {
@@ -6922,17 +6923,17 @@ void _UI_Init(qboolean inGameLoad) {
   UI_InitMemory();
 
   // cache redundant calulations
-  trap_GetGlconfig(&uiInfo.uiDC.glconfig);
+  trap_GetRenderconfig(&uiInfo.uiDC.renderConfig);
 
   // for 640x480 virtualized screen
-  uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight * (1.0 / 480.0);
-  uiInfo.uiDC.xscale = uiInfo.uiDC.glconfig.vidWidth * (1.0 / 640.0);
-  if (uiInfo.uiDC.glconfig.vidWidth * 480 >
-      uiInfo.uiDC.glconfig.vidHeight * 640) {
+  uiInfo.uiDC.yscale = uiInfo.uiDC.renderConfig.vidHeight * (1.0 / 480.0);
+  uiInfo.uiDC.xscale = uiInfo.uiDC.renderConfig.vidWidth * (1.0 / 640.0);
+  if (uiInfo.uiDC.renderConfig.vidWidth * 480 >
+      uiInfo.uiDC.renderConfig.vidHeight * 640) {
     // wide screen
     uiInfo.uiDC.bias =
-        0.5 * (uiInfo.uiDC.glconfig.vidWidth -
-               (uiInfo.uiDC.glconfig.vidHeight * (640.0 / 480.0)));
+        0.5 * (uiInfo.uiDC.renderConfig.vidWidth -
+               (uiInfo.uiDC.renderConfig.vidHeight * (640.0 / 480.0)));
   } else {
     // no wide screen
     uiInfo.uiDC.bias = 0;
