@@ -74,7 +74,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #define MAX_VIDEO_HANDLES 16
 
-extern renderconfig_t renderConfig;
+static renderconfig_t renderConfig;
 extern int s_paintedtime;
 extern int s_soundtime;
 extern int s_rawend[]; // DAJ added [] to match definition

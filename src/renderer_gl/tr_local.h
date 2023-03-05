@@ -896,10 +896,7 @@ typedef struct {
   int colorBits, depthBits, stencilBits;
 
   glDriverType_t driverType;
-  glHardwareType_t hardwareType;
 
-  qboolean deviceSupportsGamma;
-  textureCompression_t textureCompression;
   qboolean textureEnvAddAvailable;
   qboolean anisotropicAvailable; //----(SA)	added
   float maxAnisotropy;           //----(SA)	added
@@ -913,22 +910,9 @@ typedef struct {
   int ATINormalMode;     // for truform support
   int ATIPointMode;      // for truform support
 
-  int vidWidth, vidHeight;
-  // aspect is the screen's physical width / height, which may be different
-  // than scrWidth / scrHeight if the pixels are non-square
-  // normal screens should be 4/3, but wide aspect monitors may be 16/9
-  float windowAspect;
-
-  int displayFrequency;
-
-  // synonymous with "does rendering consume the entire screen?", therefore
-  // a Voodoo or Voodoo2 will have this set to TRUE, as will a Win32 ICD that
-  // used CDS.
-  qboolean isFullscreen;
-  qboolean stereoEnabled;
-  qboolean smpActive; // dual processor
-
   qboolean textureFilterAnisotropicAvailable; // DAJ
+
+  renderconfig_t *renderConfig;
 } glconfig_t;
 
 #if !defined _WIN32
@@ -1111,6 +1095,7 @@ typedef struct {
 
 extern backEndState_t backEnd;
 extern trGlobals_t tr;
+extern renderconfig_t renderConfig;
 extern glconfig_t
     glConfig; // outside of TR since it shouldn't be cleared during ref re-init
 extern glstate_t
@@ -1375,7 +1360,7 @@ void RE_UploadCinematic(int w, int h, int cols, int rows, const byte *data,
                         int client, qboolean dirty);
 
 void RE_BeginFrame(stereoFrame_t stereoFrame);
-void RE_BeginRegistration(glconfig_t *glconfig);
+void RE_BeginRegistration(renderconfig_t *glconfig);
 void RE_LoadWorldMap(const char *mapname);
 void RE_SetWorldVisData(const byte *vis);
 qhandle_t RE_RegisterModel(const char *name);

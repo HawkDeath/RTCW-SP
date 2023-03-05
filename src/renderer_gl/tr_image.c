@@ -180,7 +180,7 @@ void GL_TextureMode(const char *string) {
 
   // hack to prevent trilinear from being set on voodoo,
   // because their driver freaks...
-  if (i == 5 && glConfig.hardwareType == GLHW_3DFX_2D3D) {
+  if (i == 5 && renderConfig.hardwareType == GLHW_3DFX_2D3D) {
     ri.Printf(PRINT_ALL, "Refusing to set trilinear on a voodoo.\n");
     i = 3;
   }
@@ -362,7 +362,7 @@ lighting range
 void R_LightScaleTexture(unsigned *in, int inwidth, int inheight,
                          qboolean only_gamma) {
   if (only_gamma) {
-    if (!glConfig.deviceSupportsGamma) {
+    if (!renderConfig.deviceSupportsGamma) {
       int i, c;
       byte *p;
 
@@ -383,7 +383,7 @@ void R_LightScaleTexture(unsigned *in, int inwidth, int inheight,
 
     c = inwidth * inheight;
 
-    if (glConfig.deviceSupportsGamma) {
+    if (renderConfig.deviceSupportsGamma) {
       for (i = 0; i < c; i++, p += 4) {
         p[0] = s_intensitytable[p[0]];
         p[1] = s_intensitytable[p[1]];
@@ -770,10 +770,10 @@ static void Upload32(unsigned *data, int width, int height, qboolean mipmap,
     }
     // select proper internal format
     if (samples == 3) {
-      if (!noCompress && glConfig.textureCompression == TC_EXT_COMP_S3TC) {
+      if (!noCompress && renderConfig.textureCompression == TC_EXT_COMP_S3TC) {
         // TODO: which format is best for which textures?
         internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-      } else if (!noCompress && glConfig.textureCompression == TC_S3TC) {
+      } else if (!noCompress && renderConfig.textureCompression == TC_S3TC) {
         internalFormat = GL_RGB4_S3TC;
       } else if (r_texturebits->integer == 16) {
         internalFormat = GL_RGB5;
@@ -783,7 +783,7 @@ static void Upload32(unsigned *data, int width, int height, qboolean mipmap,
         internalFormat = 3;
       }
     } else if (samples == 4) {
-      if (!noCompress && glConfig.textureCompression == TC_EXT_COMP_S3TC) {
+      if (!noCompress && renderConfig.textureCompression == TC_EXT_COMP_S3TC) {
         // TODO: which format is best for which textures?
         internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
       } else if (r_texturebits->integer == 16) {
@@ -2336,12 +2336,12 @@ void R_SetColorMappings(void) {
 
   // setup the overbright lighting
   tr.overbrightBits = r_overBrightBits->integer;
-  if (!glConfig.deviceSupportsGamma) {
+  if (!renderConfig.deviceSupportsGamma) {
     tr.overbrightBits = 0; // need hardware gamma for overbright
   }
 
   // never overbright in windowed mode
-  if (!glConfig.isFullscreen) {
+  if (!renderConfig.isFullscreen) {
     tr.overbrightBits = 0;
   }
 
@@ -2400,7 +2400,7 @@ void R_SetColorMappings(void) {
     s_intensitytable[i] = j;
   }
 
-  if (glConfig.deviceSupportsGamma) {
+  if (renderConfig.deviceSupportsGamma) {
     GLimp_SetGamma(s_gammatable, s_gammatable, s_gammatable);
   }
 }

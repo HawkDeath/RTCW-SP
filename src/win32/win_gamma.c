@@ -55,13 +55,13 @@ static unsigned short s_oldHardwareGamma[3][256];
 void WG_CheckHardwareGamma(void) {
   HDC hDC;
 
-  glConfig.deviceSupportsGamma = qfalse;
+  renderConfig.deviceSupportsGamma = qfalse;
 
   if (qwglSetDeviceGammaRamp3DFX) {
-    glConfig.deviceSupportsGamma = qtrue;
+    renderConfig.deviceSupportsGamma = qtrue;
 
     hDC = GetDC(GetDesktopWindow());
-    glConfig.deviceSupportsGamma =
+    renderConfig.deviceSupportsGamma =
         qwglGetDeviceGammaRamp3DFX(hDC, s_oldHardwareGamma);
     ReleaseDC(GetDesktopWindow(), hDC);
 
@@ -75,10 +75,11 @@ void WG_CheckHardwareGamma(void) {
 
   if (!r_ignorehwgamma->integer) {
     hDC = GetDC(GetDesktopWindow());
-    glConfig.deviceSupportsGamma = GetDeviceGammaRamp(hDC, s_oldHardwareGamma);
+    renderConfig.deviceSupportsGamma =
+        GetDeviceGammaRamp(hDC, s_oldHardwareGamma);
     ReleaseDC(GetDesktopWindow(), hDC);
 
-    if (glConfig.deviceSupportsGamma) {
+    if (renderConfig.deviceSupportsGamma) {
       //
       // do a sanity check on the gamma values
       //
@@ -88,7 +89,7 @@ void WG_CheckHardwareGamma(void) {
            HIBYTE(s_oldHardwareGamma[1][0])) ||
           (HIBYTE(s_oldHardwareGamma[2][255]) <=
            HIBYTE(s_oldHardwareGamma[2][0]))) {
-        glConfig.deviceSupportsGamma = qfalse;
+        renderConfig.deviceSupportsGamma = qfalse;
         ri.Printf(
             PRINT_WARNING,
             "WARNING: device has broken gamma support, generated gamma.dat\n");
@@ -153,7 +154,7 @@ void GLimp_SetGamma(unsigned char red[256], unsigned char green[256],
   int ret;
   OSVERSIONINFO vinfo;
 
-  if (!glConfig.deviceSupportsGamma || r_ignorehwgamma->integer ||
+  if (!renderConfig.deviceSupportsGamma || r_ignorehwgamma->integer ||
       !glw_state.hDC) {
     return;
   }
@@ -209,7 +210,7 @@ void GLimp_SetGamma(unsigned char red[256], unsigned char green[256],
 ** WG_RestoreGamma
 */
 void WG_RestoreGamma(void) {
-  if (glConfig.deviceSupportsGamma) {
+  if (renderConfig.deviceSupportsGamma) {
     if (qwglSetDeviceGammaRamp3DFX) {
       qwglSetDeviceGammaRamp3DFX(glw_state.hDC, s_oldHardwareGamma);
     } else {

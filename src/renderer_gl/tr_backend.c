@@ -1150,11 +1150,11 @@ void RB_SetGL2D(void) {
   backEnd.projection2D = qtrue;
 
   // set 2D virtual screen size
-  qglViewport(0, 0, glConfig.vidWidth, glConfig.vidHeight);
-  qglScissor(0, 0, glConfig.vidWidth, glConfig.vidHeight);
+  qglViewport(0, 0, renderConfig.vidWidth, renderConfig.vidHeight);
+  qglScissor(0, 0, renderConfig.vidWidth, renderConfig.vidHeight);
   qglMatrixMode(GL_PROJECTION);
   qglLoadIdentity();
-  qglOrtho(0, glConfig.vidWidth, glConfig.vidHeight, 0, 0, 1);
+  qglOrtho(0, renderConfig.vidWidth, renderConfig.vidHeight, 0, 0, 1);
   qglMatrixMode(GL_MODELVIEW);
   qglLoadIdentity();
 
@@ -1535,8 +1535,8 @@ void RB_ShowImages(void) {
   for (i = 0; i < tr.numImages; i++) {
     image = tr.images[i];
 
-    w = glConfig.vidWidth / 40;
-    h = glConfig.vidHeight / 30;
+    w = renderConfig.vidWidth / 40;
+    h = renderConfig.vidHeight / 30;
 
     x = i % 40 * w;
     y = i / 30 * h;
@@ -1594,12 +1594,13 @@ const void *RB_SwapBuffers(const void *data) {
     long sum = 0;
     unsigned char *stencilReadback;
 
-    stencilReadback =
-        ri.Hunk_AllocateTempMemory(glConfig.vidWidth * glConfig.vidHeight);
-    qglReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_STENCIL_INDEX,
+    stencilReadback = ri.Hunk_AllocateTempMemory(renderConfig.vidWidth *
+                                                 renderConfig.vidHeight);
+    qglReadPixels(0, 0, renderConfig.vidWidth, renderConfig.vidHeight,
+                  GL_STENCIL_INDEX,
                   GL_UNSIGNED_BYTE, stencilReadback);
 
-    for (i = 0; i < glConfig.vidWidth * glConfig.vidHeight; i++) {
+    for (i = 0; i < renderConfig.vidWidth * renderConfig.vidHeight; i++) {
       sum += stencilReadback[i];
     }
 

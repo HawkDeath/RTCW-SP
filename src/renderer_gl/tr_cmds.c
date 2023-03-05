@@ -60,7 +60,7 @@ void R_PerformanceCounters(void) {
         backEnd.pc.c_vertexes, backEnd.pc.c_indexes / 3,
         backEnd.pc.c_totalIndexes / 3, R_SumOfUsedImages() / (1000000.0f),
         backEnd.pc.c_overDraw /
-            (float)(glConfig.vidWidth * glConfig.vidHeight));
+            (float)(renderConfig.vidWidth * renderConfig.vidHeight));
   } else if (r_speeds->integer == 2) {
     ri.Printf(PRINT_ALL,
               "(patch) %i sin %i sclip  %i sout %i bin %i bclip %i bout\n",
@@ -102,12 +102,12 @@ R_InitCommandBuffers
 ====================
 */
 void R_InitCommandBuffers(void) {
-  glConfig.smpActive = qfalse;
+  renderConfig.smpActive = qfalse;
   if (r_smp->integer) {
     ri.Printf(PRINT_ALL, "Trying SMP acceleration...\n");
     if (GLimp_SpawnRenderThread(RB_RenderThread)) {
       ri.Printf(PRINT_ALL, "...succeeded.\n");
-      glConfig.smpActive = qtrue;
+      renderConfig.smpActive = qtrue;
     } else {
       ri.Printf(PRINT_ALL, "...failed.\n");
     }
@@ -121,9 +121,9 @@ R_ShutdownCommandBuffers
 */
 void R_ShutdownCommandBuffers(void) {
   // kill the rendering thread
-  if (glConfig.smpActive) {
+  if (renderConfig.smpActive) {
     GLimp_WakeRenderer(NULL);
-    glConfig.smpActive = qfalse;
+    renderConfig.smpActive = qfalse;
   }
 }
 
@@ -146,7 +146,7 @@ void R_IssueRenderCommands(qboolean runPerformanceCounters) {
   // clear it out, in case this is a sync and not a buffer flip
   cmdList->used = 0;
 
-  if (glConfig.smpActive) {
+  if (renderConfig.smpActive) {
     // if the render thread is not idle, wait for it
     if (renderThreadActive) {
       c_blockedOnRender++;
@@ -173,7 +173,7 @@ void R_IssueRenderCommands(qboolean runPerformanceCounters) {
   // actually start the commands going
   if (!r_skipBackEnd->integer) {
     // let it start on the new batch
-    if (!glConfig.smpActive) {
+    if (!renderConfig.smpActive) {
       RB_ExecuteRenderCommands(cmdList->cmds);
     } else {
       GLimp_WakeRenderer(cmdList);
@@ -197,7 +197,7 @@ void R_SyncRenderThread(void) {
   }
   R_IssueRenderCommands(qfalse);
 
-  if (!glConfig.smpActive) {
+  if (!renderConfig.smpActive) {
     return;
   }
   GLimp_FrontEndSleep();
@@ -510,7 +510,7 @@ void RE_BeginFrame(stereoFrame_t stereoFrame) {
   }
   cmd->commandId = RC_DRAW_BUFFER;
 
-  if (glConfig.stereoEnabled) {
+  if (renderConfig.stereoEnabled) {
     if (stereoFrame == STEREO_LEFT) {
       cmd->buffer = (int)GL_BACK_LEFT;
     } else if (stereoFrame == STEREO_RIGHT) {

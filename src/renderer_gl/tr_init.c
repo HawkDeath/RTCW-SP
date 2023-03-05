@@ -42,6 +42,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // void RE_A3D_RenderGeometry (void *pVoidA3D, void *pVoidGeom, void *pVoidMat,
 // void *pVoidGeomStatus); #endif
 
+renderconfig_t renderConfig;
 glconfig_t glConfig;
 glstate_t glState;
 
@@ -313,7 +314,7 @@ static void InitOpenGL(void) {
   //		- r_gamma
   //
 
-  if (glConfig.vidWidth == 0) {
+  if (renderConfig.vidWidth == 0) {
     GLint temp;
 
     GLimp_Init();
@@ -467,7 +468,7 @@ void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
   int i, c, temp;
 
   buffer = ri.Hunk_AllocateTempMemory(
-      glConfig.vidWidth * glConfig.vidHeight * 3 + 18);
+      renderConfig.vidWidth * renderConfig.vidHeight * 3 + 18);
 
   memset(buffer, 0, 18);
   buffer[2] = 2; // uncompressed type
@@ -488,8 +489,9 @@ void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
   }
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && glConfig.deviceSupportsGamma) {
-    R_GammaCorrect(buffer + 18, glConfig.vidWidth * glConfig.vidHeight * 3);
+  if ((tr.overbrightBits > 0) && renderConfig.deviceSupportsGamma) {
+    R_GammaCorrect(buffer + 18,
+                   renderConfig.vidWidth * renderConfig.vidHeight * 3);
   }
 
   ri.FS_WriteFile(fileName, buffer, c);
@@ -505,18 +507,18 @@ R_TakeScreenshotJPEG
 void R_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName) {
   byte *buffer;
 
-  buffer =
-      ri.Hunk_AllocateTempMemory(glConfig.vidWidth * glConfig.vidHeight * 4);
+  buffer = ri.Hunk_AllocateTempMemory(renderConfig.vidWidth *
+                                      renderConfig.vidHeight * 4);
 
   qglReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && glConfig.deviceSupportsGamma) {
-    R_GammaCorrect(buffer, glConfig.vidWidth * glConfig.vidHeight * 4);
+  if ((tr.overbrightBits > 0) && renderConfig.deviceSupportsGamma) {
+    R_GammaCorrect(buffer, renderConfig.vidWidth * renderConfig.vidHeight * 4);
   }
 
   ri.FS_WriteFile(fileName, buffer, 1); // create path
-  SaveJPG(fileName, 95, glConfig.vidWidth, glConfig.vidHeight, buffer);
+  SaveJPG(fileName, 95, renderConfig.vidWidth, renderConfig.vidHeight, buffer);
 
   ri.Hunk_FreeTempMemory(buffer);
 }
@@ -589,8 +591,8 @@ void R_LevelShot(void) {
 
   sprintf(checkname, "levelshots/%s.tga", tr.world->baseName);
 
-  source =
-      ri.Hunk_AllocateTempMemory(glConfig.vidWidth * glConfig.vidHeight * 3);
+  source = ri.Hunk_AllocateTempMemory(renderConfig.vidWidth *
+                                      renderConfig.vidHeight * 3);
 
   buffer = ri.Hunk_AllocateTempMemory(128 * 128 * 3 + 18);
   memset(buffer, 0, 18);
@@ -599,18 +601,19 @@ void R_LevelShot(void) {
   buffer[14] = 128;
   buffer[16] = 24; // pixel size
 
-  qglReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGB,
+  qglReadPixels(0, 0, renderConfig.vidWidth, renderConfig.vidHeight, GL_RGB,
                 GL_UNSIGNED_BYTE, source);
 
   // resample from source
-  xScale = glConfig.vidWidth / 512.0f;
-  yScale = glConfig.vidHeight / 384.0f;
+  xScale = renderConfig.vidWidth / 512.0f;
+  yScale = renderConfig.vidHeight / 384.0f;
   for (y = 0; y < 128; y++) {
     for (x = 0; x < 128; x++) {
       r = g = b = 0;
       for (yy = 0; yy < 3; yy++) {
         for (xx = 0; xx < 4; xx++) {
-          src = source + 3 * (glConfig.vidWidth * (int)((y * 3 + yy) * yScale) +
+          src = source +
+                3 * (renderConfig.vidWidth * (int)((y * 3 + yy) * yScale) +
                               (int)((x * 4 + xx) * xScale));
           r += src[0];
           g += src[1];
@@ -625,7 +628,7 @@ void R_LevelShot(void) {
   }
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && glConfig.deviceSupportsGamma) {
+  if ((tr.overbrightBits > 0) && renderConfig.deviceSupportsGamma) {
     R_GammaCorrect(buffer + 18, 128 * 128 * 3);
   }
 
@@ -696,7 +699,8 @@ void R_ScreenShot_f(void) {
     lastNumber++;
   }
 
-  R_TakeScreenshot(0, 0, glConfig.vidWidth, glConfig.vidHeight, checkname);
+  R_TakeScreenshot(0, 0, renderConfig.vidWidth, renderConfig.vidHeight,
+                   checkname);
 
   if (!silent) {
     ri.Printf(PRINT_ALL, "Wrote %s\n", checkname);
@@ -750,7 +754,8 @@ void R_ScreenShotJPEG_f(void) {
     lastNumber++;
   }
 
-  R_TakeScreenshotJPEG(0, 0, glConfig.vidWidth, glConfig.vidHeight, checkname);
+  R_TakeScreenshotJPEG(0, 0, renderConfig.vidWidth, renderConfig.vidHeight,
+                       checkname);
 
   if (!silent) {
     ri.Printf(PRINT_ALL, "Wrote %s\n", checkname);
@@ -859,14 +864,14 @@ void GfxInfo_f(void) {
             "\nPIXELFORMAT: color(%d-bits) Z(%d-bit) stencil(%d-bits)\n",
             glConfig.colorBits, glConfig.depthBits, glConfig.stencilBits);
   ri.Printf(PRINT_ALL, "MODE: %d, %d x %d %s hz:", r_mode->integer,
-            glConfig.vidWidth, glConfig.vidHeight,
+            renderConfig.vidWidth, renderConfig.vidHeight,
             fsstrings[r_fullscreen->integer == 1]);
-  if (glConfig.displayFrequency) {
-    ri.Printf(PRINT_ALL, "%d\n", glConfig.displayFrequency);
+  if (renderConfig.displayFrequency) {
+    ri.Printf(PRINT_ALL, "%d\n", renderConfig.displayFrequency);
   } else {
     ri.Printf(PRINT_ALL, "N/A\n");
   }
-  if (glConfig.deviceSupportsGamma) {
+  if (renderConfig.deviceSupportsGamma) {
     ri.Printf(PRINT_ALL, "GAMMA: hardware w/ %d overbright bits\n",
               tr.overbrightBits);
   } else {
@@ -912,7 +917,7 @@ void GfxInfo_f(void) {
   ri.Printf(PRINT_ALL, "texenv add: %s\n",
             enablestrings[glConfig.textureEnvAddAvailable != 0]);
   ri.Printf(PRINT_ALL, "compressed textures: %s\n",
-            enablestrings[glConfig.textureCompression != TC_NONE]);
+            enablestrings[renderConfig.textureCompression != TC_NONE]);
 
   ri.Printf(PRINT_ALL, "ATI truform: %s\n",
             enablestrings[qglPNTrianglesiATI != 0]);
@@ -933,16 +938,16 @@ void GfxInfo_f(void) {
     ri.Printf(PRINT_ALL, "Fog Mode: %s\n", r_nv_fogdist_mode->string);
   }
 
-  if (r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2) {
+  if (r_vertexLight->integer || renderConfig.hardwareType == GLHW_PERMEDIA2) {
     ri.Printf(PRINT_ALL, "HACK: using vertex lightmap approximation\n");
   }
-  if (glConfig.hardwareType == GLHW_RAGEPRO) {
+  if (renderConfig.hardwareType == GLHW_RAGEPRO) {
     ri.Printf(PRINT_ALL, "HACK: ragePro approximations\n");
   }
-  if (glConfig.hardwareType == GLHW_RIVA128) {
+  if (renderConfig.hardwareType == GLHW_RIVA128) {
     ri.Printf(PRINT_ALL, "HACK: riva128 approximations\n");
   }
-  if (glConfig.smpActive) {
+  if (renderConfig.smpActive) {
     ri.Printf(PRINT_ALL, "Using dual processor acceleration\n");
   }
   if (r_finish->integer) {

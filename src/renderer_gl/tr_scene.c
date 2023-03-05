@@ -167,7 +167,7 @@ void RE_AddPolyToScene(qhandle_t hShader, int numVerts,
 
   memcpy(poly->verts, verts, numVerts * sizeof(*verts));
   // Ridah
-  if (glConfig.hardwareType == GLHW_RAGEPRO) {
+  if (renderConfig.hardwareType == GLHW_RAGEPRO) {
     poly->verts->modulate[0] = 255;
     poly->verts->modulate[1] = 255;
     poly->verts->modulate[2] = 255;
@@ -245,7 +245,7 @@ void RE_AddPolysToScene(qhandle_t hShader, int numVerts,
 
     memcpy(poly->verts, &verts[numVerts * j], numVerts * sizeof(*verts));
     // Ridah
-    if (glConfig.hardwareType == GLHW_RAGEPRO) {
+    if (renderConfig.hardwareType == GLHW_RAGEPRO) {
       poly->verts->modulate[0] = 255;
       poly->verts->modulate[1] = 255;
       poly->verts->modulate[2] = 255;
@@ -336,8 +336,8 @@ void RE_AddLightToScene(const vec3_t org, float intensity, float r, float g,
     return;
   }
   // these cards don't have the correct blend mode
-  if (glConfig.hardwareType == GLHW_RIVA128 ||
-      glConfig.hardwareType == GLHW_PERMEDIA2) {
+  if (renderConfig.hardwareType == GLHW_RIVA128 ||
+      renderConfig.hardwareType == GLHW_PERMEDIA2) {
     return;
   }
   // RF, allow us to force some dlights under all circumstances
@@ -505,7 +505,7 @@ void RE_RenderScene(const refdef_t *fd) {
   if (/*r_dynamiclight->integer == 0 ||*/ // RF, disabled so we can force things
                                           // like lightning dlights
           r_vertexLight->integer == 1 ||
-      glConfig.hardwareType == GLHW_PERMEDIA2) {
+      renderConfig.hardwareType == GLHW_PERMEDIA2) {
     tr.refdef.num_dlights = 0;
   }
 
@@ -525,7 +525,7 @@ void RE_RenderScene(const refdef_t *fd) {
   //
   memset(&parms, 0, sizeof(parms));
   parms.viewportX = tr.refdef.x;
-  parms.viewportY = glConfig.vidHeight - (tr.refdef.y + tr.refdef.height);
+  parms.viewportY = renderConfig.vidHeight - (tr.refdef.y + tr.refdef.height);
   parms.viewportWidth = tr.refdef.width;
   parms.viewportHeight = tr.refdef.height;
   parms.isPortal = qfalse;

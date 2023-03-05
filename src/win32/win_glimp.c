@@ -342,9 +342,9 @@ static void GLW_CreatePFD(PIXELFORMATDESCRIPTOR *pPFD, int colorbits,
   if (stereo) {
     ri.Printf(PRINT_ALL, "...attempting to use stereo\n");
     src.dwFlags |= PFD_STEREO;
-    glConfig.stereoEnabled = qtrue;
+    renderConfig.stereoEnabled = qtrue;
   } else {
-    glConfig.stereoEnabled = qfalse;
+    renderConfig.stereoEnabled = qfalse;
   }
 
   *pPFD = src;
@@ -519,7 +519,7 @@ static qboolean GLW_InitDriver(const char *drivername, int colorbits) {
     */
     if (!(pfd.dwFlags & PFD_STEREO) && (r_stereo->integer != 0)) {
       ri.Printf(PRINT_ALL, "...failed to select stereo pixel format\n");
-      glConfig.stereoEnabled = qfalse;
+      renderConfig.stereoEnabled = qfalse;
     }
   }
 
@@ -694,12 +694,13 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
   // print out informational messages
   //
   ri.Printf(PRINT_ALL, "...setting mode %d:", mode);
-  if (!R_GetModeInfo(&glConfig.vidWidth, &glConfig.vidHeight,
-                     &glConfig.windowAspect, mode)) {
+  if (!R_GetModeInfo(&renderConfig.vidWidth, &renderConfig.vidHeight,
+                     &renderConfig.windowAspect, mode)) {
     ri.Printf(PRINT_ALL, " invalid mode\n");
     return RSERR_INVALID_MODE;
   }
-  ri.Printf(PRINT_ALL, " %d %d %s\n", glConfig.vidWidth, glConfig.vidHeight,
+  ri.Printf(PRINT_ALL, " %d %d %s\n", renderConfig.vidWidth,
+            renderConfig.vidHeight,
             win_fs[cdsFullscreen]);
 
   //
@@ -739,8 +740,8 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
 
     dm.dmSize = sizeof(dm);
 
-    dm.dmPelsWidth = glConfig.vidWidth;
-    dm.dmPelsHeight = glConfig.vidHeight;
+    dm.dmPelsWidth = renderConfig.vidWidth;
+    dm.dmPelsHeight = renderConfig.vidHeight;
     dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 
     if (r_displayRefresh->integer != 0) {
@@ -770,7 +771,8 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
     if (glw_state.cdsFullscreen) {
       ri.Printf(PRINT_ALL, "...already fullscreen, avoiding redundant CDS\n");
 
-      if (!GLW_CreateWindow(drivername, glConfig.vidWidth, glConfig.vidHeight,
+      if (!GLW_CreateWindow(drivername, renderConfig.vidWidth,
+                            renderConfig.vidHeight,
                             colorbits, qtrue)) {
         ri.Printf(PRINT_ALL, "...restoring display settings\n");
         ChangeDisplaySettings(0, 0);
@@ -789,7 +791,8 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
           DISP_CHANGE_SUCCESSFUL) {
         ri.Printf(PRINT_ALL, "ok\n");
 
-        if (!GLW_CreateWindow(drivername, glConfig.vidWidth, glConfig.vidHeight,
+        if (!GLW_CreateWindow(drivername, renderConfig.vidWidth,
+                              renderConfig.vidHeight,
                               colorbits, qtrue)) {
           ri.Printf(PRINT_ALL, "...restoring display settings\n");
           ChangeDisplaySettings(0, 0);
@@ -817,8 +820,8 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
             modeNum = -1;
             break;
           }
-          if (devmode.dmPelsWidth >= glConfig.vidWidth &&
-              devmode.dmPelsHeight >= glConfig.vidHeight &&
+          if (devmode.dmPelsWidth >= renderConfig.vidWidth &&
+              devmode.dmPelsHeight >= renderConfig.vidHeight &&
               devmode.dmBitsPerPel >= 15) {
             break;
           }
@@ -828,8 +831,8 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
             (cdsRet = ChangeDisplaySettings(&devmode, CDS_FULLSCREEN)) ==
                 DISP_CHANGE_SUCCESSFUL) {
           ri.Printf(PRINT_ALL, " ok\n");
-          if (!GLW_CreateWindow(drivername, glConfig.vidWidth,
-                                glConfig.vidHeight, colorbits, qtrue)) {
+          if (!GLW_CreateWindow(drivername, renderConfig.vidWidth,
+                                renderConfig.vidHeight, colorbits, qtrue)) {
             ri.Printf(PRINT_ALL, "...restoring display settings\n");
             ChangeDisplaySettings(0, 0);
             return RSERR_INVALID_MODE;
@@ -845,9 +848,9 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
           ChangeDisplaySettings(0, 0);
 
           glw_state.cdsFullscreen = qfalse;
-          glConfig.isFullscreen = qfalse;
-          if (!GLW_CreateWindow(drivername, glConfig.vidWidth,
-                                glConfig.vidHeight, colorbits, qfalse)) {
+          renderConfig.isFullscreen = qfalse;
+          if (!GLW_CreateWindow(drivername, renderConfig.vidWidth,
+                                renderConfig.vidHeight, colorbits, qfalse)) {
             return RSERR_INVALID_MODE;
           }
           return RSERR_INVALID_FULLSCREEN;
@@ -860,7 +863,8 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
     }
 
     glw_state.cdsFullscreen = qfalse;
-    if (!GLW_CreateWindow(drivername, glConfig.vidWidth, glConfig.vidHeight,
+    if (!GLW_CreateWindow(drivername, renderConfig.vidWidth,
+                          renderConfig.vidHeight,
                           colorbits, qfalse)) {
       return RSERR_INVALID_MODE;
     }
@@ -873,11 +877,11 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
   memset(&dm, 0, sizeof(dm));
   dm.dmSize = sizeof(dm);
   if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm)) {
-    glConfig.displayFrequency = dm.dmDisplayFrequency;
+    renderConfig.displayFrequency = dm.dmDisplayFrequency;
   }
 
   // NOTE: this is overridden later on standalone 3Dfx drivers
-  glConfig.isFullscreen = cdsFullscreen;
+  renderConfig.isFullscreen = cdsFullscreen;
 
   return RSERR_OK;
 }
@@ -888,7 +892,7 @@ static rserr_t GLW_SetMode(const char *drivername, int mode, int colorbits,
 static void GLW_InitExtensions(void) {
 
   //----(SA)	moved these up
-  glConfig.textureCompression = TC_NONE;
+  renderConfig.textureCompression = TC_NONE;
   glConfig.textureEnvAddAvailable = qfalse;
   qglMultiTexCoord2fARB = NULL;
   qglActiveTextureARB = NULL;
@@ -915,10 +919,10 @@ static void GLW_InitExtensions(void) {
   // RF, check for GL_EXT_texture_compression_s3tc
   if (strstr(glConfig.extensions_string, "GL_EXT_texture_compression_s3tc")) {
     if (r_ext_compressed_textures->integer) {
-      glConfig.textureCompression = TC_EXT_COMP_S3TC;
+      renderConfig.textureCompression = TC_EXT_COMP_S3TC;
       ri.Printf(PRINT_ALL, "...using GL_EXT_texture_compression_s3tc\n");
     } else {
-      glConfig.textureCompression = TC_NONE;
+      renderConfig.textureCompression = TC_NONE;
       ri.Printf(PRINT_ALL, "...ignoring GL_EXT_texture_compression_s3tc\n");
     }
   }
@@ -997,7 +1001,7 @@ static void GLW_InitExtensions(void) {
 
   // GL_EXT_compiled_vertex_array
   if (strstr(glConfig.extensions_string, "GL_EXT_compiled_vertex_array") &&
-      (glConfig.hardwareType != GLHW_RIVA128)) {
+      (renderConfig.hardwareType != GLHW_RIVA128)) {
     if (r_ext_compiled_vertex_array->integer) {
       ri.Printf(PRINT_ALL, "...using GL_EXT_compiled_vertex_array\n");
       qglLockArraysEXT =
@@ -1198,7 +1202,7 @@ static qboolean GLW_LoadOpenGL(const char *drivername) {
     }
 
     if (glConfig.driverType == GLDRV_VOODOO) {
-      glConfig.isFullscreen = qtrue;
+      renderConfig.isFullscreen = qtrue;
     }
 
     return qtrue;
@@ -1220,7 +1224,7 @@ void GLimp_EndFrame(void) {
   if (r_swapInterval->modified) {
     r_swapInterval->modified = qfalse;
 
-    if (!glConfig.stereoEnabled) { // why?
+    if (!renderConfig.stereoEnabled) { // why?
       if (qwglSwapIntervalEXT) {
         qwglSwapIntervalEXT(r_swapInterval->integer);
       }
@@ -1369,7 +1373,7 @@ void GLimp_Init(void) {
   // them to their default state when the hardware is first installed/run.
   //
   if (Q_stricmp(lastValidRenderer->string, glConfig.renderer_string)) {
-    glConfig.hardwareType = GLHW_GENERIC;
+    renderConfig.hardwareType = GLHW_GENERIC;
 
     ri.Cvar_Set("r_textureMode", "GL_LINEAR_MIPMAP_NEAREST");
 
@@ -1395,19 +1399,19 @@ void GLimp_Init(void) {
   // detected/initialized every startup should go.
   //
   if (strstr(buf, "banshee") || strstr(buf, "voodoo3")) {
-    glConfig.hardwareType = GLHW_3DFX_2D3D;
+    renderConfig.hardwareType = GLHW_3DFX_2D3D;
   }
   // VOODOO GRAPHICS w/ 2MB
   else if (strstr(buf, "voodoo graphics/1 tmu/2 mb")) {
   } else if (strstr(buf, "glzicd")) {
   } else if (strstr(buf, "rage pro") || strstr(buf, "Rage Pro") ||
              strstr(buf, "ragepro")) {
-    glConfig.hardwareType = GLHW_RAGEPRO;
+    renderConfig.hardwareType = GLHW_RAGEPRO;
   } else if (strstr(buf, "rage 128")) {
   } else if (strstr(buf, "permedia2")) {
-    glConfig.hardwareType = GLHW_PERMEDIA2;
+    renderConfig.hardwareType = GLHW_PERMEDIA2;
   } else if (strstr(buf, "riva 128")) {
-    glConfig.hardwareType = GLHW_RIVA128;
+    renderConfig.hardwareType = GLHW_RIVA128;
   } else if (strstr(buf, "riva tnt ")) {
   }
 

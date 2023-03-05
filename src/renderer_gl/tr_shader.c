@@ -622,7 +622,8 @@ static qboolean ParseStage(shaderStage_t *stage, char **text) {
       }
     } else if (!Q_stricmp(token, "mapcomp")) { // only use this texture if
                                                // compression is enabled
-      if (glConfig.textureCompression && r_ext_compressed_textures->integer) {
+      if (renderConfig.textureCompression &&
+          r_ext_compressed_textures->integer) {
         token = "map"; // use this map
       } else {
         COM_ParseExt(text, qfalse); // ignore the map
@@ -632,7 +633,7 @@ static qboolean ParseStage(shaderStage_t *stage, char **text) {
                    token,
                    "mapnocomp")) { // only use this texture if compression is
                                    // not available or disabled
-      if (!glConfig.textureCompression) {
+      if (!renderConfig.textureCompression) {
         token = "map"; // use this map
       } else {
         COM_ParseExt(text, qfalse); // ignore the map
@@ -640,7 +641,8 @@ static qboolean ParseStage(shaderStage_t *stage, char **text) {
       }
     } else if (!Q_stricmp(token, "animmapcomp")) { // only use this texture if
                                                    // compression is enabled
-      if (glConfig.textureCompression && r_ext_compressed_textures->integer) {
+      if (renderConfig.textureCompression &&
+          r_ext_compressed_textures->integer) {
         token = "animmap"; // use this map
       } else {
         while (token[0])
@@ -651,7 +653,7 @@ static qboolean ParseStage(shaderStage_t *stage, char **text) {
                    token,
                    "animmapnocomp")) { // only use this texture if compression
                                        // is not available or disabled
-      if (!glConfig.textureCompression) {
+      if (!renderConfig.textureCompression) {
         token = "animmap"; // use this map
       } else {
         while (token[0])
@@ -2449,7 +2451,7 @@ static shader_t *FinishShader(void) {
   // if we are in r_vertexLight mode, never use a lightmap texture
   //
   if (stage > 1 && ((r_vertexLight->integer && !r_uiFullScreen->integer) ||
-                    glConfig.hardwareType == GLHW_PERMEDIA2)) {
+                    renderConfig.hardwareType == GLHW_PERMEDIA2)) {
     VertexLightingCollapse();
     stage = 1;
     hasLightmapStage = qfalse;

@@ -199,6 +199,9 @@ static void AssertCvarRange(cvar_t *cv, float minVal, float maxVal,
   }
 }
 
+
+void OS_CreateWindow() {}
+
 /*
 ** InitVulkan
 **
@@ -930,6 +933,8 @@ void R_Init(void) {
   backEndData[1] = NULL; // second backend is not needed for now
 
   R_ToggleSmpFrame();
+
+  OS_CreateWindow();
 
   InitVulkan();
 
