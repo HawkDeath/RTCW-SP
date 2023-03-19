@@ -42,7 +42,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __CMDLIB__
 #define __CMDLIB__
 
-#ifdef _WIN32
+#ifdef _WIN32 || _WIN64
 #pragma warning(disable : 4244) // MIPS
 #pragma warning(disable : 4136) // X86
 #pragma warning(disable : 4051) // ALPHA

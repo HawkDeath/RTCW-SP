@@ -83,7 +83,7 @@ void PrintMemorySize(unsigned long size) {
 // Changes Globals:		-
 //===========================================================================
 int MemorySize(void *ptr) {
-#if defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 #ifdef __WATCOMC__
   // Intel 32 bits memory addressing, 16 bytes aligned
   return (_msize(ptr) + 15) >> 4 << 4;

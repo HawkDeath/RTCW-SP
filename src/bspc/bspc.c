@@ -45,7 +45,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 //optimization" results 						in micro brushes??
 //===========================================================================
 
-#if defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 #include <direct.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -428,7 +428,7 @@ void AASOuputFile(quakefile_t *qf, char *outputpath, char *filename) {
 // Changes Globals:		-
 //===========================================================================
 void CreateAASFilesForAllBSPFiles(char *quakepath) {
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
   WIN32_FIND_DATA filedata;
   HWND handle;
   struct _stat statbuf;
@@ -446,7 +446,7 @@ void CreateAASFilesForAllBSPFiles(char *quakepath) {
   AppendPathSeperator(filter, sizeof(filter));
   strcat(filter, "*");
 
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
   handle = FindFirstFile(filter, &filedata);
   done = (handle == INVALID_HANDLE_VALUE);
   while (!done) {
@@ -511,7 +511,7 @@ void CreateAASFilesForAllBSPFiles(char *quakepath) {
         }   // end for
       }     // end for
     }       // end if
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
     // find the next file
     done = !FindNextFile(handle, &filedata);
   } // end while
@@ -1068,7 +1068,7 @@ int main(int argc, char **argv) {
   else {
     Log_Print(
         "Usage:   bspc [-<switch> [-<switch> ...]]\n"
-#if defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
         "Example 1: bspc -bsp2aas d:\\quake3\\baseq3\\maps\\mymap?.bsp\n"
         "Example 2: bspc -bsp2aas "
         "d:\\quake3\\baseq3\\pak0.pk3\\maps/q3dm*.bsp\n"

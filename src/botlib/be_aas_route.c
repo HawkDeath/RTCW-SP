@@ -1093,7 +1093,7 @@ int AAS_ReadRouteCache(void) {
     // AAS_Error("route cache dump has wrong number of clusters\n");
     return qfalse;
   }           // end if
-#ifdef _WIN32 // crc code is only good on intel machines
+#ifdef _WIN32 || _WIN64 // crc code is only good on intel machines
   if (routecacheheader.areacrc !=
       CRC_ProcessString((unsigned char *)(*aasworld).areas,
                         sizeof(aas_area_t) * (*aasworld).numareas)) {

@@ -34,7 +34,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 
 // clang-format off
-#if defined( WIN32 ) || defined( _WIN32 )
+#if defined( WIN32 ) || defined( _WIN32 ) || defined( _WIN64 )
 #include <io.h>
 #endif
 #include <malloc.h>

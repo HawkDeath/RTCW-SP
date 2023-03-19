@@ -915,7 +915,7 @@ typedef struct {
   renderconfig_t *renderConfig;
 } glconfig_t;
 
-#if !defined _WIN32
+#if !defined _WIN32 || !defined _WIN64
 
 #define _3DFX_DRIVER_NAME "libMesaVoodooGL.so.3.1"
 #define OPENGL_DRIVER_NAME "libGL.so.1"

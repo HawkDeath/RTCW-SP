@@ -44,7 +44,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #include <GL/gl.h>
 
-#elif defined( _WIN32 )
+#elif defined( _WIN32 ) || defined( _WIN64 )
 
 #pragma warning (disable: 4201)
 #pragma warning (disable: 4214)
@@ -240,7 +240,7 @@ extern void(APIENTRY *qglPNTrianglesfATI)(GLenum pname, GLfloat param);
 //===========================================================================
 
 // non-windows systems will just redefine qgl* to gl*
-#if !defined(_WIN32) && !defined(MACOS_X) && !defined(__linux__) &&            \
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(MACOS_X) && !defined(__linux__) &&            \
     !defined(__FreeBSD__) // rb010123
 
 #include "qgl_linked.h"
@@ -706,7 +706,7 @@ extern void(APIENTRY *qglVertexPointer)(GLint size, GLenum type, GLsizei stride,
 extern void(APIENTRY *qglViewport)(GLint x, GLint y, GLsizei width,
                                    GLsizei height);
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(_WIN64)
 
 extern int(WINAPI *qwglChoosePixelFormat)(HDC, CONST PIXELFORMATDESCRIPTOR *);
 extern int(WINAPI *qwglDescribePixelFormat)(HDC, int, UINT,

@@ -1228,8 +1228,8 @@ void RB_ShowImages(void) {
   for (i = 0; i < tr.numImages; i++) {
     image = tr.images[i];
 
-    w = vkConfig.vidWidth / 40;
-    h = vkConfig.vidHeight / 30;
+    w = renderConfig.vidWidth / 40;
+    h = renderConfig.vidHeight / 30;
 
     x = i % 40 * w;
     y = i / 30 * h;

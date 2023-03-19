@@ -88,7 +88,7 @@ int botlibsetup = qfalse;
 // Changes Globals:		-
 //===========================================================================
 // Ridah, faster Win32 code
-#ifdef _WIN32
+#ifdef _WIN32 || _WIN64
 #undef MAX_PATH // this is an ugly hack, to temporarily ignore the current
                 // definition, since it's also defined in windows.h
 #include <windows.h>
@@ -98,7 +98,7 @@ int botlibsetup = qfalse;
 
 int Sys_MilliSeconds(void) {
 // Ridah, faster Win32 code
-#ifdef _WIN32
+#ifdef _WIN32 | _WIN64
   int sys_curtime;
   static qboolean initialized = qfalse;
   static int sys_timeBase;

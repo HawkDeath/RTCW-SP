@@ -95,7 +95,8 @@ set(RENDERER_VK_SOURCES
     vk_shadows.c
     vk_sky.c
     vk_surface.c
-    vk_world.c)
+    vk_world.c
+    ../win32/win_vk.c)
 
 add_library(Renderer_VK STATIC ref_trin.def ${RENDERER_VK_SOURCES} ${RENDERER_VK_HEADERS})
 target_link_libraries(Renderer_VK PRIVATE Vulkan::Vulkan) # TODO: remove external dependencies for Vulkan headers

@@ -2,6 +2,14 @@
 
 #include "vk_local.h"
 
+// temporary solution; only for windows
+#ifdef WIN32 || WIN64
+#include "../win32/win_local.h"
+#include <Windows.h>
+#include <vulkan/vulkan_win32.h>
+#endif // WIN32 || WIN64
+
+#include <stdio.h>
 // #ifdef __USEA3D
 //// Defined in snd_a3dg_refcommon.c
 // void RE_A3D_RenderGeometry (void *pVoidA3D, void *pVoidGeom, void *pVoidMat,
@@ -199,16 +207,12 @@ static void AssertCvarRange(cvar_t *cv, float minVal, float maxVal,
   }
 }
 
-
-void OS_CreateWindow() {}
-
 /*
 ** InitVulkan
 **
 ** This function is responsible for initializing a valid Vulkan subsystem.
 */
-static void InitVulkan(void)
-{
+static void InitVulkan(void) {
   char renderer_buffer[1024];
 
   //
@@ -222,10 +226,184 @@ static void InitVulkan(void)
   //		- r_ignorehwgamma
   //		- r_gamma
   //
-
-
+  // memset(&vkConfig, 0, sizeof(vkConfig));
+  VK_CreateInstance();
+  VK_CreateSurface();
+  VK_PickPhysicalDevice();
+  VK_CreateDevice();
   // print info
   VkInfo_f();
+}
+
+// Vulkan stuff init
+void VK_CreateInstance() {
+  VkApplicationInfo appInfo;
+  appInfo.pNext = VK_NULL_HANDLE;
+  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  appInfo.apiVersion = VK_API_VERSION_1_3;
+  appInfo.applicationVersion = VK_MAKE_VERSION(0, 0, 2);
+  appInfo.pApplicationName = "Wolfenstein";
+  appInfo.engineVersion = VK_MAKE_VERSION(0, 0, 1);
+  appInfo.pEngineName = "Wolfenstein_vk_idtech3_custom";
+
+  const char *extensions[2] = {VK_KHR_SURFACE_EXTENSION_NAME,
+#ifdef WIN32 || WIN64
+                               VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+#endif
+  };
+
+  VkInstanceCreateInfo createInfo;
+  memset(&createInfo, 0, sizeof(createInfo));
+  createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+  createInfo.pApplicationInfo = &appInfo;
+  createInfo.enabledExtensionCount = 2;
+  createInfo.ppEnabledExtensionNames = &extensions;
+
+  VK_CHECK(vkCreateInstance(&createInfo, NULL, &vkConfig.instance),
+           "Failed to create intance");
+}
+
+void VK_PickPhysicalDevice() {
+  uint32_t deviceCount = 0;
+  vkEnumeratePhysicalDevices(vkConfig.instance, &deviceCount, NULL);
+  if (deviceCount == 0) {
+    ri.Printf(PRINT_ERROR, "No availalble GPU supported Vulkan");
+    exit(0);
+  } else {
+    ri.Printf(PRINT_ALL, "Available Vulkan devices %d\n", deviceCount);
+  }
+  VkPhysicalDevice *availableDevices =
+      (VkPhysicalDevice *)malloc(deviceCount * sizeof(VkPhysicalDevice));
+  vkEnumeratePhysicalDevices(vkConfig.instance, &deviceCount, availableDevices);
+
+  vkConfig.physicalDevice = *availableDevices; // get first available as default
+
+  for (int i = 0; i < deviceCount; ++i) {
+    VkPhysicalDevice *device =
+        availableDevices + (sizeof(VkPhysicalDevice) *
+                            i); // addres of next physical device if available
+    VkPhysicalDeviceProperties props;
+    vkGetPhysicalDeviceProperties(*device, &props);
+    if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+      vkConfig.physicalDevice = *device;
+      break;
+    }
+  }
+
+  if (vkConfig.physicalDevice == VK_NULL_HANDLE) {
+    ri.Printf(PRINT_ERROR, "Cannot find the suitable physical device");
+    exit(0);
+  }
+  free(availableDevices);
+
+  vkGetPhysicalDeviceProperties(vkConfig.physicalDevice,
+                                &vkConfig.gpuProperties);
+
+  ri.Printf(PRINT_ALL, "Choosen the %s\n", vkConfig.gpuProperties.deviceName);
+  printf("Choosen the %s\n", vkConfig.gpuProperties.deviceName);
+}
+
+void VK_CreateSurface() {
+
+#ifdef WIN32 || WIN64
+  VkWin32SurfaceCreateInfoKHR winSurface;
+  winSurface.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+  winSurface.hwnd = g_wv.hWnd;
+  winSurface.hinstance = g_wv.hInstance;
+
+  VK_CHECK(vkCreateWin32SurfaceKHR(vkConfig.instance, &winSurface, NULL,
+                                   &vkConfig.surface),
+           "Failed to create Win32 surface");
+
+#endif // WIN32 || WIN64
+}
+
+void VK_CreateDevice() {
+
+  uint32_t queueFamiliesCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(vkConfig.physicalDevice,
+                                           &queueFamiliesCount, NULL);
+  VkQueueFamilyProperties *queueFamilies = (VkQueueFamilyProperties *)malloc(
+      queueFamiliesCount * sizeof(VkQueueFamilyProperties));
+  vkGetPhysicalDeviceQueueFamilyProperties(vkConfig.physicalDevice,
+                                           &queueFamiliesCount, queueFamilies);
+
+  for (int i = 0; i < queueFamiliesCount; ++i) {
+    VkQueueFamilyProperties *familyQueue =
+        queueFamilies + (sizeof(VkQueueFamilyProperties) * i);
+
+    if (familyQueue->queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+      vkConfig.graphicsQueueFamily = i;
+      vkConfig.hasGraphicsQueueFamily = qtrue;
+    }
+
+    VkBool32 presentSupported = 0;
+    vkGetPhysicalDeviceSurfaceSupportKHR(vkConfig.physicalDevice, i,
+                                         vkConfig.surface, &presentSupported);
+
+    if (presentSupported) {
+      vkConfig.presentQueueFamily = i;
+      vkConfig.hasPresentQueueFamily = qtrue;
+    }
+
+    if (vkConfig.hasGraphicsQueueFamily && vkConfig.hasPresentQueueFamily) {
+      break;
+    }
+  }
+
+  VkDeviceQueueCreateInfo queueCreateInfos[1];
+  float queuePriority = 1.0f;
+
+  queueCreateInfos[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queueCreateInfos[0].pNext = NULL;
+  queueCreateInfos[0].queueFamilyIndex = vkConfig.graphicsQueueFamily;
+  queueCreateInfos[0].queueCount = 1U;
+  queueCreateInfos[0].pQueuePriorities = &queuePriority;
+  queueCreateInfos[0].flags = (VkDeviceQueueCreateFlags)0;
+
+  // TODO: fix present Queue
+  // queueCreateInfos[1].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  // queueCreateInfos[1].pNext = NULL;
+  // queueCreateInfos[1].queueFamilyIndex = vkConfig.presentQueueFamily;
+  // queueCreateInfos[1].queueCount = 1U;
+  // queueCreateInfos[1].pQueuePriorities = &queuePriority;
+  // queueCreateInfos[1].flags = (VkDeviceQueueCreateFlags)0;
+
+
+  // get all available features on gpu
+  vkGetPhysicalDeviceFeatures(vkConfig.physicalDevice, &vkConfig.gpuFeatures);
+
+  const char *deviceExtensions = {
+      VK_KHR_SWAPCHAIN_EXTENSION_NAME}; // TODO: temporary solution, make it
+                                        // better
+
+  VkDeviceCreateInfo deviceInfo = (VkDeviceCreateInfo){
+      VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO, // sType
+      NULL,                                 // pNext
+      (VkDeviceCreateFlags)0,               // flags
+      (uint32_t)(sizeof(queueCreateInfos) /
+          sizeof(VkDeviceQueueCreateInfo)), // queueCreateInfoCount
+      &queueCreateInfos,                    // pQueueCreateInfos
+      0U,                                   // enabledLayerCount
+      VK_NULL_HANDLE,                       // ppEnabledLayerNames
+      1U,                                   // enabledExtensionCount
+      &deviceExtensions,                    // ppEnabledExtensionNames
+      &vkConfig.gpuFeatures,                // pEnabledFeatures
+  };
+
+  VK_CHECK(vkCreateDevice(vkConfig.physicalDevice, &deviceInfo, NULL,
+                          &vkConfig.device),
+           "Failed to create logical device");
+
+  //// TODO: fix - something is wrong here; check
+   vkGetDeviceQueue(vkConfig.device, vkConfig.graphicsQueueFamily, 0,
+                    &vkConfig.graphicsQueue);
+
+  // vkGetDeviceQueue(vkConfig.device, vkConfig.presentQueueFamily, 0,
+  //                  &vkConfig.presentQueue);
+
+  // TODO: add throw if not found graphics or/and present queue(s)
+  free(queueFamilies);
 }
 
 /*
@@ -237,7 +415,8 @@ typedef struct vidmode_s {
   float pixelAspect; // pixel width / height
 } vidmode_t;
 
-vidmode_t r_vidModes[] = { // TODO: find solution for add support for modern resolutions
+vidmode_t r_vidModes[] = {
+    // TODO: find solution for add support for modern resolutions
     {"Mode  0: 320x240", 320, 240, 1},
     {"Mode  1: 400x300", 400, 300, 1},
     {"Mode  2: 512x384", 512, 384, 1},
@@ -298,7 +477,7 @@ void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
   int i, c, temp;
 
   buffer = ri.Hunk_AllocateTempMemory(
-      vkConfig.vidWidth * vkConfig.vidHeight * 3 + 18);
+      renderConfig.vidWidth * renderConfig.vidHeight * 3 + 18);
 
   memset(buffer, 0, 18);
   buffer[2] = 2; // uncompressed type
@@ -319,8 +498,9 @@ void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
   }
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && vkConfig.deviceSupportsGamma) {
-    R_GammaCorrect(buffer + 18, vkConfig.vidWidth * vkConfig.vidHeight * 3);
+  if ((tr.overbrightBits > 0) && renderConfig.deviceSupportsGamma) {
+    R_GammaCorrect(buffer + 18,
+                   renderConfig.vidWidth * renderConfig.vidHeight * 3);
   }
 
   ri.FS_WriteFile(fileName, buffer, c);
@@ -336,18 +516,18 @@ R_TakeScreenshotJPEG
 void R_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName) {
   byte *buffer;
 
-  buffer =
-      ri.Hunk_AllocateTempMemory(vkConfig.vidWidth * vkConfig.vidHeight * 4);
+  buffer = ri.Hunk_AllocateTempMemory(renderConfig.vidWidth *
+                                      renderConfig.vidHeight * 4);
 
   // qglReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && vkConfig.deviceSupportsGamma) {
-    R_GammaCorrect(buffer, vkConfig.vidWidth * vkConfig.vidHeight * 4);
+  if ((tr.overbrightBits > 0) && renderConfig.deviceSupportsGamma) {
+    R_GammaCorrect(buffer, renderConfig.vidWidth * renderConfig.vidHeight * 4);
   }
 
   ri.FS_WriteFile(fileName, buffer, 1); // create path
-  SaveJPG(fileName, 95, vkConfig.vidWidth, vkConfig.vidHeight, buffer);
+  SaveJPG(fileName, 95, renderConfig.vidWidth, renderConfig.vidHeight, buffer);
 
   ri.Hunk_FreeTempMemory(buffer);
 }
@@ -381,8 +561,7 @@ void R_ScreenshotFilename(int lastNumber, char *fileName) {
 R_ScreenshotFilenameJPEG
 ==============
 */
-void R_ScreenshotFilenameJPEG(int lastNumber, char *fileName)
-{
+void R_ScreenshotFilenameJPEG(int lastNumber, char *fileName) {
   int a, b, c, d;
 
   if (lastNumber < 0 || lastNumber > 9999) {
@@ -409,8 +588,7 @@ levelshots are specialized 128*128 thumbnails for
 the menu system, sampled down from full screen distorted images
 ====================
 */
-void R_LevelShot(void)
-{
+void R_LevelShot(void) {
   char checkname[MAX_OSPATH];
   byte *buffer;
   byte *source;
@@ -422,8 +600,8 @@ void R_LevelShot(void)
 
   sprintf(checkname, "levelshots/%s.tga", tr.world->baseName);
 
-  source =
-      ri.Hunk_AllocateTempMemory(vkConfig.vidWidth * vkConfig.vidHeight * 3);
+  source = ri.Hunk_AllocateTempMemory(renderConfig.vidWidth *
+                                      renderConfig.vidHeight * 3);
 
   buffer = ri.Hunk_AllocateTempMemory(128 * 128 * 3 + 18);
   memset(buffer, 0, 18);
@@ -437,15 +615,16 @@ void R_LevelShot(void)
                  GL_UNSIGNED_BYTE, source);*/
 
   // resample from source
-  xScale = vkConfig.vidWidth / 512.0f;
-  yScale = vkConfig.vidHeight / 384.0f;
+  xScale = renderConfig.vidWidth / 512.0f;
+  yScale = renderConfig.vidHeight / 384.0f;
   for (y = 0; y < 128; y++) {
     for (x = 0; x < 128; x++) {
       r = g = b = 0;
       for (yy = 0; yy < 3; yy++) {
         for (xx = 0; xx < 4; xx++) {
-          src = source + 3 * (vkConfig.vidWidth * (int)((y * 3 + yy) * yScale) +
-                              (int)((x * 4 + xx) * xScale));
+          src = source +
+                3 * (renderConfig.vidWidth * (int)((y * 3 + yy) * yScale) +
+                     (int)((x * 4 + xx) * xScale));
           r += src[0];
           g += src[1];
           b += src[2];
@@ -459,7 +638,7 @@ void R_LevelShot(void)
   }
 
   // gamma correct
-  if ((tr.overbrightBits > 0) && vkConfig.deviceSupportsGamma) {
+  if ((tr.overbrightBits > 0) && renderConfig.deviceSupportsGamma) {
     R_GammaCorrect(buffer + 18, 128 * 128 * 3);
   }
 
@@ -585,24 +764,20 @@ void R_ScreenShotJPEG_f(void) {
     lastNumber++;
   }
 
-  R_TakeScreenshotJPEG(0, 0, vkConfig.vidWidth, vkConfig.vidHeight, checkname);
+  R_TakeScreenshotJPEG(0, 0, renderConfig.vidWidth, renderConfig.vidHeight,
+                       checkname);
 
   if (!silent) {
     ri.Printf(PRINT_ALL, "Wrote %s\n", checkname);
   }
 }
 
-
-void VkInfo_f(void)
-{
-
-}
+void VkInfo_f(void) {}
 
 // RF
 extern void R_CropImages_f(void);
 
-void R_Register(void)
-{
+void R_Register(void) {
   //
   // latched and archived variables
   //
@@ -928,7 +1103,6 @@ void R_Init(void) {
       ri.Hunk_Alloc(sizeof(*backEndData[0]) + sizeof(srfPoly_t) * max_polys +
                         sizeof(polyVert_t) * max_polyverts,
                     h_low);
-
 
   backEndData[1] = NULL; // second backend is not needed for now
 

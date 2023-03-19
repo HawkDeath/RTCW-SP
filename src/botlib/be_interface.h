@@ -59,7 +59,7 @@ many people"
 
 //#define DEBUG			//debug code
 #define RANDOMIZE // randomize bot behaviour
-#if defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 #define AASZIP // allow reading directly from aasX.zip files
 #endif
 #define QUAKE2 // bot for Quake2

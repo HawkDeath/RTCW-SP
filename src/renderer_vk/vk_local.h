@@ -46,7 +46,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 // clang-format on
 
-
 // fast float to int conversion
 #if id386 && !((defined __linux__ || defined __FreeBSD__) &&                   \
                (defined __i386__)) // rb010123
@@ -93,7 +92,6 @@ typedef struct {
   float modelMatrix[16];
 } orientationr_t;
 
-
 // TODO: image
 typedef struct image_s {
   char imgName[MAX_QPATH];       // game path, including extension
@@ -117,57 +115,64 @@ typedef struct image_s {
   struct image_s *next;
 } image_t;
 
-
 // TODO: vkContext - initialization of vulkan instance
+
 typedef struct {
-  // Device related
-  VkInstance instance;
-  VkDevice device;
-  VkPhysicalDevice physicalDevice;
-  VkPhysicalDeviceProperties gpuProperties;
-  VkSurfaceKHR surface;
-
-  qboolean validationLayersEnabled;
-  VkDebugUtilsMessengerEXT debugMessenger; // not NULL if validationLayersEnabled is true
-
-  VkCommandPool commandPool;
-  VkCommandBuffer* commandBuffers;
-  VkQueue presentQueue;
-  VkQueue graphicsQueue;
-
   // swapchain related
   VkSwapchainKHR swapchain;
-  VkSwapchainKHR* oldSwapChain;
+  VkSwapchainKHR *oldSwapChain;
+
   VkFormat swapchainImageFormat;
+
+  VkImage *swapchainImage;
+  VkDeviceMemory *swapchainDeviceMemorys;
+  VkImageView *swapchainImageViews;
+  VkFramebuffer
+      *swapchainFramebuffers; // probably will changed to 2 elements array
+
+} VkSwapchain;
+
+typedef struct {
   VkFormat swapchainDepthFormat;
-  
-  VkFramebuffer* swapchainFramebuffers; // probably will changed to 2 elements array
-  VkRenderPass renderPass;
 
   VkImage *depthImage;
-  VkDeviceMemory* depthImageMemorys;
-  VkImageView* depthImageViews;
+  VkDeviceMemory *depthImageMemorys;
+  VkImageView *depthImageViews;
+} VkDepthBuffer;
 
-  VkImage* swapchainImage;
-  VkDeviceMemory* swapchainDeviceMemorys;
-  VkImageView* swapchainImageViews;
+typedef struct {
+  // Device related
+  VkDevice device;
+  VkInstance instance;
+  VkPhysicalDevice physicalDevice;
+  VkPhysicalDeviceProperties gpuProperties;
+  VkPhysicalDeviceFeatures gpuFeatures;
+  VkSurfaceKHR surface;
 
-  VkSemaphore* imageAvailableSemaphores;
-  VkSemaphore* renderFinishedSemaphores;
-  VkFence* inFlightFences;
-  VkFence* ImagesInFlight;
+  VkCommandPool commandPool;
+  VkCommandBuffer *commandBuffers;
+  VkQueue presentQueue;
+  uint32_t presentQueueFamily;
+  qboolean hasPresentQueueFamily;
+
+  VkQueue graphicsQueue;
+  uint32_t graphicsQueueFamily;
+  qboolean hasGraphicsQueueFamily;
+
+  VkSwapchain swapchain;
+  VkDepthBuffer depthBuffer;
+
+  VkRenderPass renderPass;
+
+  VkSemaphore *imageAvailableSemaphores;
+  VkSemaphore *renderFinishedSemaphores;
+  VkFence *inFlightFences;
+  VkFence *ImagesInFlight;
 
   size_t currentFrame;
 
-  uint32_t vidWidth;
-  uint32_t vidHeight;
-  qboolean deviceSupportsGamma;
-  qboolean isFullscreen;
-  uint32_t colorBits;
-  int smpActive; // TMP_SOL is usele here; TODO: remove
-
+  renderconfig_t *renderConfig;
 } vkContext;
-
 
 //===============================================================================
 
@@ -340,7 +345,7 @@ typedef struct {
 } texModInfo_t;
 
 // RF increased this for onfire animation
-//#define	MAX_IMAGE_ANIMATIONS	8
+// #define	MAX_IMAGE_ANIMATIONS	8
 #define MAX_IMAGE_ANIMATIONS 16
 
 typedef struct {
@@ -375,7 +380,8 @@ typedef struct {
 
   byte constantColor[4]; // for CGEN_CONST and AGEN_CONST
 
-  unsigned stateBits; // GLS_xxxx mask // TODO: shaderStage_t - probably to remove (opengl stuff)
+  unsigned stateBits; // GLS_xxxx mask // TODO: shaderStage_t - probably to
+                      // remove (opengl stuff)
 
   acff_t adjustColorsForFog;
 
@@ -404,7 +410,8 @@ typedef enum {
 
 typedef struct {
   float cloudHeight;
-  image_t *outerbox[6], *innerbox[6]; // TODO: maybe here shoulde be dedicated skybox object, not arrays of textures
+  image_t *outerbox[6], *innerbox[6]; // TODO: maybe here shoulde be dedicated
+                                      // skybox object, not arrays of textures
 } skyParms_t;
 
 typedef struct {
@@ -441,7 +448,8 @@ typedef struct shader_s {
 
   float portalRange; // distance to fog out at
 
-  int multitextureEnv; // 0, GL_MODULATE, GL_ADD (FIXME: put in stage) // TODO: shader_s - probably typical OpenGL Stuff
+  int multitextureEnv; // 0, GL_MODULATE, GL_ADD (FIXME: put in stage) // TODO:
+                       // shader_s - probably typical OpenGL Stuff
 
   cullType_t cullType;    // CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
   qboolean polygonOffset; // set for decals and other items that must be offset
@@ -507,10 +515,10 @@ typedef struct dlight_s {
   // done.
 
   shader_t *dlshader; //----(SA) adding a shader to dlights, so, if desired, we
-                      //can change the blend or texture of a dlight
+                      // can change the blend or texture of a dlight
 
   qboolean forced; //----(SA)	use this dlight when r_dynamiclight is either 1
-                   //or 2 (rather than just 1) for "important" gameplay lights
+                   // or 2 (rather than just 1) for "important" gameplay lights
                    //(alarm lights, etc)
                    // done
 
@@ -912,7 +920,6 @@ removed	: used to be clipped flag
 #define QSORT_SHADERNUM_SHIFT 22
 #define QSORT_ENTITYNUM_SHIFT 11
 #define QSORT_FOGNUM_SHIFT 2
-
 
 // TODO: remove begin
 // GR - tessellation flag in bit 8
@@ -1436,27 +1443,29 @@ void R_ShaderList_f(void);
 void R_RemapShader(const char *oldShader, const char *newShader,
                    const char *timeOffset);
 
+void OS_CreateWindow();
+
 /*
 ====================================================================
 
-IMPLEMENTATION SPECIFIC FUNCTIONS
+IMPLEMENTATION OF VULKAN SPECIFIC FUNCTIONS
 
 ====================================================================
 */
 
-void GLimp_Init(void);
-void GLimp_Shutdown(void);
-void GLimp_EndFrame(void);
+// TODO: implement
+#define VK_CHECK(x, msg)                                                       \
+  VkResult res = (x);                                                          \
+  if (res != VK_SUCCESS) {                                                     \
+    ri.Printf(PRINT_ERROR, "Vulkan Error %d: %s\n", (int)res, msg);            \
+    printf("VK_CHECK error: %d:  %s\n", (int)res, msg);                        \
+  }
 
-qboolean GLimp_SpawnRenderThread(void (*function)(void));
-void *GLimp_RendererSleep(void);
-void GLimp_FrontEndSleep(void);
-void GLimp_WakeRenderer(void *data);
-
-void GLimp_LogComment(char *comment);
-
-void GLimp_SetGamma(unsigned char red[256], unsigned char green[256],
-                    unsigned char blue[256]);
+void VK_CreateInstance();
+void VK_PickPhysicalDevice();
+void VK_CreateSurface();
+void VK_CreateDevice();
+// VkSwapchainKHR VK_CreateSwapChain();
 
 /*
 ====================================================================
@@ -1792,8 +1801,8 @@ typedef enum {
 // the main view, all the 3D icons, etc
 
 // Ridah, these aren't enough for cool effects
-//#define	MAX_POLYS		256
-//#define	MAX_POLYVERTS	1024
+// #define	MAX_POLYS		256
+// #define	MAX_POLYVERTS	1024
 #define MAX_POLYS 4096
 #define MAX_POLYVERTS 8192
 // done.

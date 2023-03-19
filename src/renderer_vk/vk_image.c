@@ -2339,17 +2339,17 @@ void R_SetColorMappings(void) {
 
   // setup the overbright lighting
   tr.overbrightBits = r_overBrightBits->integer;
-  if (!vkConfig.deviceSupportsGamma) {
+  if (!renderConfig.deviceSupportsGamma) {
     tr.overbrightBits = 0; // need hardware gamma for overbright
   }
 
   // never overbright in windowed mode
-  if (!vkConfig.isFullscreen) {
+  if (!renderConfig.isFullscreen) {
     tr.overbrightBits = 0;
   }
 
   // allow 2 overbright bits in 24 bit, but only 1 in 16 bit
-  if (vkConfig.colorBits > 16) {
+  if (renderConfig.colorBits > 16) {
     if (tr.overbrightBits > 2) {
       tr.overbrightBits = 2;
     }

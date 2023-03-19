@@ -42,7 +42,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // Tab Size:		3
 //===========================================================================
 
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <windows.h>
@@ -433,7 +433,7 @@ quakefile_t *FindQuakeFilesInPak(char *pakfile, char *filter) {
 // Changes Globals:		-
 //===========================================================================
 quakefile_t *FindQuakeFilesWithPakFilter(char *pakfilter, char *filter) {
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
   WIN32_FIND_DATA filedata;
   HWND handle;
   struct _stat statbuf;
@@ -449,7 +449,7 @@ quakefile_t *FindQuakeFilesWithPakFilter(char *pakfilter, char *filter) {
   qfiles = NULL;
   lastqf = NULL;
   if (pakfilter && strlen(pakfilter)) {
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
     handle = FindFirstFile(pakfilter, &filedata);
     done = (handle == INVALID_HANDLE_VALUE);
     while (!done) {
@@ -480,7 +480,7 @@ quakefile_t *FindQuakeFilesWithPakFilter(char *pakfilter, char *filter) {
           lastqf = lastqf->next;
       } // end if
       else {
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
         str = StringContains(pakfile, ".pk3", false);
 #else
         str = StringContains(pakfile, ".pk3", true);
@@ -504,7 +504,7 @@ quakefile_t *FindQuakeFilesWithPakFilter(char *pakfilter, char *filter) {
         } // end if
       }   // end else
         //
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
       // find the next file
       done = !FindNextFile(handle, &filedata);
     } // end while
@@ -514,7 +514,7 @@ quakefile_t *FindQuakeFilesWithPakFilter(char *pakfilter, char *filter) {
 #endif
   } // end if
   else {
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
     handle = FindFirstFile(filter, &filedata);
     done = (handle == INVALID_HANDLE_VALUE);
     while (!done) {
@@ -547,7 +547,7 @@ quakefile_t *FindQuakeFilesWithPakFilter(char *pakfilter, char *filter) {
         qfiles = qf;
       }
       lastqf = qf;
-#if defined(WIN32) | defined(_WIN32)
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64)
       // find the next file
       done = !FindNextFile(handle, &filedata);
     } // end while

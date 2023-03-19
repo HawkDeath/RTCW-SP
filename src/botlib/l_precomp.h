@@ -46,7 +46,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #endif
 
 #ifndef PATH_SEPERATORSTR
-#if defined(WIN32) | defined(_WIN32) | defined(__NT__) |                       \
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64) | defined(__NT__) |                       \
     defined(__WINDOWS__) | defined(__WINDOWS_386__)
 #define PATHSEPERATOR_STR "\\"
 #else
@@ -54,7 +54,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #endif
 #endif
 #ifndef PATH_SEPERATORCHAR
-#if defined(WIN32) | defined(_WIN32) | defined(__NT__) |                       \
+#if defined(WIN32) | defined(_WIN32) | defined(_WIN64) | defined(__NT__) |                       \
     defined(__WINDOWS__) | defined(__WINDOWS_386__)
 #define PATHSEPERATOR_CHAR '\\'
 #else

@@ -45,7 +45,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #define SIN
 #endif // SIN
 
-#if defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 #include <direct.h>
 #else
 #include <unistd.h>
@@ -78,7 +78,7 @@ Mimic unix command line expansion
 #define MAX_EX_ARGC 1024
 int ex_argc;
 char *ex_argv[MAX_EX_ARGC];
-#ifdef _WIN32
+#ifdef _WIN32 || _WIN64
 #include "io.h"
 void ExpandWildcards(int *argc, char ***argv) {
   struct _finddata_t fileinfo;
@@ -370,7 +370,7 @@ double I_FloatTime(void) {
 }
 
 void Q_getwd(char *out) {
-#if defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
   getcwd(out, 256);
   strcat(out, "\\");
 #else

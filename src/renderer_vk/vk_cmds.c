@@ -60,7 +60,7 @@ void R_PerformanceCounters(void) {
         backEnd.pc.c_vertexes, backEnd.pc.c_indexes / 3,
         backEnd.pc.c_totalIndexes / 3, R_SumOfUsedImages() / (1000000.0f),
         backEnd.pc.c_overDraw /
-            (float)(vkConfig.vidWidth * vkConfig.vidHeight));
+            (float)(renderConfig.vidWidth * renderConfig.vidHeight));
   } else if (r_speeds->integer == 2) {
     ri.Printf(PRINT_ALL,
               "(patch) %i sin %i sclip  %i sout %i bin %i bclip %i bout\n",
@@ -116,7 +116,7 @@ void R_IssueRenderCommands(qboolean runPerformanceCounters) {
   // clear it out, in case this is a sync and not a buffer flip
   cmdList->used = 0;
 
-  if (vkConfig.smpActive) {
+  if (renderConfig.smpActive) {
     // if the render thread is not idle, wait for it
     if (renderThreadActive) {
       c_blockedOnRender++;
@@ -143,7 +143,7 @@ void R_IssueRenderCommands(qboolean runPerformanceCounters) {
   // actually start the commands going
   if (!r_skipBackEnd->integer) {
     // let it start on the new batch
-    if (!vkConfig.smpActive) {
+    if (!renderConfig.smpActive) {
       RB_ExecuteRenderCommands(cmdList->cmds);
     } else {
     //  GLimp_WakeRenderer(cmdList);
@@ -167,7 +167,7 @@ void R_SyncRenderThread(void) {
   }
   R_IssueRenderCommands(qfalse);
 
-  if (!vkConfig.smpActive) {
+  if (!renderConfig.smpActive) {
     return;
   }
   // GLimp_FrontEndSleep();

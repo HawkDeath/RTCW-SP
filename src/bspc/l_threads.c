@@ -128,7 +128,7 @@ void RunThreadsOnIndividual(int workcnt, qboolean showpacifier,
 //
 //===================================================================
 
-#if defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 
 #define USED
 

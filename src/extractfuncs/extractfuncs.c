@@ -39,7 +39,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include <limits.h>
 #include <string.h>
 #include <stdarg.h>
-#ifdef _WIN32
+#ifdef _WIN32 || _WIN64 
 #include <windows.h>
 #include <io.h>
 #endif
@@ -357,7 +357,7 @@ void AddFunctionName(char *funcname, char *filename, tokenList_t *head) {
 
   // NERVE - SMF - workaround for Graeme's predifined MACOSX functions
   // TTimo - looks like linux version needs to escape those too
-#if defined(_WIN32) || defined(__linux__)
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
   if (!Q_stricmp(funcname, "qmax")) {
     return;
   } else if (!Q_stricmp(funcname, "qmin")) {

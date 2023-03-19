@@ -2086,7 +2086,7 @@ image_t *R_FindImageFileExt(const char *name, qboolean mipmap,
 // (possibly for mod authors)
 // /me maintained off for win32, using otherwise but printing diagnostics as
 // developer
-#if !defined(_WIN32)
+#if !defined(_WIN32) || !defined(_WIN64)
     char altname[MAX_QPATH]; // copy the name
     int len;                 //
     strcpy(altname, name);   //
