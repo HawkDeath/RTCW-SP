@@ -44,6 +44,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #include <vulkan/vulkan.h>
 
+
 // clang-format on
 
 // fast float to int conversion
@@ -142,9 +143,9 @@ typedef struct {
 
 typedef struct {
   // Device related
-  VkDevice device;
   VkInstance instance;
   VkPhysicalDevice physicalDevice;
+  VkDevice device;
   VkPhysicalDeviceProperties gpuProperties;
   VkPhysicalDeviceFeatures gpuFeatures;
   VkSurfaceKHR surface;
@@ -1455,11 +1456,13 @@ IMPLEMENTATION OF VULKAN SPECIFIC FUNCTIONS
 
 // TODO: implement
 #define VK_CHECK(x, msg)                                                       \
-  VkResult res = (x);                                                          \
-  if (res != VK_SUCCESS) {                                                     \
-    ri.Printf(PRINT_ERROR, "Vulkan Error %d: %s\n", (int)res, msg);            \
-    printf("VK_CHECK error: %d:  %s\n", (int)res, msg);                        \
-  }
+  do {                                                                         \
+    VkResult res = (x);                                                        \
+    if (res != VK_SUCCESS) {                                                   \
+      ri.Printf(PRINT_ERROR, "Vulkan Error %d: %s\n", (int)res, msg);          \
+      printf("VK_CHECK error: %d:  %s\n", (int)res, msg);                      \
+    }                                                                          \
+  }while (0)
 
 void VK_CreateInstance();
 void VK_PickPhysicalDevice();

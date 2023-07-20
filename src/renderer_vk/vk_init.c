@@ -4,8 +4,10 @@
 
 // temporary solution; only for windows
 #ifdef WIN32 || WIN64
+#define VK_USE_PLATFORM_WIN32_KHR
 #include "../win32/win_local.h"
 #include <Windows.h>
+#include <vulkan/vulkan.h>
 #include <vulkan/vulkan_win32.h>
 #endif // WIN32 || WIN64
 
@@ -14,6 +16,9 @@
 //// Defined in snd_a3dg_refcommon.c
 // void RE_A3D_RenderGeometry (void *pVoidA3D, void *pVoidGeom, void *pVoidMat,
 // void *pVoidGeomStatus); #endif
+
+#define COUNT_OF(x)                                                            \
+  ((sizeof(x) / sizeof(0 [x])) / ((size_t)(!(sizeof(x) % sizeof(0 [x])))))
 
 renderconfig_t renderConfig;
 vkContext vkConfig;
@@ -226,7 +231,7 @@ static void InitVulkan(void) {
   //		- r_ignorehwgamma
   //		- r_gamma
   //
-  // memset(&vkConfig, 0, sizeof(vkConfig));
+  memset(&vkConfig, 0, sizeof(vkConfig));
   VK_CreateInstance();
   VK_CreateSurface();
   VK_PickPhysicalDevice();
@@ -238,26 +243,31 @@ static void InitVulkan(void) {
 // Vulkan stuff init
 void VK_CreateInstance() {
   VkApplicationInfo appInfo;
-  appInfo.pNext = VK_NULL_HANDLE;
+  memset(&appInfo, 0, sizeof(VkApplicationInfo));
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  appInfo.apiVersion = VK_API_VERSION_1_3;
+  appInfo.pNext = VK_NULL_HANDLE;
+  appInfo.apiVersion = VK_API_VERSION_1_1;
   appInfo.applicationVersion = VK_MAKE_VERSION(0, 0, 2);
   appInfo.pApplicationName = "Wolfenstein";
   appInfo.engineVersion = VK_MAKE_VERSION(0, 0, 1);
   appInfo.pEngineName = "Wolfenstein_vk_idtech3_custom";
 
-  const char *extensions[2] = {VK_KHR_SURFACE_EXTENSION_NAME,
-#ifdef WIN32 || WIN64
-                               VK_KHR_WIN32_SURFACE_EXTENSION_NAME
-#endif
-  };
+  char *extensions[2];
+  extensions[0] = "VK_KHR_surface";
+ #ifdef WIN32 || WIN64
+  extensions[1] = "VK_KHR_win32_surface";
+ #endif
 
   VkInstanceCreateInfo createInfo;
   memset(&createInfo, 0, sizeof(createInfo));
   createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+  createInfo.pNext = VK_NULL_HANDLE;
+  createInfo.flags = (VkInstanceCreateFlags)0u;
   createInfo.pApplicationInfo = &appInfo;
-  createInfo.enabledExtensionCount = 2;
-  createInfo.ppEnabledExtensionNames = &extensions;
+  createInfo.enabledLayerCount = 0u;
+  createInfo.ppEnabledLayerNames = VK_NULL_HANDLE;
+  createInfo.enabledExtensionCount = 2u;
+  createInfo.ppEnabledExtensionNames = extensions;
 
   VK_CHECK(vkCreateInstance(&createInfo, NULL, &vkConfig.instance),
            "Failed to create intance");
@@ -304,31 +314,31 @@ void VK_PickPhysicalDevice() {
 }
 
 void VK_CreateSurface() {
-
 #ifdef WIN32 || WIN64
   VkWin32SurfaceCreateInfoKHR winSurface;
+  memset(&winSurface, 0, sizeof(VkWin32SurfaceCreateInfoKHR));
   winSurface.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
   winSurface.hwnd = g_wv.hWnd;
   winSurface.hinstance = g_wv.hInstance;
-
-  VK_CHECK(vkCreateWin32SurfaceKHR(vkConfig.instance, &winSurface, NULL,
-                                   &vkConfig.surface),
+  VK_CHECK(vkCreateWin32SurfaceKHR(vkConfig.instance, &winSurface,
+                                   VK_NULL_HANDLE, &vkConfig.surface),
            "Failed to create Win32 surface");
 
 #endif // WIN32 || WIN64
 }
 
 void VK_CreateDevice() {
-
   uint32_t queueFamiliesCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(vkConfig.physicalDevice,
                                            &queueFamiliesCount, NULL);
-  VkQueueFamilyProperties *queueFamilies = (VkQueueFamilyProperties *)malloc(
-      queueFamiliesCount * sizeof(VkQueueFamilyProperties));
+  VkQueueFamilyProperties *queueFamilies = (VkQueueFamilyProperties *)calloc(
+      queueFamiliesCount, sizeof(VkQueueFamilyProperties));
+  memset(queueFamilies, 0,
+         queueFamiliesCount * sizeof(VkQueueFamilyProperties));
   vkGetPhysicalDeviceQueueFamilyProperties(vkConfig.physicalDevice,
                                            &queueFamiliesCount, queueFamilies);
 
-  for (int i = 0; i < queueFamiliesCount; ++i) {
+  for (uint32_t i = 0; i < queueFamiliesCount;) {
     VkQueueFamilyProperties *familyQueue =
         queueFamilies + (sizeof(VkQueueFamilyProperties) * i);
 
@@ -337,7 +347,7 @@ void VK_CreateDevice() {
       vkConfig.hasGraphicsQueueFamily = qtrue;
     }
 
-    VkBool32 presentSupported = 0;
+    VkBool32 presentSupported = VK_FALSE;
     vkGetPhysicalDeviceSurfaceSupportKHR(vkConfig.physicalDevice, i,
                                          vkConfig.surface, &presentSupported);
 
@@ -349,61 +359,66 @@ void VK_CreateDevice() {
     if (vkConfig.hasGraphicsQueueFamily && vkConfig.hasPresentQueueFamily) {
       break;
     }
+    ++i;
   }
 
-  VkDeviceQueueCreateInfo queueCreateInfos[1];
   float queuePriority = 1.0f;
 
-  queueCreateInfos[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-  queueCreateInfos[0].pNext = NULL;
-  queueCreateInfos[0].queueFamilyIndex = vkConfig.graphicsQueueFamily;
-  queueCreateInfos[0].queueCount = 1U;
-  queueCreateInfos[0].pQueuePriorities = &queuePriority;
-  queueCreateInfos[0].flags = (VkDeviceQueueCreateFlags)0;
+  VkDeviceQueueCreateInfo *queuesInfos =
+      (VkDeviceQueueCreateInfo *)calloc(2u, sizeof(VkDeviceQueueCreateInfo));
+  VkDeviceQueueCreateInfo *qi = queuesInfos;
+  qi->sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  qi->pNext = VK_NULL_HANDLE;
+  qi->flags = (VkDeviceQueueCreateFlags)0U;
+  qi->queueFamilyIndex = vkConfig.graphicsQueueFamily;
+  qi->queueCount = 1U;
+  qi->pQueuePriorities = &queuePriority;
 
-  // TODO: fix present Queue
-  // queueCreateInfos[1].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-  // queueCreateInfos[1].pNext = NULL;
-  // queueCreateInfos[1].queueFamilyIndex = vkConfig.presentQueueFamily;
-  // queueCreateInfos[1].queueCount = 1U;
-  // queueCreateInfos[1].pQueuePriorities = &queuePriority;
-  // queueCreateInfos[1].flags = (VkDeviceQueueCreateFlags)0;
-
+  qi = queuesInfos + sizeof(VkDeviceQueueCreateInfo);
+  qi->sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  qi->pNext = VK_NULL_HANDLE;
+  qi->flags = (VkDeviceQueueCreateFlags)0U;
+  qi->queueFamilyIndex = vkConfig.presentQueueFamily;
+  qi->queueCount = 1U;
+  qi->pQueuePriorities = &queuePriority;
 
   // get all available features on gpu
+  memset(&vkConfig.gpuFeatures, 0, sizeof(vkConfig.gpuFeatures));
   vkGetPhysicalDeviceFeatures(vkConfig.physicalDevice, &vkConfig.gpuFeatures);
 
-  const char *deviceExtensions = {
-      VK_KHR_SWAPCHAIN_EXTENSION_NAME}; // TODO: temporary solution, make it
-                                        // better
+  VkPhysicalDeviceFeatures reqFeatures;
+  memset(&reqFeatures, 0, sizeof(VkPhysicalDeviceFeatures));
+  reqFeatures.samplerAnisotropy = VK_TRUE;
+  reqFeatures.depthClamp = VK_TRUE;
 
-  VkDeviceCreateInfo deviceInfo = (VkDeviceCreateInfo){
-      VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO, // sType
-      NULL,                                 // pNext
-      (VkDeviceCreateFlags)0,               // flags
-      (uint32_t)(sizeof(queueCreateInfos) /
-          sizeof(VkDeviceQueueCreateInfo)), // queueCreateInfoCount
-      &queueCreateInfos,                    // pQueueCreateInfos
-      0U,                                   // enabledLayerCount
-      VK_NULL_HANDLE,                       // ppEnabledLayerNames
-      1U,                                   // enabledExtensionCount
-      &deviceExtensions,                    // ppEnabledExtensionNames
-      &vkConfig.gpuFeatures,                // pEnabledFeatures
-  };
+  const char *pDevExt[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-  VK_CHECK(vkCreateDevice(vkConfig.physicalDevice, &deviceInfo, NULL,
+  VkDeviceCreateInfo deviceInfo;
+  memset(&deviceInfo, 0, sizeof(VkDeviceCreateInfo));
+
+  deviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  deviceInfo.pNext = VK_NULL_HANDLE;
+  deviceInfo.flags = (VkDeviceCreateFlags)0;
+  deviceInfo.queueCreateInfoCount = 2u;
+  deviceInfo.pQueueCreateInfos = queuesInfos;
+  deviceInfo.enabledLayerCount = 0u;
+  deviceInfo.ppEnabledLayerNames = VK_NULL_HANDLE;
+  deviceInfo.enabledExtensionCount = (uint32_t)(COUNT_OF(pDevExt));
+  deviceInfo.ppEnabledExtensionNames = pDevExt;
+  deviceInfo.pEnabledFeatures = &reqFeatures;
+
+  VK_CHECK(vkCreateDevice(vkConfig.physicalDevice, &deviceInfo, VK_NULL_HANDLE,
                           &vkConfig.device),
            "Failed to create logical device");
 
-  //// TODO: fix - something is wrong here; check
-   vkGetDeviceQueue(vkConfig.device, vkConfig.graphicsQueueFamily, 0,
-                    &vkConfig.graphicsQueue);
+  vkGetDeviceQueue(vkConfig.device, vkConfig.graphicsQueueFamily, 0,
+                   &vkConfig.graphicsQueue);
 
-  // vkGetDeviceQueue(vkConfig.device, vkConfig.presentQueueFamily, 0,
-  //                  &vkConfig.presentQueue);
+  vkGetDeviceQueue(vkConfig.device, vkConfig.presentQueueFamily, 0,
+                   &vkConfig.presentQueue);
 
-  // TODO: add throw if not found graphics or/and present queue(s)
   free(queueFamilies);
+  free(queuesInfos);
 }
 
 /*

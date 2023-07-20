@@ -121,7 +121,6 @@ static qboolean GLW_CreateWindow(int width, int height,
     ri.Printf(PRINT_ALL, "...window already present, CreateWindowEx skipped\n");
   }
 
-
   SetForegroundWindow(g_wv.hWnd);
   SetFocus(g_wv.hWnd);
 
@@ -137,6 +136,7 @@ void OS_CreateWindow()
 
   cv = ri.Cvar_Get("win_wndproc", "", 0);
   sscanf(cv->string, "%i", (int *)&glw_state.wndproc);
+ // memset(&g_wv, 0, sizeof(g_wv));
   renderConfig.isFullscreen = qfalse;
   renderConfig.vidWidth = 1280;
   renderConfig.vidHeight = 720;
