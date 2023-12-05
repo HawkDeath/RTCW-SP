@@ -124,8 +124,11 @@ typedef struct {
   VkSwapchainKHR *oldSwapChain;
 
   VkFormat swapchainImageFormat;
+  VkExtent2D imageExtent;
 
   VkImage *swapchainImage;
+  uint32_t swapchainImageCount;
+
   VkDeviceMemory *swapchainDeviceMemorys;
   VkImageView *swapchainImageViews;
   VkFramebuffer
@@ -1468,7 +1471,9 @@ void VK_CreateInstance();
 void VK_PickPhysicalDevice();
 void VK_CreateSurface();
 void VK_CreateDevice();
-// VkSwapchainKHR VK_CreateSwapChain();
+void VK_CreateSwapChain();
+void VK_CreateRenderPass();
+    // VkSwapchainKHR VK_CreateSwapChain();
 
 /*
 ====================================================================

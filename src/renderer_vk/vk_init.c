@@ -232,10 +232,13 @@ static void InitVulkan(void) {
   //		- r_gamma
   //
   memset(&vkConfig, 0, sizeof(vkConfig));
+  vkConfig.renderConfig = &renderConfig;
   VK_CreateInstance();
   VK_CreateSurface();
   VK_PickPhysicalDevice();
   VK_CreateDevice();
+  VK_CreateSwapChain();
+  VK_CreateRenderPass();
   // print info
   VkInfo_f();
 }
@@ -254,9 +257,9 @@ void VK_CreateInstance() {
 
   char *extensions[2];
   extensions[0] = "VK_KHR_surface";
- #ifdef WIN32 || WIN64
+#ifdef WIN32 || WIN64
   extensions[1] = "VK_KHR_win32_surface";
- #endif
+#endif
 
   VkInstanceCreateInfo createInfo;
   memset(&createInfo, 0, sizeof(createInfo));
@@ -367,6 +370,7 @@ void VK_CreateDevice() {
   VkDeviceQueueCreateInfo *queuesInfos =
       (VkDeviceQueueCreateInfo *)calloc(2u, sizeof(VkDeviceQueueCreateInfo));
   VkDeviceQueueCreateInfo *qi = queuesInfos;
+  assert(qi);
   qi->sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
   qi->pNext = VK_NULL_HANDLE;
   qi->flags = (VkDeviceQueueCreateFlags)0U;
@@ -419,7 +423,76 @@ void VK_CreateDevice() {
 
   free(queueFamilies);
   free(queuesInfos);
+  qi = NULL;
 }
+
+void VK_CreateSwapChain() {
+
+  VkSurfaceFormatKHR surfaceFormat;
+  surfaceFormat.format = VK_FORMAT_B8G8R8A8_SRGB;
+  surfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+  VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR; // TODO: add support VK_PRESENT_MODE_MAILBOX_KHR
+  VkExtent2D windowExtent;
+  windowExtent.width = vkConfig.renderConfig->vidWidth;
+  windowExtent.height = vkConfig.renderConfig->vidHeight;
+
+  VkSurfaceCapabilitiesKHR surfaceCapabilities;
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+      vkConfig.physicalDevice, vkConfig.surface, &surfaceCapabilities);
+
+  uint32_t imageCount = surfaceCapabilities.minImageCount + 1u;
+  if (surfaceCapabilities.maxImageCount > 0u && imageCount > surfaceCapabilities.maxImageCount)
+  {
+    imageCount = surfaceCapabilities.maxImageCount;
+  }
+
+  VkSwapchainCreateInfoKHR swapchainInfo;
+  memset(&swapchainInfo, 0, sizeof(VkSwapchainCreateInfoKHR));
+  swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+  swapchainInfo.surface = vkConfig.surface;
+
+  swapchainInfo.minImageCount = imageCount;
+  swapchainInfo.imageFormat = surfaceFormat.format;
+  swapchainInfo.imageColorSpace = surfaceFormat.colorSpace;
+  swapchainInfo.imageExtent = windowExtent;
+  swapchainInfo.imageArrayLayers = 1u;
+  swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  uint32_t familesIndices[] = {vkConfig.graphicsQueueFamily,
+                               vkConfig.presentQueueFamily};
+
+  if (vkConfig.graphicsQueueFamily != vkConfig.presentQueueFamily)
+  {
+    swapchainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+    swapchainInfo.queueFamilyIndexCount = 2u;
+    swapchainInfo.pQueueFamilyIndices = &familesIndices;
+  } else {
+    swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  }
+
+  swapchainInfo.preTransform = surfaceCapabilities.currentTransform;
+  swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+  swapchainInfo.presentMode = presentMode;
+  swapchainInfo.clipped = VK_TRUE;
+
+
+  VK_CHECK(vkCreateSwapchainKHR(vkConfig.device, &swapchainInfo, NULL,
+                                &vkConfig.swapchain.swapchain),
+           "Failed to create swapchain");
+
+  // TODO: get swapchain images 
+
+  vkGetSwapchainImagesKHR(vkConfig.device, vkConfig.swapchain.swapchain,
+                          &imageCount, VK_NULL_HANDLE);
+  vkConfig.swapchain.swapchainImageCount = imageCount;
+  vkConfig.swapchain.swapchainImage =
+      (VkImage *)calloc(imageCount, sizeof(VkImage));
+  vkGetSwapchainImagesKHR(vkConfig.device, vkConfig.swapchain.swapchain,
+                          &imageCount, vkConfig.swapchain.swapchainImage);
+
+  vkConfig.swapchain.imageExtent = windowExtent;
+  vkConfig.swapchain.swapchainImageFormat = surfaceFormat.format;
+}
+void VK_CreateRenderPass() {}
 
 /*
 ** R_GetModeInfo
