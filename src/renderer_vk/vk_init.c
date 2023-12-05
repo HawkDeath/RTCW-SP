@@ -492,7 +492,71 @@ void VK_CreateSwapChain() {
   vkConfig.swapchain.imageExtent = windowExtent;
   vkConfig.swapchain.swapchainImageFormat = surfaceFormat.format;
 }
-void VK_CreateRenderPass() {}
+void VK_CreateRenderPass() {
+  VkAttachmentDescription colorAttachment;
+  colorAttachment.format = vkConfig.swapchain.swapchainImageFormat;
+  colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+  colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+  colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+  colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+  colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+  colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+
+  VkAttachmentDescription depthAttachment;
+  depthAttachment.format = VK_FORMAT_D32_SFLOAT; // VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT
+  depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+  depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+  depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+  depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+  depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+  depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  depthAttachment.finalLayout =
+      VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+
+  VkAttachmentReference colorAttachRef;
+  colorAttachRef.attachment = 0u;
+  colorAttachRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+  VkAttachmentReference depthAttachRef;
+  depthAttachRef.attachment = 1u;
+  depthAttachRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+  VkSubpassDescription subpass;
+  subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+  subpass.colorAttachmentCount = 1u;
+  subpass.pColorAttachments = &colorAttachRef;
+  subpass.pDepthStencilAttachment = &depthAttachRef;
+
+  VkSubpassDependency dependency;
+  dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+  dependency.dstSubpass = 0u;
+  dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+                            VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+  dependency.srcAccessMask = 0u;
+  dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+                            VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+  dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+                             VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+
+  VkAttachmentDescription attachments[] = {colorAttachment, depthAttachment};
+  VkRenderPassCreateInfo renderPassInfo;
+  renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+  renderPassInfo.attachmentCount = 2u;
+  renderPassInfo.pAttachments = &attachments;
+  renderPassInfo.subpassCount = 1u;
+  renderPassInfo.pSubpasses = &subpass;
+  renderPassInfo.dependencyCount = 1u;
+  renderPassInfo.pDependencies = &dependency;
+
+  VK_CHECK(vkCreateRenderPass(vkConfig.device, &renderPassInfo, VK_NULL_HANDLE,
+                              &vkConfig.renderPass),
+           "Failed to create render pass");
+
+}
 
 /*
 ** R_GetModeInfo
