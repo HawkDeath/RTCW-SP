@@ -239,11 +239,27 @@ static void InitVulkan(void) {
   VK_CreateDevice();
   VK_CreateSwapChain();
   VK_CreateRenderPass();
+  VK_CreateDepthBuffer();
+  VK_CreateCommandPool();
+
   // print info
   VkInfo_f();
 }
 
 // Vulkan stuff init
+uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+  VkPhysicalDeviceMemoryProperties memProperties;
+  vkGetPhysicalDeviceMemoryProperties(vkConfig.physicalDevice, &memProperties);
+
+  for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+    if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags &
+                                    properties) == properties) {
+      return i;
+    }
+  }
+}
+
 void VK_CreateInstance() {
   VkApplicationInfo appInfo;
   memset(&appInfo, 0, sizeof(VkApplicationInfo));
@@ -492,6 +508,7 @@ void VK_CreateSwapChain() {
   vkConfig.swapchain.imageExtent = windowExtent;
   vkConfig.swapchain.swapchainImageFormat = surfaceFormat.format;
 }
+
 void VK_CreateRenderPass() {
   VkAttachmentDescription colorAttachment;
   colorAttachment.format = vkConfig.swapchain.swapchainImageFormat;
@@ -556,6 +573,84 @@ void VK_CreateRenderPass() {
                               &vkConfig.renderPass),
            "Failed to create render pass");
 
+}
+
+
+void VK_CreateDepthBuffer() {
+
+  vkConfig.depthBuffer.format = VK_FORMAT_D32_SFLOAT;  // VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT
+
+  VkImageCreateInfo imgInfo;
+  memset(&imgInfo, 0, sizeof(imgInfo));
+  imgInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+  imgInfo.imageType = VK_IMAGE_TYPE_2D;
+  imgInfo.extent.width = vkConfig.swapchain.imageExtent.width;
+  imgInfo.extent.height = vkConfig.swapchain.imageExtent.height;
+  imgInfo.extent.depth = 1u;
+  imgInfo.mipLevels = 1u;
+  imgInfo.arrayLayers = 1u;
+  imgInfo.format = vkConfig.depthBuffer.format;
+  imgInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+  imgInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  imgInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+  imgInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+  imgInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+  VK_CHECK(vkCreateImage(vkConfig.device, &imgInfo, VK_NULL_HANDLE,
+                         &vkConfig.depthBuffer.image),
+           "Failed to create depth image");
+
+  VkMemoryRequirements memReqs;
+  vkGetImageMemoryRequirements(vkConfig.device, vkConfig.depthBuffer.image,
+                               &memReqs);
+
+
+  VkMemoryAllocateInfo allocInfo;
+  allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+  allocInfo.pNext = VK_NULL_HANDLE;
+  allocInfo.allocationSize = memReqs.size;
+  allocInfo.memoryTypeIndex = findMemoryType(
+      memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+  VK_CHECK(vkAllocateMemory(vkConfig.device, &allocInfo, VK_NULL_HANDLE,
+                            &vkConfig.depthBuffer.imageMemory),
+           "Failed to allocate depth buffer memory");
+
+  vkBindImageMemory(vkConfig.device, vkConfig.depthBuffer.image,
+                    vkConfig.depthBuffer.imageMemory, 0u);
+
+  VkImageViewCreateInfo imageViewInfo;
+  memset(&imageViewInfo, 0, sizeof(imageViewInfo));
+  imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+  imageViewInfo.pNext = VK_NULL_HANDLE;
+  imageViewInfo.image = vkConfig.depthBuffer.image;
+  imageViewInfo.format = vkConfig.depthBuffer.format;
+  imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+  imageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+  imageViewInfo.subresourceRange.baseMipLevel = 0u;
+  imageViewInfo.subresourceRange.levelCount = 1u;
+  imageViewInfo.subresourceRange.baseArrayLayer = 0u;
+  imageViewInfo.subresourceRange.layerCount = 1u;
+
+  VK_CHECK(vkCreateImageView(vkConfig.device, &imageViewInfo, VK_NULL_HANDLE,
+                             &vkConfig.depthBuffer.imageView),
+           "Failed to create depth image view");
+}
+
+
+void VK_CreateCommandPool()
+{
+  VkCommandPoolCreateInfo command_pool_create_info;
+  memset(&command_pool_create_info, 0, sizeof(VkCommandPoolCreateInfo));
+  command_pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  command_pool_create_info.pNext = VK_NULL_HANDLE;
+  command_pool_create_info.flags =
+      VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+  command_pool_create_info.queueFamilyIndex = vkConfig.graphicsQueueFamily;
+
+  VK_CHECK(vkCreateCommandPool(vkConfig.device, &command_pool_create_info, NULL,
+                               &vkConfig.commandPool),
+           "Failed to create command pool");
 }
 
 /*

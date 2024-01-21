@@ -137,11 +137,11 @@ typedef struct {
 } VkSwapchain;
 
 typedef struct {
-  VkFormat swapchainDepthFormat;
+  VkFormat format;
 
-  VkImage *depthImage;
-  VkDeviceMemory *depthImageMemorys;
-  VkImageView *depthImageViews;
+  VkImage image;
+  VkDeviceMemory imageMemory;
+  VkImageView imageView;
 } VkDepthBuffer;
 
 typedef struct {
@@ -1467,12 +1467,16 @@ IMPLEMENTATION OF VULKAN SPECIFIC FUNCTIONS
     }                                                                          \
   }while (0)
 
+uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
 void VK_CreateInstance();
 void VK_PickPhysicalDevice();
 void VK_CreateSurface();
 void VK_CreateDevice();
 void VK_CreateSwapChain();
 void VK_CreateRenderPass();
+void VK_CreateDepthBuffer();
+void VK_CreateCommandPool();
     // VkSwapchainKHR VK_CreateSwapChain();
 
 /*
