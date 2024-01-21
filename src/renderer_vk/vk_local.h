@@ -131,8 +131,10 @@ typedef struct {
 
   VkDeviceMemory *swapchainDeviceMemorys;
   VkImageView *swapchainImageViews;
+  uint32_t swapchainImageViewsSize;
   VkFramebuffer
       *swapchainFramebuffers; // probably will changed to 2 elements array
+  uint32_t swapchainFramebuffersCount;
 
 } VkSwapchain;
 
@@ -143,6 +145,8 @@ typedef struct {
   VkDeviceMemory imageMemory;
   VkImageView imageView;
 } VkDepthBuffer;
+
+  const int32_t MAX_FRAMES_IN_FLIGHT;
 
 typedef struct {
   // Device related
@@ -155,6 +159,7 @@ typedef struct {
 
   VkCommandPool commandPool;
   VkCommandBuffer *commandBuffers;
+  uint32_t commandBufferSize;
   VkQueue presentQueue;
   uint32_t presentQueueFamily;
   qboolean hasPresentQueueFamily;
@@ -1477,7 +1482,8 @@ void VK_CreateSwapChain();
 void VK_CreateRenderPass();
 void VK_CreateDepthBuffer();
 void VK_CreateCommandPool();
-    // VkSwapchainKHR VK_CreateSwapChain();
+void VK_CreateCommandBuffers();
+void VK_CreateFramebuffers();
 
 /*
 ====================================================================

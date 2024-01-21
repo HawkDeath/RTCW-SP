@@ -20,6 +20,8 @@
 #define COUNT_OF(x)                                                            \
   ((sizeof(x) / sizeof(0 [x])) / ((size_t)(!(sizeof(x) % sizeof(0 [x])))))
 
+const int32_t MAX_FRAMES_IN_FLIGHT = 2;
+
 renderconfig_t renderConfig;
 vkContext vkConfig;
 glstate_t glState;
@@ -240,15 +242,16 @@ static void InitVulkan(void) {
   VK_CreateSwapChain();
   VK_CreateRenderPass();
   VK_CreateDepthBuffer();
+  VK_CreateFramebuffers();
   VK_CreateCommandPool();
+  VK_CreateCommandBuffers();
 
   // print info
   VkInfo_f();
 }
 
 // Vulkan stuff init
-uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
-{
+uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(vkConfig.physicalDevice, &memProperties);
 
@@ -447,7 +450,8 @@ void VK_CreateSwapChain() {
   VkSurfaceFormatKHR surfaceFormat;
   surfaceFormat.format = VK_FORMAT_B8G8R8A8_SRGB;
   surfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-  VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR; // TODO: add support VK_PRESENT_MODE_MAILBOX_KHR
+  VkPresentModeKHR presentMode =
+      VK_PRESENT_MODE_FIFO_KHR; // TODO: add support VK_PRESENT_MODE_MAILBOX_KHR
   VkExtent2D windowExtent;
   windowExtent.width = vkConfig.renderConfig->vidWidth;
   windowExtent.height = vkConfig.renderConfig->vidHeight;
@@ -457,8 +461,8 @@ void VK_CreateSwapChain() {
       vkConfig.physicalDevice, vkConfig.surface, &surfaceCapabilities);
 
   uint32_t imageCount = surfaceCapabilities.minImageCount + 1u;
-  if (surfaceCapabilities.maxImageCount > 0u && imageCount > surfaceCapabilities.maxImageCount)
-  {
+  if (surfaceCapabilities.maxImageCount > 0u &&
+      imageCount > surfaceCapabilities.maxImageCount) {
     imageCount = surfaceCapabilities.maxImageCount;
   }
 
@@ -476,8 +480,7 @@ void VK_CreateSwapChain() {
   uint32_t familesIndices[] = {vkConfig.graphicsQueueFamily,
                                vkConfig.presentQueueFamily};
 
-  if (vkConfig.graphicsQueueFamily != vkConfig.presentQueueFamily)
-  {
+  if (vkConfig.graphicsQueueFamily != vkConfig.presentQueueFamily) {
     swapchainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
     swapchainInfo.queueFamilyIndexCount = 2u;
     swapchainInfo.pQueueFamilyIndices = &familesIndices;
@@ -490,12 +493,11 @@ void VK_CreateSwapChain() {
   swapchainInfo.presentMode = presentMode;
   swapchainInfo.clipped = VK_TRUE;
 
-
   VK_CHECK(vkCreateSwapchainKHR(vkConfig.device, &swapchainInfo, NULL,
                                 &vkConfig.swapchain.swapchain),
            "Failed to create swapchain");
 
-  // TODO: get swapchain images 
+  // TODO: get swapchain images
 
   vkGetSwapchainImagesKHR(vkConfig.device, vkConfig.swapchain.swapchain,
                           &imageCount, VK_NULL_HANDLE);
@@ -507,6 +509,32 @@ void VK_CreateSwapChain() {
 
   vkConfig.swapchain.imageExtent = windowExtent;
   vkConfig.swapchain.swapchainImageFormat = surfaceFormat.format;
+
+  vkConfig.swapchain.swapchainImageViewsSize =
+      vkConfig.swapchain.swapchainImageCount;
+
+  vkConfig.swapchain.swapchainImageViews = (VkImageView *)calloc(
+      vkConfig.swapchain.swapchainImageViewsSize, sizeof(VkImageView));
+
+  for (uint32_t i = 0u; i < vkConfig.swapchain.swapchainImageViewsSize; ++i) {
+    VkImageViewCreateInfo view_info;
+    memset(&view_info, 0, sizeof(VkImageViewCreateInfo));
+    view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    view_info.pNext = VK_NULL_HANDLE;
+    view_info.image = vkConfig.swapchain.swapchainImage[i];
+    view_info.viewType = VK_IMAGE_TYPE_2D;
+    view_info.format = vkConfig.swapchain.swapchainImageFormat;
+
+    view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    view_info.subresourceRange.baseMipLevel = 0u;
+    view_info.subresourceRange.levelCount = 1u;
+    view_info.subresourceRange.baseArrayLayer = 0u;
+    view_info.subresourceRange.layerCount = 1u;
+
+    VK_CHECK(vkCreateImageView(vkConfig.device, &view_info, NULL,
+                               &vkConfig.swapchain.swapchainImageViews[i]),
+             "Failed to create swapchain image view");
+  }
 }
 
 void VK_CreateRenderPass() {
@@ -520,9 +548,9 @@ void VK_CreateRenderPass() {
   colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-
   VkAttachmentDescription depthAttachment;
-  depthAttachment.format = VK_FORMAT_D32_SFLOAT; // VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT
+  depthAttachment.format = VK_FORMAT_D32_SFLOAT; // VK_FORMAT_D32_SFLOAT_S8_UINT,
+                                                 // VK_FORMAT_D24_UNORM_S8_UINT
   depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
   depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
   depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -531,7 +559,6 @@ void VK_CreateRenderPass() {
   depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   depthAttachment.finalLayout =
       VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
 
   VkAttachmentReference colorAttachRef;
   colorAttachRef.attachment = 0u;
@@ -558,7 +585,6 @@ void VK_CreateRenderPass() {
   dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
                              VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-
   VkAttachmentDescription attachments[] = {colorAttachment, depthAttachment};
   VkRenderPassCreateInfo renderPassInfo;
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -572,13 +598,13 @@ void VK_CreateRenderPass() {
   VK_CHECK(vkCreateRenderPass(vkConfig.device, &renderPassInfo, VK_NULL_HANDLE,
                               &vkConfig.renderPass),
            "Failed to create render pass");
-
 }
-
 
 void VK_CreateDepthBuffer() {
 
-  vkConfig.depthBuffer.format = VK_FORMAT_D32_SFLOAT;  // VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT
+  vkConfig.depthBuffer.format =
+      VK_FORMAT_D32_SFLOAT; // VK_FORMAT_D32_SFLOAT_S8_UINT,
+                            // VK_FORMAT_D24_UNORM_S8_UINT
 
   VkImageCreateInfo imgInfo;
   memset(&imgInfo, 0, sizeof(imgInfo));
@@ -603,7 +629,6 @@ void VK_CreateDepthBuffer() {
   VkMemoryRequirements memReqs;
   vkGetImageMemoryRequirements(vkConfig.device, vkConfig.depthBuffer.image,
                                &memReqs);
-
 
   VkMemoryAllocateInfo allocInfo;
   allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -637,9 +662,7 @@ void VK_CreateDepthBuffer() {
            "Failed to create depth image view");
 }
 
-
-void VK_CreateCommandPool()
-{
+void VK_CreateCommandPool() {
   VkCommandPoolCreateInfo command_pool_create_info;
   memset(&command_pool_create_info, 0, sizeof(VkCommandPoolCreateInfo));
   command_pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -651,6 +674,55 @@ void VK_CreateCommandPool()
   VK_CHECK(vkCreateCommandPool(vkConfig.device, &command_pool_create_info, NULL,
                                &vkConfig.commandPool),
            "Failed to create command pool");
+}
+
+void VK_CreateCommandBuffers() {
+  vkConfig.commandBufferSize = MAX_FRAMES_IN_FLIGHT;
+  vkConfig.commandBuffers = (VkCommandBuffer *)calloc(
+      vkConfig.commandBufferSize, sizeof(VkCommandBuffer));
+
+  VkCommandBufferAllocateInfo alloc_info;
+  memset(&alloc_info, 0, sizeof(VkCommandBufferAllocateInfo));
+  alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  alloc_info.pNext = VK_NULL_HANDLE;
+  alloc_info.commandPool = vkConfig.commandPool;
+  alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  alloc_info.commandBufferCount = (uint32_t)vkConfig.commandBufferSize;
+
+  VK_CHECK(vkAllocateCommandBuffers(vkConfig.device, &alloc_info,
+                                    vkConfig.commandBuffers),
+           "Failed to allocate command buffers");
+}
+
+void VK_CreateFramebuffers() {
+  vkConfig.swapchain.swapchainFramebuffersCount =
+      vkConfig.swapchain.swapchainImageCount;
+
+  vkConfig.swapchain.swapchainFramebuffers = (VkFramebuffer *)calloc(
+      vkConfig.swapchain.swapchainFramebuffersCount, sizeof(VkFramebuffer));
+
+  for (uint32_t i = 0u; i < vkConfig.swapchain.swapchainFramebuffersCount;
+       ++i) {
+
+    VkImageView attachments[] = {vkConfig.swapchain.swapchainImageViews[i],
+                                 vkConfig.depthBuffer.imageView};
+
+    VkFramebufferCreateInfo framebuffer_info;
+    memset(&framebuffer_info, 0, sizeof(VkFramebufferCreateInfo));
+    framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebuffer_info.pNext = VK_NULL_HANDLE;
+    framebuffer_info.renderPass = vkConfig.renderPass;
+    framebuffer_info.attachmentCount = (uint32_t)COUNT_OF(attachments);
+    framebuffer_info.pAttachments = attachments;
+    framebuffer_info.width = vkConfig.swapchain.imageExtent.width;
+    framebuffer_info.height = vkConfig.swapchain.imageExtent.height;
+    framebuffer_info.layers = 1u;
+
+    VK_CHECK(vkCreateFramebuffer(vkConfig.device, &framebuffer_info, NULL,
+                                 &vkConfig.swapchain.swapchainFramebuffers[i]),
+             "Failed to create framebuffer");
+
+  }
 }
 
 /*
