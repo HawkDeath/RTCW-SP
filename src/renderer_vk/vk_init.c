@@ -539,6 +539,7 @@ void VK_CreateSwapChain() {
 
 void VK_CreateRenderPass() {
   VkAttachmentDescription colorAttachment;
+  memset(&colorAttachment, 0, sizeof(VkAttachmentDescription));
   colorAttachment.format = vkConfig.swapchain.swapchainImageFormat;
   colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
   colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -549,8 +550,10 @@ void VK_CreateRenderPass() {
   colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
   VkAttachmentDescription depthAttachment;
-  depthAttachment.format = VK_FORMAT_D32_SFLOAT; // VK_FORMAT_D32_SFLOAT_S8_UINT,
-                                                 // VK_FORMAT_D24_UNORM_S8_UINT
+  memset(&depthAttachment, 0, sizeof(VkAttachmentDescription));
+  depthAttachment.format =
+      VK_FORMAT_D32_SFLOAT; // VK_FORMAT_D32_SFLOAT_S8_UINT,
+                            // VK_FORMAT_D24_UNORM_S8_UINT
   depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
   depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
   depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -561,20 +564,29 @@ void VK_CreateRenderPass() {
       VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
   VkAttachmentReference colorAttachRef;
+  memset(&colorAttachRef, 0, sizeof(VkAttachmentReference));
   colorAttachRef.attachment = 0u;
   colorAttachRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
   VkAttachmentReference depthAttachRef;
+  memset(&depthAttachRef, 0, sizeof(VkAttachmentReference));
   depthAttachRef.attachment = 1u;
   depthAttachRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
   VkSubpassDescription subpass;
+  memset(&subpass, 0, sizeof(VkSubpassDependency));
+  subpass.inputAttachmentCount = 0u;
+  subpass.pInputAttachments = VK_NULL_HANDLE;
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass.colorAttachmentCount = 1u;
   subpass.pColorAttachments = &colorAttachRef;
   subpass.pDepthStencilAttachment = &depthAttachRef;
+  subpass.pResolveAttachments = VK_NULL_HANDLE;
+  subpass.preserveAttachmentCount = 0u;
+  subpass.pPreserveAttachments = VK_NULL_HANDLE;
 
   VkSubpassDependency dependency;
+  memset(&dependency, 0, sizeof(VkSubpassDependency));
   dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
   dependency.dstSubpass = 0u;
   dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
@@ -586,10 +598,14 @@ void VK_CreateRenderPass() {
                              VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
   VkAttachmentDescription attachments[] = {colorAttachment, depthAttachment};
+
   VkRenderPassCreateInfo renderPassInfo;
+  memset(&renderPassInfo, 0, sizeof(VkRenderPassCreateInfo));
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+  renderPassInfo.pNext = VK_NULL_HANDLE;
+  renderPassInfo.flags = 0u;
   renderPassInfo.attachmentCount = 2u;
-  renderPassInfo.pAttachments = &attachments;
+  renderPassInfo.pAttachments = attachments;
   renderPassInfo.subpassCount = 1u;
   renderPassInfo.pSubpasses = &subpass;
   renderPassInfo.dependencyCount = 1u;
@@ -721,7 +737,6 @@ void VK_CreateFramebuffers() {
     VK_CHECK(vkCreateFramebuffer(vkConfig.device, &framebuffer_info, NULL,
                                  &vkConfig.swapchain.swapchainFramebuffers[i]),
              "Failed to create framebuffer");
-
   }
 }
 
