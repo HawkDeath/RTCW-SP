@@ -25,7 +25,7 @@ add_subdirectory(src/cgame)
 add_subdirectory(src/game)
 
 if(WOLFSP_USE_RENDERER_VULKAN)
-    find_package(Vulkan REQUIRED FATAL_ERROR)
+    find_package(Vulkan REQUIRED)
     add_subdirectory(src/renderer_vk)
 else()
     add_subdirectory(src/renderer_gl)

@@ -53,6 +53,7 @@ CMakeSettings.json
 
 # Clion
 .idea/
+build-debug/
 cmake-build-debug/
 cmake-build-relase/
 cmake-build-relwithdebinfo/
