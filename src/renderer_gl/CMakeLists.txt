@@ -44,23 +44,45 @@ set(JPEG_SOURCES
     ../jpeg-6/jmemnobs.c
     ../jpeg-6/jutils.c
     )
+if (WIN32)
+    set(GL_API_H
+            ../win32/win_local.h
+            ../win32/resource.h
+            ../win32/glw_win.h
 
+    )
+else ()
+    set(GL_API_H
+            ../unix/linux_local.h
+            ../unix/unix_glw.h
+    )
+endif ()
 set(RENDERER_GL_HEADERS
     anorms256.h
     ../qcommon/cm_public.h
-    ../win32/glw_win.h
     ../jpeg-6/jchuff.h
     ../game/q_shared.h
     ../qcommon/qcommon.h
     ../qcommon/qfiles.h
     qgl.h
-    ../win32/resource.h
     ../game/surfaceflags.h
     tr_local.h
     tr_public.h
     ../cgame/tr_types.h
-    ../win32/win_local.h
+    ${GL_API_H}
     )
+
+if (WIN32)
+set(GL_API
+        ../win32/win_gamma.c
+        ../win32/win_glimp.c
+        ../win32/win_qgl.c)
+else ()
+    set(GL_API
+            ../unix/linux_qgl.c
+            ../unix/linux_glimp.c
+    )
+endif ()
 
 set(RENDERER_GL_SOURCES
     ${JPEG_SOURCES}
@@ -88,9 +110,7 @@ set(RENDERER_GL_SOURCES
     tr_sky.c
     tr_surface.c
     tr_world.c
-    ../win32/win_gamma.c
-    ../win32/win_glimp.c
-    ../win32/win_qgl.c
+    ${GL_API}
     )
 
 add_library(Renderer_GL STATIC ref_trin.def ${RENDERER_GL_SOURCES} ${RENDERER_GL_HEADERS})

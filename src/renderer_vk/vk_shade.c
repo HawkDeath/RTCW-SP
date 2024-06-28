@@ -36,7 +36,9 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // tr_shade.c
 
 #include "vk_local.h"
+#ifdef WIN32
 #include <Windows.h> // temporary
+#endif
 /*
 
   THIS ENTIRE FILE IS BACK END
@@ -70,6 +72,9 @@ R_DrawStripElements
 
 ===================
 */
+#define APIENTRY void
+#define GLint unsigned int
+
 static int c_vertexes; // for seeing how long our average strips are
 static int c_begins;
 static void R_DrawStripElements(int numIndexes, const unsigned int *indexes,

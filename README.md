@@ -13,3 +13,7 @@ RTCW-SP build system support only x86 Windows platform.
 
 ### Renderer TODO
 - [ ] Vulkan API support
+
+### Linux deps
+
+`` sudo dnf install libXxf86dga-devel libXxf86vm-devel``

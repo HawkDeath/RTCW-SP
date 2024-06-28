@@ -1112,8 +1112,7 @@ void RB_CalcRotateTexCoords(float degsPerSecond, float *st) {
                (defined __i386__)) // rb010123
 
 long myftol(float f) {
-  static int tmp;
-  __asm fld f __asm fistp tmp __asm mov eax, tmp
+  return (long)f;
 }
 
 #endif

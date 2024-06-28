@@ -58,7 +58,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
-#include "../renderer/tr_public.h"
+#include "../renderer_gl/tr_public.h"
 
 #include "linux_local.h" // bk001204
 
@@ -433,7 +433,7 @@ void Sys_ConsoleInputInit() {
 				  characters  EOF,  EOL,  EOL2, ERASE, KILL, REPRINT,
 				  STATUS, and WERASE, and buffers by lines.
 		 ISIG: when any of the characters  INTR,  QUIT,  SUSP,  or
-				  DSUSP are received, generate the corresponding sig­
+				  DSUSP are received, generate the corresponding sigï¿½
 				  nal
 		*/
 		tc.c_lflag &= ~( ECHO | ICANON );
@@ -660,7 +660,7 @@ void *Sys_LoadDll( const char *name,
 #elif defined __mips__
 	snprintf( fname, sizeof( fname ), "%smips.so", name );
 #else
-#error Unknown arch
+  snprintf( fname, sizeof( fname ), "%six86_64.so", name );
 #endif
 
 // bk001129 - was RTLD_LAZY

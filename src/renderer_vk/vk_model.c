@@ -38,7 +38,9 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "vk_local.h"
 #include "anorms256.h"
 
+#ifdef WIN32
 #include <Windows.h> // temporary
+#endif
 
 #define LL(x) x = LittleLong(x)
 

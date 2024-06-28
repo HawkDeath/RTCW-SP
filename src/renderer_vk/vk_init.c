@@ -289,7 +289,7 @@ void VK_CreateInstance() {
   createInfo.enabledLayerCount = 0u;
   createInfo.ppEnabledLayerNames = VK_NULL_HANDLE;
   createInfo.enabledExtensionCount = 2u;
-  createInfo.ppEnabledExtensionNames = extensions;
+  createInfo.ppEnabledExtensionNames = (const char* const *)extensions;
 
   VK_CHECK(vkCreateInstance(&createInfo, NULL, &vkConfig.instance),
            "Failed to create intance");

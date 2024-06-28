@@ -62,7 +62,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "../renderer/tr_local.h"
+#include "../renderer_gl/tr_local.h"
 #include "../client/client.h"
 #include "linux_local.h" // bk001130
 
@@ -367,7 +367,7 @@ static void install_grabs( void ) {
 	// inviso cursor
 	XWarpPointer( dpy, None, win,
 				  0, 0, 0, 0,
-				  glConfig.vidWidth / 2, glConfig.vidHeight / 2 );
+				  glConfig.renderConfig->vidWidth / 2, glConfig.renderConfig->vidHeight / 2 );
 	XSync( dpy, False );
 
 	XDefineCursor( dpy, win, CreateNullCursor( dpy, win ) );
@@ -404,8 +404,8 @@ static void install_grabs( void ) {
 		}
 	} else
 	{
-		mwx = glConfig.vidWidth / 2;
-		mwy = glConfig.vidHeight / 2;
+		mwx = glConfig.renderConfig->vidWidth / 2;
+		mwy = glConfig.renderConfig->vidHeight / 2;
 		mx = my = 0;
 	}
 
@@ -431,7 +431,7 @@ static void uninstall_grabs( void ) {
 
 	XWarpPointer( dpy, None, win,
 				  0, 0, 0, 0,
-				  glConfig.vidWidth / 2, glConfig.vidHeight / 2 );
+				  glConfig.renderConfig->vidWidth / 2, glConfig.renderConfig->vidHeight / 2 );
 
 	// inviso cursor
 	XUndefineCursor( dpy, win );
@@ -568,10 +568,10 @@ static void HandleEvents( void ) {
 				} else
 				{
 					// If it's a center motion, we've just returned from our warp
-					if ( event.xmotion.x == glConfig.vidWidth / 2 &&
-						 event.xmotion.y == glConfig.vidHeight / 2 ) {
-						mwx = glConfig.vidWidth / 2;
-						mwy = glConfig.vidHeight / 2;
+					if ( event.xmotion.x == glConfig.renderConfig->vidWidth / 2 &&
+						 event.xmotion.y == glConfig.renderConfig->vidHeight / 2 ) {
+						mwx = glConfig.renderConfig->vidWidth / 2;
+						mwy = glConfig.renderConfig->vidHeight / 2;
 						t = Sys_Milliseconds();
 						if ( t - mouseResetTime > MOUSE_RESET_DELAY ) {
 							Sys_QueEvent( t, SE_MOUSE, mx, my, 0, NULL );
@@ -664,7 +664,7 @@ static void HandleEvents( void ) {
 
 	if ( dowarp ) {
 		XWarpPointer( dpy,None,win,0,0,0,0,
-					  ( glConfig.vidWidth / 2 ),( glConfig.vidHeight / 2 ) );
+					  ( glConfig.renderConfig->vidWidth / 2 ),( glConfig.renderConfig->vidHeight / 2 ) );
 	}
 }
 
@@ -763,7 +763,7 @@ void GLimp_Shutdown( void ) {
 		if ( vidmode_active ) {
 			XF86VidModeSwitchToMode( dpy, scrnum, vidmodes[0] );
 		}
-		if ( glConfig.deviceSupportsGamma ) {
+		if ( glConfig.renderConfig->deviceSupportsGamma ) {
 			XF86VidModeSetGamma( dpy, scrnum, &vidmode_InitialGamma );
 		}
 		// NOTE TTimo opening/closing the display should be necessary only once per run
@@ -862,11 +862,11 @@ int GLW_SetMode( const char *drivername, int mode, qboolean fullscreen ) {
 
 	ri.Printf( PRINT_ALL, "...setting mode %d:", mode );
 
-	if ( !R_GetModeInfo( &glConfig.vidWidth, &glConfig.vidHeight, &glConfig.windowAspect, mode ) ) {
+	if ( !R_GetModeInfo( &glConfig.renderConfig->vidWidth, &glConfig.renderConfig->vidHeight, &glConfig.renderConfig->windowAspect, mode ) ) {
 		ri.Printf( PRINT_ALL, " invalid mode\n" );
 		return RSERR_INVALID_MODE;
 	}
-	ri.Printf( PRINT_ALL, " %d %d\n", glConfig.vidWidth, glConfig.vidHeight );
+	ri.Printf( PRINT_ALL, " %d %d\n", glConfig.renderConfig->vidWidth, glConfig.renderConfig->vidHeight );
 
 	if ( !( dpy = XOpenDisplay( NULL ) ) ) {
 		fprintf( stderr, "Error couldn't open the X display\n" );
@@ -876,8 +876,8 @@ int GLW_SetMode( const char *drivername, int mode, qboolean fullscreen ) {
 	scrnum = DefaultScreen( dpy );
 	root = RootWindow( dpy, scrnum );
 
-	actualWidth = glConfig.vidWidth;
-	actualHeight = glConfig.vidHeight;
+	actualWidth = glConfig.renderConfig->vidWidth;
+	actualHeight = glConfig.renderConfig->vidHeight;
 
 	// Get video mode list
 	if ( !XF86VidModeQueryVersion( dpy, &vidmode_MajorVersion, &vidmode_MinorVersion ) ) {
@@ -915,13 +915,13 @@ int GLW_SetMode( const char *drivername, int mode, qboolean fullscreen ) {
 
 			for ( i = 0; i < num_vidmodes; i++ )
 			{
-				if ( glConfig.vidWidth > vidmodes[i]->hdisplay ||
-					 glConfig.vidHeight > vidmodes[i]->vdisplay ) {
+				if ( glConfig.renderConfig->vidWidth > vidmodes[i]->hdisplay ||
+					 glConfig.renderConfig->vidHeight > vidmodes[i]->vdisplay ) {
 					continue;
 				}
 
-				x = glConfig.vidWidth - vidmodes[i]->hdisplay;
-				y = glConfig.vidHeight - vidmodes[i]->vdisplay;
+				x = glConfig.renderConfig->vidWidth - vidmodes[i]->hdisplay;
+				y = glConfig.renderConfig->vidHeight - vidmodes[i]->vdisplay;
 				dist = ( x * x ) + ( y * y );
 				if ( dist < best_dist ) {
 					best_dist = dist;
@@ -1140,16 +1140,16 @@ static void GLW_InitExtensions( void ) {
 	// GL_S3_s3tc
 	if ( Q_stristr( glConfig.extensions_string, "GL_S3_s3tc" ) ) {
 		if ( r_ext_compressed_textures->value ) {
-			glConfig.textureCompression = TC_S3TC;
+			glConfig.renderConfig->textureCompression = TC_S3TC;
 			ri.Printf( PRINT_ALL, "...using GL_S3_s3tc\n" );
 		} else
 		{
-			glConfig.textureCompression = TC_NONE;
+			glConfig.renderConfig->textureCompression = TC_NONE;
 			ri.Printf( PRINT_ALL, "...ignoring GL_S3_s3tc\n" );
 		}
 	} else
 	{
-		glConfig.textureCompression = TC_NONE;
+		glConfig.renderConfig->textureCompression = TC_NONE;
 		ri.Printf( PRINT_ALL, "...GL_S3_s3tc not found\n" );
 	}
 
@@ -1240,7 +1240,7 @@ static void GLW_InitGamma() {
   #define GAMMA_MINMAJOR 2
   #define GAMMA_MINMINOR 0
 
-	glConfig.deviceSupportsGamma = qfalse;
+	glConfig.renderConfig->deviceSupportsGamma = qfalse;
 
 	if ( vidmode_ext ) {
 		if ( vidmode_MajorVersion < GAMMA_MINMAJOR ||
@@ -1250,7 +1250,7 @@ static void GLW_InitGamma() {
 		}
 		XF86VidModeGetGamma( dpy, scrnum, &vidmode_InitialGamma );
 		ri.Printf( PRINT_ALL, "XF86 Gamma extension initialized\n" );
-		glConfig.deviceSupportsGamma = qtrue;
+		glConfig.renderConfig->deviceSupportsGamma = qtrue;
 	}
 }
 
@@ -1391,7 +1391,7 @@ void GLimp_Init( void ) {
 
 	// This values force the UI to disable driver selection
 	glConfig.driverType = GLDRV_ICD;
-	glConfig.hardwareType = GLHW_GENERIC;
+	glConfig.renderConfig->hardwareType = GLHW_GENERIC;
 
 	// get our config strings
 	Q_strncpyz( glConfig.vendor_string, qglGetString( GL_VENDOR ), sizeof( glConfig.vendor_string ) );
@@ -1414,7 +1414,7 @@ void GLimp_Init( void ) {
 	// them to their default state when the hardware is first installed/run.
 	//
 	if ( Q_stricmp( lastValidRenderer->string, glConfig.renderer_string ) ) {
-		glConfig.hardwareType = GLHW_GENERIC;
+		glConfig.renderConfig->hardwareType = GLHW_GENERIC;
 
 		ri.Cvar_Set( "r_textureMode", "GL_LINEAR_MIPMAP_NEAREST" );
 
@@ -1441,13 +1441,13 @@ void GLimp_Init( void ) {
 	// detected/initialized every startup should go.
 	//
 	if ( Q_stristr( buf, "banshee" ) || Q_stristr( buf, "Voodoo_Graphics" ) ) {
-		glConfig.hardwareType = GLHW_3DFX_2D3D;
+		glConfig.renderConfig->hardwareType = GLHW_3DFX_2D3D;
 	} else if ( Q_stristr( buf, "rage pro" ) || Q_stristr( buf, "RagePro" ) ) {
-		glConfig.hardwareType = GLHW_RAGEPRO;
+		glConfig.renderConfig->hardwareType = GLHW_RAGEPRO;
 	} else if ( Q_stristr( buf, "permedia2" ) ) {
-		glConfig.hardwareType = GLHW_PERMEDIA2;
+		glConfig.renderConfig->hardwareType = GLHW_PERMEDIA2;
 	} else if ( Q_stristr( buf, "riva 128" ) ) {
-		glConfig.hardwareType = GLHW_RIVA128;
+		glConfig.renderConfig->hardwareType = GLHW_RIVA128;
 	} else if ( Q_stristr( buf, "riva tnt " ) ) {
 	}
 
