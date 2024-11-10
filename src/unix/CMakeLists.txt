@@ -83,7 +83,7 @@ set(WOLFSP_SOURCES
         linux_qgl.c
         linux_snd.c
         unix_main.c
-        vm_x86.c
+        # vm_x86.c
         unix_shared.c
         unix_net.c
     )
@@ -99,5 +99,5 @@ target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_VK
     winmm wsock32 kernel32 user32 gdi32 winspool comdlg32 advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32)
 else()
 target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL
-    winmm wsock32 kernel32 user32 gdi32 winspool comdlg32 advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32)
+                        X11 Xxf86vm Xxf86dga)
 endif(WOLFSP_USE_RENDERER_VULKAN)

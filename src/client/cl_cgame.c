@@ -36,7 +36,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // cl_cgame.c  -- client system interaction with client game
 // clang-format off
 #include "client.h"
-
+#include "../qcommon/qcommon.h"
 #include "../game/botlib.h"
 // clang-format on
 
@@ -51,6 +51,7 @@ extern qboolean getCameraInfo(int camNum, int time, vec3_t *origin,
 extern void SV_SendMoveSpeedsToGame(int entnum, char *text);
 extern qboolean SV_GetModelInfo(int clientNum, char *modelName,
                                 animModelInfo_t **modelInfo);
+void Sys_SnapVector(float *v);
 
 /*
 ====================
@@ -751,7 +752,7 @@ int CL_CgameSystemCalls(int *args) {
   case CG_REAL_TIME:
     return Com_RealTime(VMA(1));
   case CG_SNAPVECTOR:
-    Sys_SnapVector(VMA(1));
+//    Sys_SnapVector(VMA(1)); // TODO: FIXME
     return 0;
 
   case CG_SENDMOVESPEEDSTOGAME:

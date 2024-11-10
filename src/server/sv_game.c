@@ -38,6 +38,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "server.h"
 
 #include "../game/botlib.h"
+#include "../qcommon/qcommon.h"
 // clang-format on
 
 botlib_export_t *botlib_export;
@@ -460,7 +461,7 @@ int SV_GameSystemCalls(int *args) {
   case G_REAL_TIME:
     return Com_RealTime(VMA(1));
   case G_SNAPVECTOR:
-    Sys_SnapVector(VMA(1));
+//    Sys_SnapVector(VMA(1)); // TODO: FIXME
     return 0;
   case G_GETTAG:
     return SV_GetTag(args[1], VMA(2), VMA(3));

@@ -1269,8 +1269,9 @@ void R_CalcBones(mdsHeader_t *header, const refEntity_t *refent, int *boneList,
           torsoWeight = thisBoneInfo->torsoWeight;
         }
         // multiply matrices to create one matrix to do all calculations
-        Matrix4MultiplyInto3x3AndTranslation(m2, m1, bonePtr->matrix,
-                                             bonePtr->translation);
+        // Matrix4MultiplyInto3x3AndTranslation(m2, m1, bonePtr->matrix,
+        //                                     bonePtr->translation);
+        // TODO: FIXME
 
       } else { // tag's require special handling
 

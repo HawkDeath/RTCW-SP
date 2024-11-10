@@ -60,76 +60,18 @@ static int pc;
 
 static int *instructionPointers;
 
-#ifdef _WIN32
 void AsmCall(void);
 int _ftol(float);
 
 // static	int		ftolPtr = (int)_ftol;
-static int asmCallPtr = (int)AsmCall;
+int* asmCallPtr = &AsmCall;
 
-#else
-
-void doAsmCall(void);
-
-static int asmCallPtr = (int)doAsmCall;
-#endif
 
 /*
 =================
 AsmCall
 =================
 */
-#ifdef _WIN32
-__declspec(naked) void AsmCall(void) {
-  static int programStack;
-  static int *opStack;
-  static int syscallNum;
-
-  __asm {
-		mov eax, dword ptr [edi]
-		sub edi, 4
-		or      eax,eax
-		jl systemCall
-        // calling another vm function
-		shl eax,2
-		add eax, dword ptr [instructionPointers]
-		call dword ptr [eax]
-		ret
-systemCall:
-
-        // convert negative num to system call number
-        // and store right before the first arg
-		neg eax
-		dec eax
-
-		mov dword ptr syscallNum, eax // so C code can get at it
-		mov dword ptr programStack, esi // so C code can get at it
-		mov dword ptr opStack, edi
-
-		push ecx
-		push esi // we may call recursively, so the
-		push edi // statics aren't guaranteed to be around
-  }
-
-  // save the stack to allow recursive VM entry
-  currentVM->programStack = programStack - 4;
-  *(int *)((byte *)currentVM->dataBase + programStack + 4) = syscallNum;
-  // VM_LogSyscalls(  (int *)((byte *)currentVM->dataBase + programStack + 4) );
-  *(opStack + 1) = currentVM->systemCall(
-      (int *)((byte *)currentVM->dataBase + programStack + 4));
-
-  _asm {
-		pop edi
-		pop esi
-		pop ecx
-		add edi, 4 // we added the return value
-
-		ret
-  }
-}
-
-#else
-
 static int callProgramStack;
 static int *callOpStack;
 static int callSyscallNum;
@@ -144,36 +86,19 @@ void callAsmCall(void) {
 }
 
 void AsmCall(void) {
-  __asm__("doAsmCall:                \n\t"
-          "	movl (%%edi),%%eax			\n\t"
-          "	subl $4,%%edi				\n\t"
-          "   orl %%eax,%%eax				\n\t"
-          "	jl systemCall				\n\t"
-          "	shll $2,%%eax				\n\t"
-          "	addl %3,%%eax				\n\t"
-          "	call *(%%eax)				\n\t"
-          "	jmp doret					\n\t"
-          "systemCall:					\n\t"
-          "	negl %%eax					\n\t"
-          "	decl %%eax					\n\t"
-          "	movl %%eax,%0				\n\t"
-          "	movl %%esi,%1				\n\t"
-          "	movl %%edi,%2				\n\t"
-          "	pushl %%ecx					\n\t"
-          "	pushl %%esi					\n\t"
-          "	pushl %%edi					\n\t"
-          "	call callAsmCall			\n\t"
-          "	popl %%edi					\n\t"
-          "	popl %%esi					\n\t"
-          "	popl %%ecx					\n\t"
-          "	addl $4,%%edi				\n\t"
-          "doret:							\n\t"
-          "	ret							\n\t"
-          : "=rm"(callSyscallNum), "=rm"(callProgramStack), "=rm"(callOpStack)
-          : "rm"(instructionPointers)
-          : "ax", "di", "si", "cx");
+  unsigned int eax = *(unsigned int*)instructionPointers;
+  instructionPointers -= 4;
+
+  if (eax == 0) {
+    eax = (eax << 2) + *(unsigned int*)callProgramStack;
+  }
+
+  void (*funcPtr)(void) = (void (*)(void))eax;
+  instructionPointers += 4;
+
+  funcPtr();
+
 }
-#endif
 
 static int Constant4(void) {
   int v;
@@ -798,16 +723,8 @@ int VM_CallCompiled(vm_t *vm, int *args) {
     memOpStack = opStack;
     memEntryPoint = entryPoint;
 
-    __asm__("	pushal				\r\n"
-            "	movl %0,%%esi		\r\n"
-            "	movl %1,%%edi		\r\n"
-            "	call *%2			\r\n"
-            "	movl %%esi,%0		\r\n"
-            "	movl %%edi,%1		\r\n"
-            "	popal				\r\n"
-            : "=m"(memProgramStack), "=m"(memOpStack)
-            : "m"(memEntryPoint), "0"(memProgramStack), "1"(memOpStack)
-            : "si", "di");
+    void (*funcPtr)(void) = (void (*)(void))memEntryPoint;
+    funcPtr();
 
     programStack = memProgramStack;
     opStack = memOpStack;
