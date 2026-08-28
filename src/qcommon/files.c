@@ -2704,7 +2704,7 @@ static void FS_AddGameDirectory(const char *path, const char *dir) {
     }
   }
 
-  qsort(sorted, numfiles, 4, paksort);
+  qsort(sorted, numfiles, sizeof(*sorted), paksort);
 
   for (i = 0; i < numfiles; i++) {
 

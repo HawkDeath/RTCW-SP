@@ -1090,14 +1090,15 @@ void Com_InitHunkMemory(void) {
     s_hunkTotal = cv->integer * 1024 * 1024;
   }
 
-  s_hunkData = malloc(s_hunkTotal + 31);
+  s_hunkData = malloc((s_hunkTotal + 31) & ~31);
   if (!s_hunkData) {
     Com_Error(ERR_FATAL, "Hunk data failed to allocate %i megs",
               s_hunkTotal / (1024 * 1024));
   }
   // cacheline align
-  s_hunkData = (byte *)(((int)s_hunkData + 31) & ~31);
+ // s_hunkData = (byte *)(((int)s_hunkData + 31) & ~31);
   Hunk_Clear();
+ // memset(s_hunkData, 0,  s_hunkTotal);
 
   Cmd_AddCommand("meminfo", Com_Meminfo_f);
 #ifdef HUNK_DEBUG
@@ -1230,7 +1231,7 @@ void *Hunk_AllocDebug(int size, ha_pref preference, char *label, char *file,
 #else
 void *Hunk_Alloc(int size, ha_pref preference) {
 #endif
-  void *buf;
+  void *buf = NULL;
 
   if (s_hunkData == NULL) {
     Com_Error(ERR_FATAL, "Hunk_Alloc: Hunk memory system not initialized");

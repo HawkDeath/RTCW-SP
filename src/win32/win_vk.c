@@ -3,8 +3,9 @@
 #include "glw_win.h"
 #include "win_local.h"
 
+#ifdef WIN32
 #include <Windows.h>
-
+#endif
 #include <stdio.h>
 
 static qboolean s_classRegistered = qfalse;

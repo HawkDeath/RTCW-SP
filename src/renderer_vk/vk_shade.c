@@ -36,7 +36,9 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 // tr_shade.c
 
 #include "vk_local.h"
+#ifdef WIN32
 #include <Windows.h> // temporary
+#endif
 /*
 
   THIS ENTIRE FILE IS BACK END

@@ -67,6 +67,6 @@ set(WOLFSP_UNIX_SOURCES
     linux_snd.c)
 
 add_executable(WolfSP quake3.xpm ${WOLFSP_UNIX_SOURCES} ${WOLFSP_UNIX_HEADERS})
-target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL dl Xxf86vm X11 Xxf86dga)
+target_link_libraries(WolfSP PRIVATE Splines botlib uix86 Renderer_GL dl X11 Xxf86vm  Xxf86dga)
 set_target_properties(WolfSP PROPERTIES COMPILE_FLAGS " " LINK_FLAGS " ")
 

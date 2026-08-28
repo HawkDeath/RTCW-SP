@@ -1352,9 +1352,9 @@ static qboolean R_LoadMDS(model_t *mod, void *buffer, const char *mod_name) {
 void RE_BeginRegistration(renderconfig_t *glconfigOut) {
   ri.Hunk_Clear(); // (SA) MEM NOTE: not in missionpack
 
+  glConfig.renderConfig = &renderConfig;
   R_Init();
   // *glconfigOut = glConfig;
-  glConfig.renderConfig = &renderConfig;
   *glconfigOut = renderConfig;
 
   R_SyncRenderThread();

@@ -1,5 +1,8 @@
 [] add macro id386; unix/sys_dosa.s need
 [] wtf !!?!?!?!? - vm_x86a.s -> why assembler, gcc is good ???
 [] build_setup.sh - ??????
-
+---------------------------------------------
+28/08/2026
+[] Fix audio initialization (device /dev/dsp)
+[] Crash on vmUI
 
