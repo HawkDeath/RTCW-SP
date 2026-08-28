@@ -4,5 +4,5 @@
 ---------------------------------------------
 28/08/2026
 [] Fix audio initialization (device /dev/dsp)
-[] Crash on vmUI
+[] Crash on vmUI - fix export/import dll/so
 
